@@ -10,8 +10,15 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@babel/core": "^7.4.5",
+    "@storybook/addon-info": "^5.1.9",
+    "@storybook/react": "^5.1.9",
     "@types/react": "^16.8.22",
     "@types/react-dom": "^16.8.4",
+    "@types/storybook__react": "^4.0.2",
+    "babel-loader": "^8.0.6",
+    "node-sass": "^4.12.0",
+    "react-docgen-typescript-loader": "^3.1.0",
     "source-map-loader": "^0.2.4",
     "ts-loader": "^6.0.4",
     "typescript": "^3.5.2",
@@ -19,7 +26,13 @@
     "webpack-cli": "^3.3.5"
   },
   "dependencies": {
+    "css-loader": "^3.0.0",
     "react": "^16.8.6",
-    "react-dom": "^16.8.6"
+    "react-dom": "^16.8.6",
+    "sass-loader": "^7.1.0",
+    "semantic-ui-css": "^2.4.1",
+    "semantic-ui-react": "^0.87.2",
+    "storm-react-diagrams": "^5.2.1",
+    "style-loader": "^0.23.1"
   }
 }
