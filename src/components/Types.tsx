@@ -7,15 +7,15 @@ export interface Tool {
 
 export interface CodaVal {};
 
-export interface Dic {[index: string]: CodaType}
+export interface Arguments {[index: string]: CodaType}
 
 export interface CodaType {};
 
 
 export interface Node {
-    // uuid: string;
+    taskid: string;
     name: string;
     pos: {x: number; y: number}
-    // inports: [Dic];
-    // outports: [Dic];
+    inports: Arguments;
+    outports: Arguments;
 }

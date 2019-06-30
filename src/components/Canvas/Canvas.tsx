@@ -1,14 +1,17 @@
 import {Node} from "../Types"
 import * as React from "react"
 import * as SRD from "storm-react-diagrams"
+import {TaskNodeModel} from "./TaskNodeModel"
 import * as _ from "lodash"
 
-type Graph = {nodes: Node[]};
+type Props = {
+      nodes: Node[]
+};
 
-export class Canvas extends React.Component<Graph, {}>{
+export class Canvas extends React.Component<Props, {}>{
     engine: SRD.DiagramEngine;
 
-    constructor(props: Graph){
+    constructor(props: Props){
         super(props);
         this.state = {};
         this.engine = new SRD.DiagramEngine();
@@ -17,16 +20,28 @@ export class Canvas extends React.Component<Graph, {}>{
         let nodes = _.map(
             this.props.nodes,
             (val) => {
-                let node = new SRD.DefaultNodeModel(val.name, "rgb(0,192,255)");
-                node.setPosition(val.pos.x, val.pos.y);
-                return (node)
+                return (new TaskNodeModel(val))
             })
         model.addAll(... nodes);
         this.engine.setDiagramModel(model);
+        model.serializeDiagram
     }
     render(){
         return(
-            <SRD.DiagramWidget className="srd-demo-canvas" diagramEngine={this.engine} />
+            <div className="srd-demo-workspace">
+                <div className="srd-demo-workspace__toolbar">
+                    <button
+                        onClick={() => {
+                            console.log(this.engine.getDiagramModel().serializeDiagram());
+                        }}
+                    >
+                        Print Graph
+                    </button>
+                </div>
+                <div className = "srd-demo-workspace__content">
+                    <SRD.DiagramWidget className="srd-demo-canvas" allowLooseLinks={false} diagramEngine={this.engine} />
+                </div>
+            </div>
         )
     }
 }

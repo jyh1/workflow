@@ -15,7 +15,14 @@ styleLink.rel = "stylesheet";
 styleLink.href = "https://cdn.jsdelivr.net/npm/semantic-ui/dist/semantic.min.css";
 document.head.appendChild(styleLink);
 
-let defNode = (i: number): Node => ({name: "step" + i, pos: {x: 100 * i, y: 100}})
+let defNode = (i: number): Node => (
+    {
+          name: "step" + i
+        , pos: {x: 100 * i, y: 100}
+        , taskid: i.toString()
+        , inports: {dataset1: {}, dataset2: {}}
+        , outports: {result: {}}
+    })
 
 let samples: Node[] = [
       defNode(1)
@@ -35,11 +42,7 @@ ReactDOM.render(
                     <Image src="https://react.semantic-ui.com/images/wireframe/paragraph.png"/>
                 </Grid.Column> */}
                 <Grid.Column width={10}>        
-                    <div className="srd-demo-workspace">
-                        <div className = "srd-demo-workspace__content">
-                            <Canvas nodes = {samples} />
-                        </div>
-                    </div>
+                    <Canvas nodes = {samples} />
                 </Grid.Column>
             </Grid.Row>
         </Grid>,
