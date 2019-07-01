@@ -9,6 +9,8 @@ import {Canvas} from "./components/Canvas/Canvas"
 import { SimpleDiagramWidget } from "./components/Hello";
 
 require("./components/demo.scss");
+require("./theme/galaxy/base.scss");
+
 
 const styleLink = document.createElement("link");
 styleLink.rel = "stylesheet";

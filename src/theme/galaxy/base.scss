@@ -1,0 +1,163 @@
+@import "./blue.scss";
+@import "~bootstrap-scss/bootstrap.scss";
+
+$fa-font-path: "~font-awesome-scss/fonts";
+@import "font-awesome-scss/scss/font-awesome.scss";
+
+@mixin border-radius($radius) {
+    // from font-awesome 3.0
+    -webkit-border-radius: $radius;
+    -moz-border-radius: $radius;
+    border-radius: $radius;
+}
+
+// toolform
+div.toolForm {
+    border: solid $form-border 1px;
+    @include border-radius($border-radius-base);
+}
+
+.toolForm.toolFormInCanvas {
+    @extend .card;
+    z-index: 100;
+    position: absolute;
+    border-color: $brand-primary;
+    &.toolForm-active {
+        z-index: 1001;
+        box-shadow: 0 0 0 2px $brand-primary;
+    }
+    .toolFormTitle {
+        @extend .card-header;
+        @extend .py-1;
+        @extend .px-2;
+        cursor: move;
+        background: $brand-secondary;
+    }
+    .toolFormBody {
+        @extend .card-body;
+        @extend .p-0;
+        @extend .mx-2;
+        .rule {
+            height: 0;
+            border: none;
+            border-bottom: dotted black 1px;
+            margin: 0 5px;
+        }
+    }
+}
+
+
+// form
+div.form,
+div.toolForm {
+    border: solid $form-border 1px;
+    @include border-radius($border-radius-base);
+}
+
+div.form-title,
+div.toolFormTitle {
+    // font-size: $font-size-base * 1.25;
+    // line-height: $line-height-base * 1.5;
+    padding: 5px 10px;
+    background: $form-heading-bg;
+    border-bottom: solid $form-border 1px;
+    word-wrap: break-word;
+}
+
+div.form-body {
+    padding: 5px 0;
+}
+
+div.form-row {
+    position: relative;
+    padding: 5px 10px;
+}
+
+div.form-title-row {
+    padding: 5px 10px;
+}
+
+div.repeat-group-item {
+    border-left: solid $form-border 5px;
+    margin-left: 10px;
+    margin-bottom: 10px;
+}
+
+div.form-row-error {
+    background: $state-danger-bg;
+}
+
+div.form-row label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 0.2em;
+}
+
+div.form-row label.inline {
+    display: inline;
+}
+
+div.form-row-input {
+    width: 90%;
+    float: left;
+}
+
+div.form-row-input label {
+    font-weight: normal;
+    display: inline;
+}
+
+.form-row.form-actions {
+    background: whiteSmoke;
+    border-top: solid #ddd 1px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-top: 5px;
+}
+
+// select
+@mixin user-select($select) {
+    -webkit-touch-callout: #{$select};
+    @each $pre in -webkit-, -moz-, -ms-, -o-, -khtml- {
+        #{$pre + user-select}: #{$select};
+    }
+    #{user-select}: #{$select};
+}
+.unselectable {
+    @include user-select(none);
+}
+
+// > label for input and output position
+.base-terminal {
+    @extend .fa;
+    @extend .fa-circle;
+    @extend .mt-1;
+    color: $white;
+    position: absolute;
+    z-index: 1500;
+    > icon {
+        @extend .fa;
+        @extend .fa-chevron-circle-right;
+        color: $brand-primary;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
+}
+.input-terminal {
+    @extend .base-terminal;
+    left: -9px;
+    &:hover > icon {
+        color: $brand-success;
+    }
+}
+.output-terminal {
+    @extend .base-terminal;
+    right: -9px;
+    &:hover > icon {
+        color: $brand-success;
+    }
+}
+.input-terminal-active.can-accept > icon {
+    color: $brand-success;
+}

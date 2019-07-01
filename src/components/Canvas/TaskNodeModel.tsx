@@ -1,8 +1,20 @@
-import { DefaultPortModel,  DefaultNodeModel, DiagramEngine, Toolkit} from "storm-react-diagrams";
+import { 
+      DefaultPortModel
+    , DefaultNodeModel
+    , DiagramEngine
+    , Toolkit
+    , AbstractNodeFactory
+    , BaseWidget
+    , BaseWidgetProps
+    , NodeModel
+    , DefaultLinkFactory
+    , DefaultLinkModel
+    , DefaultLinkWidget
+    } from "storm-react-diagrams";
+import * as React from "react";
 import * as _ from "lodash";
 import {Node} from "../Types"
-
-type TaskPortModel = DefaultPortModel;
+import {Table, TableHeader} from 'semantic-ui-react'
 
 export class TaskNodeModel extends DefaultNodeModel {
     extras : {taskid: string}
@@ -16,12 +28,208 @@ export class TaskNodeModel extends DefaultNodeModel {
         }
         this.inports = _.map(
             Object.keys(node.inports),
-            (val) => this.addInPort(val)
+            (val) => this.addPort(new TaskPortModel(true, Toolkit.UID(), val))
         );
         this.inports = _.map(
             Object.keys(node.outports),
-            (val) => this.addOutPort(val)
+            (val) => this.addPort(new TaskPortModel(false, Toolkit.UID(), val))
         );
         
     }
 }
+
+
+export class TaskNodeFactory extends AbstractNodeFactory<DefaultNodeModel> {
+	constructor() {
+		super("default");
+	}
+
+	generateReactWidget(diagramEngine: DiagramEngine, node: TaskNodeModel): JSX.Element {
+		return React.createElement(TaskNodeWidget, {
+			node: node,
+			diagramEngine: diagramEngine
+		});
+	}
+
+	getNewInstance(initialConfig?: any): DefaultNodeModel {
+		return new DefaultNodeModel();
+	}
+}
+
+// widget
+export interface TaskNodeProps extends BaseWidgetProps {
+	node: DefaultNodeModel;
+	diagramEngine: DiagramEngine;
+}
+
+export class TaskNodeWidget extends BaseWidget<TaskNodeProps, {}> {
+	constructor(props: TaskNodeProps) {
+		super("srd-default-node", props);
+		this.state = {};
+	}
+
+	generatePort(port: TaskPortModel) {
+		return ( <TaskPortWidget model={port} key={port.id} />)
+	}
+
+	render() {
+		return (
+            <div className={"toolForm toolFormInCanvas toolForm-active"}>
+                {/* title */}
+                <div className={"toolFormTitle"}>
+                    <i className={"code icon"}/>
+                    <span>{this.props.node.name}</span>
+                </div>
+                {/* inputs */}
+                <div>
+                    <div className={"toolFormBody"}>
+                        {_.map(this.props.node.getInPorts(), this.generatePort.bind(this))}
+                    </div>
+                </div>
+                {/* divider */}
+                <div className={"ui divider"}/>
+                {/* outputs */}
+                <div>
+                    <div className={"toolFormBody"}>
+                        {_.map(this.props.node.getOutPorts(), this.generatePort.bind(this))}
+                    </div>
+                </div>
+            </div>
+		);
+	}
+}
+
+// port widget 
+export interface TaskPortWidgetProps extends BaseWidgetProps {
+	model: TaskPortModel;
+}
+export class TaskPortWidget extends BaseWidget<TaskPortWidgetProps, {}> {
+	constructor(props: TaskPortWidgetProps) {
+		super("task-port", props);
+	}
+
+	getClassName() {
+		return "form-row";
+	}
+
+	render() {
+		let terminal = <TaskTerminalWidget input={this.props.model.in} node={this.props.model.getParent()} name={this.props.model.name} />;
+        let label = this.props.model.label;
+        let content;
+        if (this.props.model.in){
+            content = [terminal, label]
+        } else{
+            content = [label, terminal]
+        }
+		return (
+			<div {...this.getProps()}>
+                {...content}
+			</div>
+		);
+	}
+}
+
+// terminal
+export interface TaskTerminalProps extends BaseWidgetProps {
+	name: string;
+    node: NodeModel;
+    input: boolean;
+}
+
+export class TaskTerminalWidget extends BaseWidget<TaskTerminalProps, {selected: boolean}> {
+	constructor(props: TaskTerminalProps) {
+		super("srd-port", props);
+		this.state = {
+			selected: false
+		};
+	}
+
+	getClassName() {
+        // (this.state.selected ? this.bem("--selected") : "") +
+		return "port " + (this.props.input ? "input" : "output") + "-terminal";        
+	}
+
+	render() {
+        let icon = React.createElement("icon");
+		return (
+			<div
+				{...this.getProps()}
+				onMouseEnter={() => {
+					this.setState({ selected: true });
+				}}
+				onMouseLeave={() => {
+					this.setState({ selected: false });
+				}}
+				data-name={this.props.name}
+				data-nodeid={this.props.node.getID()}
+			>
+                {icon}
+            </div>
+		);
+	}
+}
+
+
+// task link factory
+export class TaskLinkModel extends DefaultLinkModel {
+	constructor() {
+        super("default");
+        this.color = "rgba(1, 89, 140, 0.5)"
+		// this.width = 10;
+	}
+}
+
+export class TaskPortModel extends DefaultPortModel {
+	createLinkModel(): TaskLinkModel | null {
+		return new TaskLinkModel();
+	}
+}
+
+export class TaskLinkFactory extends DefaultLinkFactory {
+	constructor() {
+		super();
+	}
+
+	getNewInstance(initialConfig?: object): TaskLinkModel {
+		return new TaskLinkModel();
+	}
+
+	// generateLinkSegment(model: TaskLinkModel, widget: DefaultLinkWidget, selected: boolean, path: string) {
+	// 	return (
+	// 		<g>
+	// 			<TaskLinkSegment model={model} path={path} />
+	// 		</g>
+	// 	);
+	// }
+}
+
+// interface TaskLinkSegmentProps { model: TaskLinkModel; path: string }
+
+// export class TaskLinkSegment extends React.Component<TaskLinkSegmentProps> {
+// 	path: SVGPathElement;
+// 	circle: SVGCircleElement;
+// 	callback: () => any;
+// 	percent: number;
+// 	handle: any;
+// 	mounted: boolean;
+
+// 	constructor(props: TaskLinkSegmentProps) {
+// 		super(props);
+// 		this.percent = 0;
+// 	}
+
+// 	render() {
+// 		return (
+// 			<>
+// 				<path
+// 					ref={ref => {
+// 						this.path = ref;
+// 					}}
+// 					strokeWidth={this.props.model.width}
+// 					stroke="rgba(255,0,0,0.5)"
+// 					d={this.props.path}
+// 				/>
+// 			</>
+// 		);
+// 	}
+// }

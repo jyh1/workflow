@@ -1,7 +1,7 @@
 import {Node} from "../Types"
 import * as React from "react"
 import * as SRD from "storm-react-diagrams"
-import {TaskNodeModel} from "./TaskNodeModel"
+import {TaskNodeModel, TaskNodeFactory, TaskLinkFactory} from "./TaskNodeModel"
 import * as _ from "lodash"
 
 type Props = {
@@ -16,6 +16,8 @@ export class Canvas extends React.Component<Props, {}>{
         this.state = {};
         this.engine = new SRD.DiagramEngine();
         this.engine.installDefaultFactories();
+        this.engine.registerNodeFactory(new TaskNodeFactory());
+        this.engine.registerLinkFactory(new TaskLinkFactory());
         let model = new SRD.DiagramModel();
         let nodes = _.map(
             this.props.nodes,
