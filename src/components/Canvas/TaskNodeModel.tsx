@@ -169,11 +169,13 @@ export class TaskTerminalWidget extends BaseWidget<TaskTerminalProps, {selected:
 		return "port " + terminal + "-terminal";        
 	}
 	removeLinks(){
-		let port = this.props.port
-		let hasLink = Object.keys(port.links).length > 0
-		if (hasLink){
-			_.mapValues(port.links, (l) => l.remove())
-			this.props.node.refresh()	
+		if (this.props.input) {
+			let port = this.props.port
+			let hasLink = Object.keys(port.links).length > 0
+			if (hasLink){
+				_.mapValues(port.links, (l) => l.remove())
+				this.props.node.refresh()	
+			}
 		}
 	}
 
