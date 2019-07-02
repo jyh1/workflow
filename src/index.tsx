@@ -35,7 +35,7 @@ let samples: Node[] = [
 ReactDOM.render(
     // <Hello compiler="TypeScript" framework="React" />,
     // <Container>
-        <Grid celled divided="vertically">
+        <Grid celled divided="vertically" style={{height: "100%"}}>
             <Grid.Row columns={2}>
                 <Grid.Column width={3}>
                     <Image src="https://react.semantic-ui.com/images/wireframe/paragraph.png"/>

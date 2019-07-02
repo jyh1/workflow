@@ -9,18 +9,19 @@ import {
     , NodeModel
     , DefaultLinkFactory
     , DefaultLinkModel
-    , DefaultLinkWidget
+	, DefaultLinkWidget
     } from "storm-react-diagrams";
 import * as React from "react";
 import * as _ from "lodash";
 import {Node} from "../Types"
-import {Table, TableHeader} from 'semantic-ui-react'
+import {Button, Icon} from 'semantic-ui-react'
 
 export class TaskNodeModel extends DefaultNodeModel {
     extras : {taskid: string}
     inports : TaskPortModel[]
-    outports: TaskPortModel[]
-    constructor(node: Node){
+	outports: TaskPortModel[]
+	refresh: () => void
+    constructor(node: Node, refresh: () => void){
         super(node.name);
         [this.x, this.y] = [node.pos.x, node.pos.y];
         this.extras = {
@@ -33,9 +34,13 @@ export class TaskNodeModel extends DefaultNodeModel {
         this.inports = _.map(
             Object.keys(node.outports),
             (val) => this.addPort(new TaskPortModel(false, Toolkit.UID(), val))
-        );
-        
-    }
+		);
+		this.refresh = refresh;
+	}
+	removeAndRefresh(){
+		this.remove()
+		this.refresh()
+	}
 }
 
 
@@ -58,7 +63,7 @@ export class TaskNodeFactory extends AbstractNodeFactory<DefaultNodeModel> {
 
 // widget
 export interface TaskNodeProps extends BaseWidgetProps {
-	node: DefaultNodeModel;
+	node: TaskNodeModel;
 	diagramEngine: DiagramEngine;
 }
 
@@ -74,9 +79,12 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, {}> {
 
 	render() {
 		return (
-            <div className={"toolForm toolFormInCanvas toolForm-active"}>
+            <div className={"toolForm toolFormInCanvas " + (this.props.node.selected ? "toolForm-active" : "")}>
                 {/* title */}
                 <div className={"toolFormTitle"}>
+					<Button.Group basic size="small" style={{float: "right"}}>
+						<Button icon='close' style={{padding: "0"}}  onClick={()=>this.props.node.removeAndRefresh()}/>
+					</Button.Group>
                     <i className={"code icon"}/>
                     <span>{this.props.node.name}</span>
                 </div>
@@ -113,17 +121,23 @@ export class TaskPortWidget extends BaseWidget<TaskPortWidgetProps, {}> {
 	}
 
 	render() {
-		let terminal = <TaskTerminalWidget input={this.props.model.in} node={this.props.model.getParent()} name={this.props.model.name} />;
+		let terminal = 
+			<TaskTerminalWidget 
+				input={this.props.model.in} 
+				node={this.props.model.getParent() as TaskNodeModel} 
+				name={this.props.model.name} 
+				port={this.props.model}
+			/>;
         let label = this.props.model.label;
-        let content;
-        if (this.props.model.in){
-            content = [terminal, label]
-        } else{
-            content = [label, terminal]
-        }
+        // let content;
+        // if (this.props.model.in){
+        //     content = [terminal, label]
+        // } else{
+        //     content = [label, terminal]
+        // }
 		return (
 			<div {...this.getProps()}>
-                {...content}
+                {terminal}{label}
 			</div>
 		);
 	}
@@ -132,8 +146,9 @@ export class TaskPortWidget extends BaseWidget<TaskPortWidgetProps, {}> {
 // terminal
 export interface TaskTerminalProps extends BaseWidgetProps {
 	name: string;
-    node: NodeModel;
-    input: boolean;
+    node: TaskNodeModel;
+	input: boolean;
+	port: TaskPortModel;
 }
 
 export class TaskTerminalWidget extends BaseWidget<TaskTerminalProps, {selected: boolean}> {
@@ -145,8 +160,21 @@ export class TaskTerminalWidget extends BaseWidget<TaskTerminalProps, {selected:
 	}
 
 	getClassName() {
-        // (this.state.selected ? this.bem("--selected") : "") +
-		return "port " + (this.props.input ? "input" : "output") + "-terminal";        
+		let hasLink = Object.keys(this.props.port.links).length > 0
+		let terminal;
+		if (this.props.input){
+			terminal = "input"
+			if (hasLink && this.state.selected) {terminal = "delete"}
+		} else { terminal = "output" }
+		return "port " + terminal + "-terminal";        
+	}
+	removeLinks(){
+		let port = this.props.port
+		let hasLink = Object.keys(port.links).length > 0
+		if (hasLink){
+			_.mapValues(port.links, (l) => l.remove())
+			this.props.node.refresh()	
+		}
 	}
 
 	render() {
@@ -162,6 +190,7 @@ export class TaskTerminalWidget extends BaseWidget<TaskTerminalProps, {selected:
 				}}
 				data-name={this.props.name}
 				data-nodeid={this.props.node.getID()}
+				onClick={this.removeLinks.bind(this)}
 			>
                 {icon}
             </div>
@@ -182,6 +211,12 @@ export class TaskLinkModel extends DefaultLinkModel {
 export class TaskPortModel extends DefaultPortModel {
 	createLinkModel(): TaskLinkModel | null {
 		return new TaskLinkModel();
+	}
+	canLinkToPort(port: DefaultPortModel): boolean{
+		if (this.in || !port.in) {return false}
+		if (Object.keys(port.links).length > 1) {return false}
+		if (port.getParent() == this.getParent()) {return false}
+		return true;
 	}
 }
 

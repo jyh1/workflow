@@ -20,6 +20,7 @@ div.toolForm {
 .toolForm.toolFormInCanvas {
     @extend .card;
     z-index: 100;
+    min-width: 10em;
     position: absolute;
     border-color: $brand-primary;
     &.toolForm-active {
@@ -160,4 +161,19 @@ div.form-row-input label {
 }
 .input-terminal-active.can-accept > icon {
     color: $brand-success;
+}
+
+.delete-terminal {
+    @extend .btn;
+    @extend .btn-sm;
+    @extend .btn-primary;
+    @extend .fa;
+    @extend .fa-minus-circle;
+    @extend .p-1;
+    @extend .mt-1;
+    position: absolute;
+    z-index: 2500;
+    top: 0px;
+    left: -15px;
+    cursor: pointer;
 }

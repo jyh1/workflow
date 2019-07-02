@@ -22,11 +22,10 @@ export class Canvas extends React.Component<Props, {}>{
         let nodes = _.map(
             this.props.nodes,
             (val) => {
-                return (new TaskNodeModel(val))
+                return (new TaskNodeModel(val, this.forceUpdate.bind(this)))
             })
         model.addAll(... nodes);
         this.engine.setDiagramModel(model);
-        model.serializeDiagram
     }
     render(){
         return(
@@ -41,7 +40,12 @@ export class Canvas extends React.Component<Props, {}>{
                     </button>
                 </div>
                 <div className = "srd-demo-workspace__content">
-                    <SRD.DiagramWidget className="srd-demo-canvas" allowLooseLinks={false} diagramEngine={this.engine} />
+                    <SRD.DiagramWidget 
+                        className="srd-demo-canvas" 
+                        allowLooseLinks={false} 
+                        diagramEngine={this.engine} 
+                        // maxNumberPointsPerLink={0}
+                    />
                 </div>
             </div>
         )
