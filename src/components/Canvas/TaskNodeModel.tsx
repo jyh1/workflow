@@ -14,7 +14,7 @@ import {
 import * as React from "react";
 import * as _ from "lodash";
 import {Node} from "../Types"
-import {Button, Icon} from 'semantic-ui-react'
+import {Button, Icon, Divider} from 'semantic-ui-react'
 
 export class TaskNodeModel extends DefaultNodeModel {
     extras : {taskid: string}
@@ -96,7 +96,7 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, {}> {
                     </div>
                 </div>
                 {/* divider */}
-                <div className={"ui divider"}/>
+                <Divider />
                 {/* outputs */}
                 <div>
                     <div className={"toolFormBody"}>

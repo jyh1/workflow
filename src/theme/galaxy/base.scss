@@ -20,6 +20,8 @@ div.toolForm {
 .toolForm.toolFormInCanvas {
     @extend .card;
     z-index: 100;
+    font-weight: 700;
+    font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif;
     min-width: 10em;
     position: absolute;
     border-color: $brand-primary;

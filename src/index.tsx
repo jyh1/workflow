@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import {Container, List, Grid} from 'semantic-ui-react'
+import {Header, List, Grid, Divider} from 'semantic-ui-react'
 import {Node, Task, TaskElement, TaskFolder} from "./components/Types"
 import {Canvas} from "./components/Canvas/Canvas"
 import {renderTaskElementntList} from "./components/TaskList/TaskList"
@@ -60,7 +60,9 @@ ReactDOM.render(
         <Grid celled divided="vertically" style={{height: "100%"}}>
             <Grid.Row columns={2}>
                 <Grid.Column width={3}>
-                    <List>
+                    <Header as="h2">Tools</Header>
+                    <Divider />
+                    <List divided relaxed>
                         {...renderTaskElementntList(testtasks)}
                     </List>
                 </Grid.Column>

@@ -24,9 +24,9 @@ export class TaskFolderWidget extends React.Component<Props, {expand: boolean}>{
                 <List.Icon className="folder-elem" onClick = {this.toggle} name={expand ? 'folder open outline' : 'folder outline'}/>
                 <List.Content className="folder-elem">
                     <List.Header onClick = {this.toggle} >{folder.name}</List.Header>
-                    <List.Description></List.Description>
+                    <List.Description>short description</List.Description>
                 </List.Content>
-                <List.List style = {{display: (expand? "block" : "none")}}>
+                <List.List className={"ui relaxed divided"} style = {{display: (expand? "block" : "none")}}>
                     {...renderTaskElementntList(folder.contents)}
                 </List.List>
 
@@ -53,7 +53,7 @@ export class TaskWidget extends React.Component<TaskProps, {}>{
                 <List.Icon name="code"/>
                 <List.Content>
                     <List.Header>{task.name}</List.Header>
-                    <List.Description></List.Description>
+                    <List.Description>short description</List.Description>
                 </List.Content>
             </List.Item>
         )
