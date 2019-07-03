@@ -1,4 +1,4 @@
-import {Node} from "../Types"
+import {Node, taskTag, Task} from "../Types"
 import * as React from "react"
 import * as SRD from "storm-react-diagrams"
 import {TaskNodeModel, TaskNodeFactory, TaskLinkFactory} from "./TaskNodeModel"
@@ -10,6 +10,7 @@ type Props = {
 
 export class Canvas extends React.Component<Props, {}>{
     engine: SRD.DiagramEngine;
+    refresh: () => void;
 
     constructor(props: Props){
         super(props);
@@ -19,14 +20,33 @@ export class Canvas extends React.Component<Props, {}>{
         this.engine.registerNodeFactory(new TaskNodeFactory());
         this.engine.registerLinkFactory(new TaskLinkFactory());
         let model = new SRD.DiagramModel();
+        this.refresh = this.forceUpdate.bind(this)
         let nodes = _.map(
             this.props.nodes,
             (val) => {
-                return (new TaskNodeModel(val, this.forceUpdate.bind(this)))
+                return (new TaskNodeModel(val, this.refresh))
             })
         model.addAll(... nodes);
         this.engine.setDiagramModel(model);
     }
+
+    processDrop: React.DragEventHandler = (event) => {
+        event.preventDefault()
+        let data = event.dataTransfer.getData(taskTag);
+        // console.log(data)
+        let task: Task;
+        try {
+                task = JSON.parse(data);
+              } catch (e) {
+                return
+              }
+        const pos = this.engine.getRelativeMousePoint(event)
+        const node: Node = {taskInfo: task, pos, name: task.name}
+        // console.log(node)
+        this.engine.getDiagramModel().addNode(new TaskNodeModel(node, this.refresh))
+        this.refresh()
+    }
+
     render(){
         return(
             <div className="srd-demo-workspace">
@@ -39,13 +59,19 @@ export class Canvas extends React.Component<Props, {}>{
                         Print Graph
                     </button>
                 </div>
-                <div className = "srd-demo-workspace__content">
-                    <SRD.DiagramWidget 
-                        className="srd-demo-canvas" 
-                        allowLooseLinks={false} 
-                        diagramEngine={this.engine} 
-                        // maxNumberPointsPerLink={0}
-                    />
+                <div
+                    style={{height: "100%"}}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={this.processDrop}
+                >
+                    <div className = "srd-demo-workspace__content">
+                        <SRD.DiagramWidget 
+                            className="srd-demo-canvas" 
+                            allowLooseLinks={false} 
+                            diagramEngine={this.engine} 
+                            // maxNumberPointsPerLink={0}
+                        />
+                    </div>
                 </div>
             </div>
         )

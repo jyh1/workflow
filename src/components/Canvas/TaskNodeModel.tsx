@@ -23,16 +23,17 @@ export class TaskNodeModel extends DefaultNodeModel {
 	refresh: () => void
     constructor(node: Node, refresh: () => void){
         super(node.name);
-        [this.x, this.y] = [node.pos.x, node.pos.y];
+		[this.x, this.y] = [node.pos.x, node.pos.y];
+		let task = node.taskInfo
         this.extras = {
-            taskid: node.taskid
+            taskid: task.taskid
         }
         this.inports = _.map(
-            Object.keys(node.inports),
+            Object.keys(task.inports),
             (val) => this.addPort(new TaskPortModel(true, Toolkit.UID(), val))
         );
         this.inports = _.map(
-            Object.keys(node.outports),
+            Object.keys(task.outports),
             (val) => this.addPort(new TaskPortModel(false, Toolkit.UID(), val))
 		);
 		this.refresh = refresh;

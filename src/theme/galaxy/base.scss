@@ -177,3 +177,15 @@ div.form-row-input label {
     left: -15px;
     cursor: pointer;
 }
+
+
+// task list
+.folder-elem {
+    @extend .unselectable;
+    cursor: pointer;
+}
+
+.file-elem{
+    @extend .unselectable;
+    cursor: grab;
+}
