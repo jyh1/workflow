@@ -29,3 +29,10 @@ export const taskTag = "task"
 
 export type TaskFolder = {name: string; contents: TaskElement[]}
 export type TaskElement = TaskFolder | Task
+
+export type LoginRequest = (username: string, password: string) => Promise<{}>
+
+export const endPointPath = {
+      login: "/login"
+    , mainapp: "/"
+}
