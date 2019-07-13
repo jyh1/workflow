@@ -41,7 +41,7 @@ export class Canvas extends React.Component<Props, {}>{
                 return
               }
         const pos = this.engine.getRelativeMousePoint(event)
-        const node: Node = {taskInfo: task, pos, name: task.name}
+        const node: Node = {taskInfo: task, pos, name: ""}
         // console.log(node)
         this.engine.getDiagramModel().addNode(new TaskNodeModel(node, this.refresh))
         this.refresh()
