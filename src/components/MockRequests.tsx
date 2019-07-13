@@ -2,6 +2,9 @@
 import {LoginRequest, TaskInfoRequest, Task, TaskListRequest, TaskElement, TaskId, TaskListElement} from "./Types"
 import * as _ from "lodash"
 
+let latency = 3000
+let reqtime = () => latency * Math.random()
+
 export const loginReq: LoginRequest = (username, password) => (
     new Promise((executor, resolve) => {
         setTimeout(
@@ -13,7 +16,7 @@ export const loginReq: LoginRequest = (username, password) => (
                     resolve()
                 }
             }
-        , 300)
+        , reqtime())
     })
 )
 
@@ -28,7 +31,7 @@ export const taskReq: TaskInfoRequest = (taskid) => (
             () => {
                 executor(defTask(taskid.toString()))
             }
-        , 300)
+        , reqtime())
     })
 )
 
@@ -36,9 +39,9 @@ export const taskListReq: TaskListRequest = () => (
     new Promise((executor, resolve) => {
         setTimeout(
             () => {
-                executor(_.flatMap([null, null, null,null, null, null], () => toListEle(genEle())))
+                executor(_.flatMap([1, 1, 1,1, 1, 1], (i) => toListEle(genEle(i))))
             }
-            , 300)
+            , reqtime())
     })
 )
 
@@ -54,13 +57,15 @@ let coin:()=> boolean = () => (Math.random() > 0.35)
 
 let numEle = 0
 
-function genEle():TaskElement {
+function genEle(dep: number):TaskElement {
+    let newdep = dep + 1
     numEle += 1
     let id = numEle.toString()
+    if (dep > 5) {return ({name: "task" + id, taskid: id, id: id})}
     return (
         coin() ? 
               {name: "task" + id, taskid: id, id: id} 
-            : {name: "folder" + id, children: _.map([null, null, null], genEle), id: id}
+            : {name: "folder" + id, children: _.map([newdep, newdep, newdep], genEle), id: id}
     )
 }
 

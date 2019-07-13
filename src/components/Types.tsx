@@ -15,7 +15,7 @@ export interface CodaType {};
 export interface Node {
     name: string
     pos: {x: number; y: number}
-    taskInfo: Task
+    taskid: TaskId
 }
 
 export type TaskId = string
@@ -27,6 +27,7 @@ export interface Task {
 }
 
 export const taskTag = "task"
+export type TaskDragType = {name: string, id: string}
 
 export type TaskElement = {name: string, id: string} & ({children: TaskElement[]} | {taskid: TaskId})
 

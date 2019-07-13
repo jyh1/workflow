@@ -1,8 +1,9 @@
-import {Node, taskTag, Task} from "../Types"
+import {Node, taskTag, TaskDragType, Task} from "../Types"
 import * as React from "react"
 import * as SRD from "storm-react-diagrams"
 import {TaskNodeModel, TaskNodeFactory, TaskLinkFactory} from "./TaskNodeModel"
 import * as _ from "lodash"
+import {taskReq} from "../MockRequests"
 
 type Props = {
       nodes: Node[]
@@ -34,17 +35,15 @@ export class Canvas extends React.Component<Props, {}>{
         event.preventDefault()
         let data = event.dataTransfer.getData(taskTag);
         // console.log(data)
-        let task: Task;
+        let dragged: TaskDragType;
         try {
-                task = JSON.parse(data);
-              } catch (e) {
-                return
-              }
+                dragged = JSON.parse(data);
+            } catch (e) {return}
         const pos = this.engine.getRelativeMousePoint(event)
-        const node: Node = {taskInfo: task, pos, name: ""}
-        // console.log(node)
+        let node : Node = {pos, name: dragged.name, taskid: dragged.id}
         this.engine.getDiagramModel().addNode(new TaskNodeModel(node, this.refresh))
         this.refresh()
+        // console.log(node)
     }
 
     render(){

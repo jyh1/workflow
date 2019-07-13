@@ -14,28 +14,30 @@ import {
 import * as React from "react";
 import * as _ from "lodash";
 import {Node} from "../Types"
-import {Button, Icon, Divider} from 'semantic-ui-react'
+import {Button, Icon, Divider, Dimmer, Loader} from 'semantic-ui-react'
+import {taskReq} from "../MockRequests"
 
 export class TaskNodeModel extends DefaultNodeModel {
     extras : {taskid: string}
     inports : TaskPortModel[]
 	outports: TaskPortModel[]
+	loading: boolean
 	refresh: () => void
     constructor(node: Node, refresh: () => void){
         super(node.name);
 		[this.x, this.y] = [node.pos.x, node.pos.y];
-		let task = node.taskInfo
         this.extras = {
-            taskid: task.taskid
+            taskid: node.taskid
         }
-        this.inports = _.map(
-            Object.keys(task.inports),
-            (val) => this.addPort(new TaskPortModel(true, Toolkit.UID(), val))
-        );
-        this.inports = _.map(
-            Object.keys(task.outports),
-            (val) => this.addPort(new TaskPortModel(false, Toolkit.UID(), val))
-		);
+		this.inports = []
+		this.outports = []
+		this.loading = true
+		taskReq(node.taskid).then((task) => {
+			this.inports = _.map(Object.keys(task.inports), (val) => this.addPort(new TaskPortModel(true, Toolkit.UID(), val)));
+			this.outports = _.map(Object.keys(task.outports), (val) => this.addPort(new TaskPortModel(false, Toolkit.UID(), val)));
+			this.loading = false;
+			refresh()
+		})
 		this.refresh = refresh;
 	}
 	removeAndRefresh(){
@@ -81,7 +83,10 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, {}> {
 	render() {
 		return (
             <div className={"toolForm toolFormInCanvas " + (this.props.node.selected ? "toolForm-active" : "")}>
-                {/* title */}
+				{/* title */}
+				<Dimmer active={this.props.node.loading} inverted>
+					<Loader inverted content='Loading' />
+				</Dimmer>
                 <div className={"toolFormTitle"}>
 					<Button.Group basic size="small" style={{float: "right"}}>
 						<Button icon='close' style={{padding: "0"}}  onClick={()=>this.props.node.removeAndRefresh()}/>

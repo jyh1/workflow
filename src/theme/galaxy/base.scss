@@ -49,6 +49,15 @@ div.toolForm {
     }
 }
 
+// disabled
+div.toolFormDisabled div.toolFormTitle {
+    background: #f5f5f5;
+    border-color: $border-default-color;
+}
+
+div.toolFormDisabled {
+    border-color: $border-default-color;
+}
 
 // form
 div.form,

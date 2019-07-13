@@ -1,4 +1,4 @@
-import {taskTag, TaskElement, TaskId, TaskListElement} from "../Types"
+import {taskTag, TaskElement, TaskId, TaskListElement, TaskDragType} from "../Types"
 import * as React from "react"
 import * as _ from "lodash"
 import {List, Divider, Header} from 'semantic-ui-react'
@@ -42,7 +42,8 @@ export class TaskWidget extends React.Component<TaskProps, {}>{
 
     dragStart: React.DragEventHandler = (event) => {
         // console.log(this.props.element)
-        event.dataTransfer.setData(taskTag, JSON.stringify(this.props.taskid)); 
+        let dragData : TaskDragType = {id: this.props.taskid, name: this.props.name}
+        event.dataTransfer.setData(taskTag, JSON.stringify(dragData)); 
     }
 
     render(){
