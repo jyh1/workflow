@@ -1,7 +1,7 @@
 import {taskTag, TaskElement, TaskId, TaskListElement, TaskDragType} from "../Types"
 import * as React from "react"
 import * as _ from "lodash"
-import {List, Divider, Header} from 'semantic-ui-react'
+import {List, Divider, Header, Dimmer, Loader} from 'semantic-ui-react'
 import {taskListReq} from "../MockRequests"
 
 type Props = {name: string, children: TaskElement[]}
@@ -59,18 +59,20 @@ export class TaskWidget extends React.Component<TaskProps, {}>{
     }
 }
 
-export class TaskElementListWidget extends React.Component<{}, {tasks: TaskElement[]}>{
+export class TaskElementListWidget extends React.Component<{}, {tasks: TaskElement[], loading: boolean}>{
     constructor(props: {}){
         super(props)
-        this.state = {tasks: []}
+        this.state = {tasks: [], loading: true}
     }
     render(){
         let eles = this.state.tasks
         return(
             <React.Fragment>
                 <Header as="h2">Tools</Header>
-                <Divider />
                 <List divided relaxed>
+                    <Dimmer active={this.state.loading} inverted>
+                        <Loader inverted content='Loading' />
+                    </Dimmer>
                     {...renderTaskElementList(eles)}
                 </List>
             </React.Fragment>
@@ -79,7 +81,7 @@ export class TaskElementListWidget extends React.Component<{}, {tasks: TaskEleme
     componentDidMount(){
         taskListReq().then((e) => {
             // console.log(e); 
-            this.setState((prev)=> Object.assign(prev, {tasks: this.toTaskElement(e)}))
+            this.setState((prev)=> Object.assign(prev, {tasks: this.toTaskElement(e), loading: false}))
         })
     }
     toTaskElement(eles: TaskListElement[]):TaskElement[]{

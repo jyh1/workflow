@@ -5,7 +5,7 @@ import {Location} from 'history'
 import { Button, Form, Header, ButtonProps, Container, Message } from 'semantic-ui-react'
 
 type Props = {location: Location}
-type State = {username: string, password: string, from: string, loginStatus: boolean, loginError: boolean}
+type State = {username: string, password: string, from: string, loginStatus: boolean, loginError: boolean, loading: boolean}
 
 export class Login extends React.Component<Props, State> {
     /** Constructor. */
@@ -22,6 +22,7 @@ export class Login extends React.Component<Props, State> {
             password: '',
             loginError: false,
             from: fromPathname,
+            loading: false
         };
     }
 
@@ -33,9 +34,10 @@ export class Login extends React.Component<Props, State> {
     };
 
     doLogin = (event:React.MouseEvent<HTMLButtonElement>, butt: ButtonProps) => {
+        this.setState(prev => Object.assign(prev, {loading: true}))
         loginReq(this.state.username, this.state.password)
-        .then((unit) => this.setState(prev => Object.assign(prev, {loginStatus: true})))
-        .catch(() => this.setState(prev => Object.assign(prev, {loginError: true})))
+        .then((unit) => this.setState(prev => Object.assign(prev, {loginStatus: true, loading: false})))
+        .catch(() => this.setState(prev => Object.assign(prev, {loginError: true, loading: false})))
     }
 
     render() {
@@ -81,7 +83,7 @@ export class Login extends React.Component<Props, State> {
                         header='Action Forbidden'
                         content='Wrong username or password'
                     />
-                    <Button primary onClick={this.doLogin}>Login</Button>
+                    <Button primary loading={this.state.loading} onClick={this.doLogin}>Login</Button>
                     {/* <p>
                         <a href='/account/signup'>Don't have an account? Sign up!</a>
                     </p>
