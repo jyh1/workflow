@@ -61,11 +61,11 @@ function genEle(dep: number):TaskElement {
     let newdep = dep + 1
     numEle += 1
     let id = numEle.toString()
-    if (dep > 5) {return ({name: "task" + id, taskid: id, id: id})}
+    if (dep > 5) {return ({name: "task" + id, taskid: id, id: id, description: "max depth"})}
     return (
         coin() ? 
-              {name: "task" + id, taskid: id, id: id} 
-            : {name: "folder" + id, children: _.map([newdep, newdep, newdep], genEle), id: id}
+              {name: "task" + id, taskid: id, id: id, description: "mock file description"} 
+            : {name: "folder" + id, children: _.map([newdep, newdep, newdep], genEle), id: id, description: "mock folder description"}
     )
 }
 
@@ -74,10 +74,10 @@ function toListEle(e: TaskElement, parent?: string): TaskListElement[] {
     listEleId += 1
     let id = listEleId.toString()
     if ("taskid" in e){
-        return [{name: e.name, taskid: e.taskid, id: id, parent: parent}]
+        return [{name: e.name, taskid: e.taskid, id: id, parent: parent, description: e.description}]
     } else {
         let childrenEles = _.flatMap(e.children, (x) => toListEle(x, id))
-        childrenEles.push({name: e.name, id: id, parent: parent})
+        childrenEles.push({name: e.name, id: id, parent: parent, description: e.description})
         return childrenEles
     }
 }

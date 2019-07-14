@@ -5,7 +5,7 @@ import {List, Divider, Header, Dimmer, Loader} from 'semantic-ui-react'
 // import {taskListReq} from "../MockRequests"
 import {taskListReq} from "../Requests"
 
-type Props = {name: string, children: TaskElement[]}
+type Props = {name: string, children: TaskElement[], description: string}
 
 export class TaskFolderWidget extends React.Component<Props, {expand: boolean}>{
     constructor(props: Props){
@@ -24,7 +24,7 @@ export class TaskFolderWidget extends React.Component<Props, {expand: boolean}>{
                 <List.Icon className="folder-elem" onClick = {this.toggle} name={expand ? 'folder open outline' : 'folder outline'}/>
                 <List.Content className="folder-elem">
                     <List.Header onClick = {this.toggle} >{this.props.name}</List.Header>
-                    <List.Description>short description</List.Description>
+                    <List.Description>{this.props.description}</List.Description>
                 </List.Content>
                 <List.List className={"ui relaxed divided"} style = {{display: (expand? "block" : "none")}}>
                     {...renderTaskElementList(this.props.children)}
@@ -35,7 +35,7 @@ export class TaskFolderWidget extends React.Component<Props, {expand: boolean}>{
     }
 }
 
-type TaskProps = {name: string, taskid: TaskId}
+type TaskProps = {name: string, taskid: TaskId, description: string}
 export class TaskWidget extends React.Component<TaskProps, {}>{
     constructor(props: TaskProps){
         super(props)
@@ -53,7 +53,7 @@ export class TaskWidget extends React.Component<TaskProps, {}>{
                 <List.Icon name="code"/>
                 <List.Content>
                     <List.Header>{this.props.name}</List.Header>
-                    <List.Description>short description</List.Description>
+                    <List.Description>{this.props.description}</List.Description>
                 </List.Content>
             </List.Item>
         )
@@ -93,14 +93,14 @@ export class TaskElementListWidget extends React.Component<{}, {tasks: TaskEleme
         for(let e of eles){
             let rep : TaskRep
             if('taskid' in e){
-                let task: TaskElement = {name: e.name, id: e.id, taskid: e.taskid}
+                let task: TaskElement = {name: e.name, id: e.id, taskid: e.taskid, description: e.description}
                 rep = task
             } else {
                 // file object
                 if(dic[e.id]){
-                    dic[e.id] = Object.assign(dic[e.id], {name: e.name, id: e.id})
+                    dic[e.id] = Object.assign(dic[e.id], {name: e.name, id: e.id, description: e.description})
                 } else {
-                    let newEle : TaskElement = {name: e.name, id: e.id, children: []}  
+                    let newEle : TaskElement = {name: e.name, id: e.id, children: [], description: e.description}  
                     dic[e.id] = newEle
                 }
                 rep = dic[e.id]
@@ -130,10 +130,10 @@ export class TaskElementWidget extends React.Component<TaskElementProps, {}>{
     render(){
         let element = this.props.element;
         if ("children" in element){
-            return(<TaskFolderWidget name = {element.name} children= {element.children} ></TaskFolderWidget>)
+            return(<TaskFolderWidget {...element}></TaskFolderWidget>)
         } 
         else {
-            return(<TaskWidget name={element.name} taskid={element.taskid}></TaskWidget>)
+            return(<TaskWidget {...element}></TaskWidget>)
         }
     }
 }

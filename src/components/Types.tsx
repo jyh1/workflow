@@ -29,10 +29,10 @@ export interface Task {
 export const taskTag = "task"
 export type TaskDragType = {name: string, id: string}
 
-export type TaskElement = {name: string, id: string} & ({children: TaskElement[]} | {taskid: TaskId})
+export type TaskElement = {name: string, id: string, description: string} & ({children: TaskElement[]} | {taskid: TaskId})
 
 export type TaskListElementId = string
-export type TaskListElement = {name: string; taskid?: TaskId; parent?: TaskListElementId; id: TaskListElementId}
+export type TaskListElement = {name: string; taskid?: TaskId; parent?: TaskListElementId; id: TaskListElementId; description: string}
 
 // requests
 export type LoginRequest = (username: string, password: string) => Promise<{}>
