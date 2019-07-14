@@ -5,7 +5,8 @@ import {TaskElementListWidget} from "./TaskList/TaskList"
 import {Node, Task, TaskElement, endPointPath} from "./Types"
 import * as _ from "lodash"
 import { Router, Route, Link, Redirect, withRouter, Switch, RouteProps } from 'react-router-dom';
-import {getLoginStatus} from "./MockRequests"
+// import {getLoginStatus} from "./MockRequests"
+import {getLoginStatus} from "./Requests"
 import { createBrowserHistory } from 'history';
 import {Login} from "./Login";
 

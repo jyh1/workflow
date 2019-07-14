@@ -16,6 +16,7 @@ import * as _ from "lodash";
 import {Node} from "../Types"
 import {Button, Icon, Divider, Dimmer, Loader} from 'semantic-ui-react'
 import {taskReq} from "../MockRequests"
+// import {taskReq} from "../Requests"
 
 export class TaskNodeModel extends DefaultNodeModel {
     extras : {taskid: string}
@@ -33,8 +34,8 @@ export class TaskNodeModel extends DefaultNodeModel {
 		this.outports = []
 		this.loading = true
 		taskReq(node.taskid).then((task) => {
-			this.inports = _.map(Object.keys(task.inports), (val) => this.addPort(new TaskPortModel(true, Toolkit.UID(), val)));
-			this.outports = _.map(Object.keys(task.outports), (val) => this.addPort(new TaskPortModel(false, Toolkit.UID(), val)));
+			this.inports = _.map(task.inports, (val) => this.addPort(new TaskPortModel(true, Toolkit.UID(), val)));
+			this.outports = _.map(task.outports, (val) => this.addPort(new TaskPortModel(false, Toolkit.UID(), val)));
 			this.loading = false;
 			refresh()
 		})

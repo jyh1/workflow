@@ -2,7 +2,8 @@ import {taskTag, TaskElement, TaskId, TaskListElement, TaskDragType} from "../Ty
 import * as React from "react"
 import * as _ from "lodash"
 import {List, Divider, Header, Dimmer, Loader} from 'semantic-ui-react'
-import {taskListReq} from "../MockRequests"
+// import {taskListReq} from "../MockRequests"
+import {taskListReq} from "../Requests"
 
 type Props = {name: string, children: TaskElement[]}
 

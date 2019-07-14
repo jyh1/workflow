@@ -48,8 +48,8 @@ export const taskListReq: TaskListRequest = () => (
 let defTask = (i:TaskId):Task => (
     {
         taskid: i
-      , inports: {dataset1: {}, dataset2: {}}
-      , outports: {result: {}}
+      , inports: ["dataset1", "dataset2"]
+      , outports: ["result"]
   }
 )
 

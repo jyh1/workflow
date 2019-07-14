@@ -40,6 +40,7 @@
     "semantic-ui-react": "^0.87.2",
     "storm-react-diagrams": "^5.2.1",
     "style-loader": "^0.23.1",
+    "universal-cookie": "^4.0.2",
     "url-loader": "^2.0.1"
   }
 }

@@ -1,5 +1,6 @@
 import * as React from "react";
-import {loginReq, getLoginStatus} from "./MockRequests"
+// import {loginReq, getLoginStatus} from "./MockRequests"
+import {loginReq, getLoginStatus} from "./Requests"
 import {Redirect} from "react-router-dom";
 import {Location} from 'history'
 import { Button, Form, Header, ButtonProps, Container, Message } from 'semantic-ui-react'

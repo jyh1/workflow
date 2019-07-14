@@ -3,7 +3,6 @@ import * as React from "react"
 import * as SRD from "storm-react-diagrams"
 import {TaskNodeModel, TaskNodeFactory, TaskLinkFactory} from "./TaskNodeModel"
 import * as _ from "lodash"
-import {taskReq} from "../MockRequests"
 
 type Props = {
       nodes: Node[]

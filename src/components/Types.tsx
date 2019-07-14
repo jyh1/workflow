@@ -7,7 +7,7 @@ export interface Tool {
 
 export interface CodaVal {};
 
-export interface Arguments {[index: string]: CodaType}
+export type Arguments = string[]
 
 export interface CodaType {};
 
