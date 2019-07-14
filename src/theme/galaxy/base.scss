@@ -84,6 +84,10 @@ div.form-body {
 div.form-row {
     position: relative;
     padding: 5px 10px;
+    .outport-label{
+        width: 100%;
+        text-align: right;
+    }
 }
 
 div.form-title-row {

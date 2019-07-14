@@ -15,8 +15,8 @@ import * as React from "react";
 import * as _ from "lodash";
 import {Node} from "../Types"
 import {Button, Icon, Divider, Dimmer, Loader} from 'semantic-ui-react'
-import {taskReq} from "../MockRequests"
-// import {taskReq} from "../Requests"
+// import {taskReq} from "../MockRequests"
+import {taskReq} from "../Requests"
 
 export class TaskNodeModel extends DefaultNodeModel {
     extras : {taskid: string}
@@ -136,15 +136,10 @@ export class TaskPortWidget extends BaseWidget<TaskPortWidgetProps, {}> {
 				port={this.props.model}
 			/>;
         let label = this.props.model.label;
-        // let content;
-        // if (this.props.model.in){
-        //     content = [terminal, label]
-        // } else{
-        //     content = [label, terminal]
-        // }
 		return (
 			<div {...this.getProps()}>
-                {terminal}{label}
+				{terminal}
+				<div className={this.props.model.in? "" : "outport-label"}>{label}</div>
 			</div>
 		);
 	}
