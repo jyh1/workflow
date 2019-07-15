@@ -2,6 +2,7 @@ import {Node, taskTag, TaskDragType, ToolPort, ToolNode, ToolNodeInterface} from
 import * as React from "react"
 import * as SRD from "storm-react-diagrams"
 import {TaskNodeModel, TaskNodeFactory, TaskLinkFactory} from "./TaskNodeModel"
+import {Graph} from '../algorithms'
 import * as _ from "lodash"
 
 type Props = {
@@ -32,14 +33,19 @@ export class Canvas extends React.Component<Props, {}>{
 
     serializeTaskGraph(){
         let g = this.engine.getDiagramModel().serializeDiagram()
+        let graphModel = new Graph()
         let {links, nodes} = g
         let linkDic : {[linkid: string]: {taskid: string, portid: string}} = {} //linkid to source [taskid, portid]
-        for(let l of links){linkDic[l.id] = {taskid: l.source, portid: l.sourcePort}}
+        for(let l of links){
+            linkDic[l.id] = {taskid: l.source, portid: l.sourcePort}
+            graphModel.addEdge(l.source, l.target)
+        }
         let portIdToName: {[portid: string]: string} = {}
         type ArgDic = {[arg: string]: string} //argumentname to linkid
-        let processedNodes: ToolNodeInterface<string>[] = []
+        let processedNodes: {[nodeid: string]: ToolNodeInterface<string>} = {}
         for(let n of nodes){
             let {id, ports, extras} = n
+            graphModel.addNode(id)
             let name: string = (n as any).name
             let taskid = extras.taskid as string
             let argDic: ArgDic = {} // portname to linkid
@@ -53,16 +59,17 @@ export class Canvas extends React.Component<Props, {}>{
                     argDic[portname] = link
                 }
             }
-            processedNodes.push({id, taskid, arguments: argDic, name})
+            processedNodes[id]= {id, taskid, arguments: argDic, name}
         }
+        let sortedOrder = graphModel.topoSort()
         // console.log(processedNodes)
-        let tools: ToolNode[] = _.map(processedNodes, (n) => {
+        let tools = _.mapValues(processedNodes, (n) => {
                 let toToolPort: (linkid: string) => ToolPort = (linkid) => (
                     {taskid: linkDic[linkid].taskid, label: portIdToName[linkDic[linkid].portid]}
                 )
                 return ({...n, arguments: _.mapValues(n.arguments, toToolPort)})
             })
-        return tools
+        return (_.map(sortedOrder, k => tools[k]))
     }
 
     processDrop: React.DragEventHandler = (event) => {
