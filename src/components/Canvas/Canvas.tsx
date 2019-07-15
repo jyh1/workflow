@@ -1,4 +1,4 @@
-import {Node, taskTag, TaskDragType, Task} from "../Types"
+import {Node, taskTag, TaskDragType, ToolPort, ToolNode, ToolNodeInterface} from "../Types"
 import * as React from "react"
 import * as SRD from "storm-react-diagrams"
 import {TaskNodeModel, TaskNodeFactory, TaskLinkFactory} from "./TaskNodeModel"
@@ -30,6 +30,41 @@ export class Canvas extends React.Component<Props, {}>{
         this.engine.setDiagramModel(model);
     }
 
+    serializeTaskGraph(){
+        let g = this.engine.getDiagramModel().serializeDiagram()
+        let {links, nodes} = g
+        let linkDic : {[linkid: string]: {taskid: string, portid: string}} = {} //linkid to source [taskid, portid]
+        for(let l of links){linkDic[l.id] = {taskid: l.source, portid: l.sourcePort}}
+        let portIdToName: {[portid: string]: string} = {}
+        type ArgDic = {[arg: string]: string} //argumentname to linkid
+        let processedNodes: ToolNodeInterface<string>[] = []
+        for(let n of nodes){
+            let {id, ports, extras} = n
+            let name: string = (n as any).name
+            let taskid = extras.taskid as string
+            let argDic: ArgDic = {} // portname to linkid
+            for (let p of ports){
+                let portname = (p as any).label
+                portIdToName[p.id] = portname
+                if((p as any).in){
+                    // if (p.links.length !== 1){ throw "unfilled argument"} //TODO: use a error class
+                    if (p.links.length !== 1){ continue} //TODO: use a error class
+                    let link = p.links[0]
+                    argDic[portname] = link
+                }
+            }
+            processedNodes.push({id, taskid, arguments: argDic, name})
+        }
+        // console.log(processedNodes)
+        let tools: ToolNode[] = _.map(processedNodes, (n) => {
+                let toToolPort: (linkid: string) => ToolPort = (linkid) => (
+                    {taskid: linkDic[linkid].taskid, label: portIdToName[linkDic[linkid].portid]}
+                )
+                return ({...n, arguments: _.mapValues(n.arguments, toToolPort)})
+            })
+        return tools
+    }
+
     processDrop: React.DragEventHandler = (event) => {
         event.preventDefault()
         let data = event.dataTransfer.getData(taskTag);
@@ -51,7 +86,8 @@ export class Canvas extends React.Component<Props, {}>{
                 <div className="srd-demo-workspace__toolbar">
                     <button
                         onClick={() => {
-                            console.log(this.engine.getDiagramModel().serializeDiagram());
+                            // console.log(this.engine.getDiagramModel().serializeDiagram());
+                            console.log(this.serializeTaskGraph());
                         }}
                     >
                         Print Graph

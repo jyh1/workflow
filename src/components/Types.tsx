@@ -39,6 +39,16 @@ export type LoginRequest = (username: string, password: string) => Promise<{}>
 export type TaskListRequest = () => Promise<TaskListElement[]>
 export type TaskInfoRequest = (taskid: TaskId) => Promise<Task>
 
+// graph representation
+export type ToolPort = {taskid: TaskId, label: string}
+export interface ToolNodeInterface<PortType> {
+    name: string; 
+    id: string; 
+    taskid: TaskId; 
+    arguments: {[arg: string]: PortType}
+}
+export type ToolNode = ToolNodeInterface<ToolPort>
+
 export const endPointPath = {
       login: "/login"
     , mainapp: "/"
