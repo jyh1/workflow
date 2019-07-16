@@ -38,7 +38,7 @@ export class Login extends React.Component<Props, State> {
         this.setState(prev => Object.assign(prev, {loading: true}))
         loginReq(this.state.username, this.state.password)
         .then((unit) => this.setState(prev => Object.assign(prev, {loginStatus: true, loading: false})))
-        .catch(() => this.setState(prev => Object.assign(prev, {loginError: true, loading: false})))
+        .catch(x => this.setState(prev => Object.assign(prev, {loginError: true, loading: false})))
     }
 
     render() {

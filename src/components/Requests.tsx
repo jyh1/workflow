@@ -8,6 +8,11 @@ export const loginReq: LoginRequest = (username, password) => {
         , credentials: 'same-origin'
         , method: 'POST'
         ,  body: JSON.stringify({username, password})
+        }).then((res) => {
+            if (res.status == 401){
+                return Promise.reject(res);
+            }
+            return
         })
     return req
 }
