@@ -31,7 +31,7 @@ export class Canvas extends React.Component<Props, {}>{
         this.engine.setDiagramModel(model);
     }
 
-    serializeTaskGraph(){
+    serializeTaskGraph(): ToolNode[]{
         let g = this.engine.getDiagramModel().serializeDiagram()
         let graphModel = new Graph()
         let {links, nodes} = g
