@@ -1,5 +1,18 @@
 // mock request functions for dev
-import {LoginRequest, TaskInfoRequest, Task, TaskListRequest, TaskElement, TaskId, TaskListElement} from "./Types"
+import {
+      LoginRequest
+    , TaskInfoRequest
+    , Task
+    , TaskListRequest
+    , TaskElement
+    , TaskId
+    , TaskListElement
+    , CompileRequest
+    , JRec
+    , JVar
+    , JBlock
+    } from "./Types"
+import * as T from "./Types"
 import * as _ from "lodash"
 
 let latency = 3000
@@ -82,7 +95,43 @@ function toListEle(e: TaskElement, parent?: string): TaskListElement[] {
     }
 }
 
+export const compileReq: CompileRequest = (ts) => new Promise((executor, resolve) => {
+        setTimeout(
+            () => {
+                executor({result: testRes, blocks: testBlocks})
+            }
+        , reqtime())
+    }
+)
 
+const makeVar: (x: string) => JVar = (x) => ({type: "variable", content: x})
+
+const testRes: JRec = {
+      type: "record"
+    , content: 
+        {"key1": makeVar("x"), "key2": makeVar("y")}
+}
+
+function tc<T1, T2>(a:T1, b:T2): T.JObject<T1, T2>{
+    return {type: a, content: b}
+}
+
+function val(s: string): T.JVerbatim{
+    return tc("value", s)
+}
+
+function jv(s: string): T.JVar{
+    return tc("variable", s)
+}
+
+function blk(s: string, cmd: T.JCmd): T.JBlock{
+    return {variable: s, options: [], command: cmd}
+}
+
+const testBlocks: JBlock[] = [
+      blk("x", tc("lit", val("0x0cf40bf4b76246bc9d0545e13524a174")))
+    , blk("y", tc("run", {dependencies: [["x", jv("x")]], cmd: [val("bash"), val("x"), val("x")]}))
+]
 
 // let testtasks: TaskElement[] = [
 //       ...defTaskLis(["s1", "s2", "s3"])

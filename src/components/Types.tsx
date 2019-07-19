@@ -19,7 +19,7 @@ export type JVar = JObject<"variable", string>
 export type JVerbatim = JObject <"value", string> 
 export type JDir = JObject<"dir", {root: JVar | JVerbatim, path: string[]}>
 export type JNormalRes = JVar | JVerbatim | JDir
-export type JRec = {[key: string]: JRes}
+export type JRec = JObject<"record", {[key: string]: JRes}>
 export type JRes = JVar | JVerbatim | JDir | JRec
 
 export type JCat = JObject <"cat", JNormalRes>

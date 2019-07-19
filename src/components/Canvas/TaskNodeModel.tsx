@@ -220,6 +220,7 @@ export class TaskPortModel extends DefaultPortModel {
 		if (this.in || !port.in) {return false}
 		if (Object.keys(port.links).length > 1) {return false}
 		if (port.getParent() == this.getParent()) {return false}
+		(this.getParent() as TaskNodeModel).refresh()
 		return true;
 	}
 }

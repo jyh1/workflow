@@ -1,38 +1,50 @@
-import {Node, taskTag, TaskDragType, ToolPort, ToolNode, ToolNodeInterface} from "../Types"
+import {Node, taskTag, TaskDragType, ToolPort, ToolNode, ToolNodeInterface, JLang} from "../Types"
 import * as React from "react"
 import * as SRD from "storm-react-diagrams"
 import {TaskNodeModel, TaskNodeFactory, TaskLinkFactory} from "./TaskNodeModel"
 import {Graph} from '../algorithms'
 import * as _ from "lodash"
+import * as S from 'semantic-ui-react'
+import {compileReq} from "../MockRequests"
 
 type Props = {
       nodes: Node[]
 };
 
-export class Canvas extends React.Component<Props, {}>{
-    engine: SRD.DiagramEngine;
-    refresh: () => void;
+type State = {
+    compiled?: JLang
+    loading: boolean
+}
 
+export class Canvas extends React.Component<Props, State>{
+    engine: SRD.DiagramEngine;
+    model: SRD.DiagramModel
+    // refresh: () => void;
     constructor(props: Props){
         super(props);
-        this.state = {};
+        this.state = {loading: false};
         this.engine = new SRD.DiagramEngine();
         this.engine.installDefaultFactories();
         this.engine.registerNodeFactory(new TaskNodeFactory());
         this.engine.registerLinkFactory(new TaskLinkFactory());
         let model = new SRD.DiagramModel();
-        this.refresh = this.forceUpdate.bind(this)
+        this.model = model
         let nodes = _.map(
             this.props.nodes,
             (val) => {
-                return (new TaskNodeModel(val, this.refresh))
+                return (new TaskNodeModel(val, this.refresh.bind(this)))
             })
         model.addAll(... nodes);
         this.engine.setDiagramModel(model);
     }
 
+    refresh(){
+        this.forceUpdate()
+        this.setState((prev) => Object.assign(prev, {compiled: undefined}))
+    }
+
     serializeTaskGraph(): ToolNode[]{
-        let g = this.engine.getDiagramModel().serializeDiagram()
+        let g = this.model.serializeDiagram()
         let graphModel = new Graph()
         let {links, nodes} = g
         let linkDic : {[linkid: string]: {taskid: string, portid: string}} = {} //linkid to source [taskid, portid]
@@ -72,6 +84,18 @@ export class Canvas extends React.Component<Props, {}>{
         return (_.map(sortedOrder, k => tools[k]))
     }
 
+    compile(){
+        let nodes = this.serializeTaskGraph()
+        this.model.setLocked(true)
+        this.setState(obj => Object.assign(obj, {loading: true, compiled: undefined}))
+        compileReq(nodes)
+        .then((res) => {
+            this.setState(obj => Object.assign(obj, {compiled: res, loading: false}))
+            this.model.setLocked(false)
+            console.log(res)
+        } )
+    }
+
     processDrop: React.DragEventHandler = (event) => {
         event.preventDefault()
         let data = event.dataTransfer.getData(taskTag);
@@ -82,7 +106,7 @@ export class Canvas extends React.Component<Props, {}>{
             } catch (e) {return}
         const pos = this.engine.getRelativeMousePoint(event)
         let node : Node = {pos, name: dragged.name, taskid: dragged.id}
-        this.engine.getDiagramModel().addNode(new TaskNodeModel(node, this.refresh))
+        this.engine.getDiagramModel().addNode(new TaskNodeModel(node, this.refresh.bind(this)))
         this.refresh()
         // console.log(node)
     }
@@ -99,6 +123,13 @@ export class Canvas extends React.Component<Props, {}>{
                     >
                         Print Graph
                     </button>
+                    <S.Button primary loading={this.state.loading} onClick={this.compile.bind(this)}>
+                        Compile
+                    </S.Button>
+                    <S.Button primary disabled={this.state.compiled === undefined? true : false}>
+                        Run
+                    </S.Button>
+
                 </div>
                 <div
                     style={{height: "100%"}}
