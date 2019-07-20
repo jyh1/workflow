@@ -6,6 +6,7 @@ import {Graph} from '../algorithms'
 import * as _ from "lodash"
 import * as S from 'semantic-ui-react'
 import {compileReq} from "../MockRequests"
+import {evalJLang} from "../Interpreter"
 
 type Props = {
       nodes: Node[]
@@ -96,6 +97,13 @@ export class Canvas extends React.Component<Props, State>{
         } )
     }
 
+    run(){
+        let jlang =  this.state.compiled
+        if (jlang){
+            evalJLang(jlang).then(console.log)
+        }
+    }
+
     processDrop: React.DragEventHandler = (event) => {
         event.preventDefault()
         let data = event.dataTransfer.getData(taskTag);
@@ -126,7 +134,7 @@ export class Canvas extends React.Component<Props, State>{
                     <S.Button primary loading={this.state.loading} onClick={this.compile.bind(this)}>
                         Compile
                     </S.Button>
-                    <S.Button primary disabled={this.state.compiled === undefined? true : false}>
+                    <S.Button primary disabled={this.state.compiled === undefined? true : false} onClick={this.run.bind(this)}>
                         Run
                     </S.Button>
 

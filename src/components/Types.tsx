@@ -23,7 +23,8 @@ export type JRec = JObject<"record", {[key: string]: JRes}>
 export type JRes = JVar | JVerbatim | JDir | JRec
 
 export type JCat = JObject <"cat", JNormalRes>
-export type Deps = [string, JNormalRes][]
+export type Dep = [string, JNormalRes]
+export type Deps = Dep[]
 export type JMake = JObject<"make", Deps>
 export type JRun = JObject<"run", {dependencies: Deps, cmd: CMDEle[]}>
 export type JLit = JObject<"lit", JNormalRes>
@@ -31,7 +32,8 @@ export type JCmd = JCat | JMake | JRun | JLit
 
 export type CMDEle = JNormalRes | {root: string, path: string[]}
 
-export type JBlock = {variable: string, options: [string, JNormalRes][], command: JCmd}
+export type ClOption = [string, JNormalRes]
+export type JBlock = {variable: string, options: ClOption[], command: JCmd}
 
 export type JLang = {result: JRes, blocks: JBlock[]}
 
@@ -62,6 +64,7 @@ export type LoginRequest = (username: string, password: string) => Promise<{}>
 export type TaskListRequest = () => Promise<TaskListElement[]>
 export type TaskInfoRequest = (taskid: TaskId) => Promise<Task>
 export type CompileRequest = (nodes: ToolNode[]) => Promise<JLang>
+export type ClRequest = (worsheet: string, command: string) => Promise<string>
 
 // graph representation
 export type ToolPort = {taskid: TaskId, label: string}
@@ -76,4 +79,5 @@ export type ToolNode = ToolNodeInterface<ToolPort>
 export const endPointPath = {
       login: "/login"
     , mainapp: "/"
+    , codalab: "rest/cli/command"
 }

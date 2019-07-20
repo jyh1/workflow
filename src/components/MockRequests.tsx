@@ -106,10 +106,12 @@ export const compileReq: CompileRequest = (ts) => new Promise((executor, resolve
 
 const makeVar: (x: string) => JVar = (x) => ({type: "variable", content: x})
 
-const testRes: JRec = {
-      type: "record"
-    , content: 
-        {"key1": makeVar("x"), "key2": makeVar("y")}
+const testRes: JVar = {
+    //   type: "record"
+    // , content: 
+    //     {"key1": makeVar("x"), "key2": makeVar("y")}
+      type: "variable"
+    , content: "y"
 }
 
 function tc<T1, T2>(a:T1, b:T2): T.JObject<T1, T2>{
@@ -132,6 +134,20 @@ const testBlocks: JBlock[] = [
       blk("x", tc("lit", val("0x0cf40bf4b76246bc9d0545e13524a174")))
     , blk("y", tc("run", {dependencies: [["x", jv("x")]], cmd: [val("bash"), val("x"), val("x")]}))
 ]
+
+export const clReq: T.ClRequest = (worksheet, command) => (
+    new Promise((executor, resolve) => {
+        setTimeout(
+            () => {
+                if (worksheet == "0x4329e2c6d58c4312aad5a0df042eea95"){
+                    executor("0xfb85fa298e8d48fba93febc8c1860e94")
+                } else {
+                    resolve()
+                }
+            }
+        , reqtime())
+    })
+)
 
 // let testtasks: TaskElement[] = [
 //       ...defTaskLis(["s1", "s2", "s3"])

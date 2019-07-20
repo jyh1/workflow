@@ -1,5 +1,6 @@
 import {LoginRequest, TaskInfoRequest, Task, TaskListRequest, TaskElement, TaskId, TaskListElement} from "./Types"
 import Cookies from 'universal-cookie';
+import * as T from "./Types"
 
 export const loginReq: LoginRequest = (username, password) => {
     let req = fetch('/login', 
@@ -41,4 +42,22 @@ export const taskReq: TaskInfoRequest = (taskid) => (
         , credentials: 'same-origin'
         })
     .then((e) => e.json())
+)
+
+
+export const clReq: T.ClRequest = (worksheet, command) => (
+    fetch(T.endPointPath.codalab,
+        {
+          headers: {"Content-Type":'application/json'}
+        , credentials: 'same-origin'
+        , method: 'POST'
+        , body: JSON.stringify({worksheet_uuid: worksheet, command})
+        })
+        .then((res) => {
+            if (res.status !== 200){
+                return Promise.reject(res);
+            }
+            return (res.json())
+        })
+        .then(res => (res.output as string).trim())
 )

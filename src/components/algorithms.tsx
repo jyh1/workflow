@@ -1,3 +1,5 @@
+import * as _ from 'lodash'
+
 export class Graph {
     indegree: Map<string, number>
     edge: Map<string, string[]>
@@ -48,3 +50,19 @@ export class Graph {
 
     }
 }
+
+// https://github.com/substack/node-shell-quote
+export let quote = function (xs: string[]) {
+    let strs = _.map(xs, function (s) {
+        if (/["\s]/.test(s) && !/'/.test(s)) {
+            return "'" + s.replace(/(['\\])/g, '\\$1') + "'";
+        }
+        else if (/["'\s]/.test(s)) {
+            return '"' + s.replace(/(["\\$`!])/g, '\\$1') + '"';
+        }
+        else {
+            return String(s).replace(/([#!"$&'()*,:;<=>?@\[\\\]^`{|}])/g, '\\$1'); 
+        }
+    })
+    return strs.join(" ")
+};
