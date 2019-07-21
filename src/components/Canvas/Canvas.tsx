@@ -7,6 +7,7 @@ import * as _ from "lodash"
 import * as S from 'semantic-ui-react'
 import {compileReq} from "../MockRequests"
 import {evalJLang} from "../Interpreter"
+import { object } from "prop-types";
 
 type Props = {
       nodes: Node[]
@@ -15,6 +16,7 @@ type Props = {
 type State = {
     compiled?: JLang
     loading: boolean
+    running: boolean
 }
 
 export class Canvas extends React.Component<Props, State>{
@@ -23,7 +25,7 @@ export class Canvas extends React.Component<Props, State>{
     // refresh: () => void;
     constructor(props: Props){
         super(props);
-        this.state = {loading: false};
+        this.state = {loading: false, running: false};
         this.engine = new SRD.DiagramEngine();
         this.engine.installDefaultFactories();
         this.engine.registerNodeFactory(new TaskNodeFactory());
@@ -99,8 +101,9 @@ export class Canvas extends React.Component<Props, State>{
 
     run(){
         let jlang =  this.state.compiled
+        this.setState(prev => Object.assign(prev, {running: true}))
         if (jlang){
-            evalJLang(jlang).then(console.log)
+            evalJLang(jlang).then(console.log).then(()=>{this.setState(prev => Object.assign(prev, {running: false}))})
         }
     }
 
@@ -134,7 +137,7 @@ export class Canvas extends React.Component<Props, State>{
                     <S.Button primary loading={this.state.loading} onClick={this.compile.bind(this)}>
                         Compile
                     </S.Button>
-                    <S.Button primary disabled={this.state.compiled === undefined? true : false} onClick={this.run.bind(this)}>
+                    <S.Button primary loading={this.state.running} disabled={this.state.compiled === undefined? true : false} onClick={this.run.bind(this)}>
                         Run
                     </S.Button>
 

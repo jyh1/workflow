@@ -84,8 +84,12 @@ function clrun(env: Env, opts: T.ClOption[], cmd: T.CMDEle[], deps: T.Deps): Pro
     )
 }
 
-function clmake(env: Env, deps: T.Deps): Promise<string>{
-    throw "not implemented"
+function clmake(env: Env, opts: T.ClOption[], deps: T.Deps): Promise<string>{
+    return(
+        Promise.all([resolveClOpts(env, opts), resolveDeps(env, deps)])
+        .then(xs => quote(["cl", "make"].concat(...xs)))
+        .then(x => clReq(worksheet, x))
+    )
 }
 
 function clcat(env: Env, bundle: T.JNormalRes): Promise<string>{
@@ -94,6 +98,7 @@ function clcat(env: Env, bundle: T.JNormalRes): Promise<string>{
         .then(clWait)
         .then(x => (quote(["cl", "cat", x])))
         .then(x => clReq(worksheet, x))
+        .then(res => {let strs = res.split('\n'); strs.pop(); return strs.join('\n')})
     )
 }
 
@@ -101,15 +106,17 @@ function clcat(env: Env, bundle: T.JNormalRes): Promise<string>{
 function resolveJBlock(env: Env, blk: T.JBlock): void{
     // console.log(blk)
     // console.log(blk.command)
+    let options = blk.options.slice()
+    options.unshift(["name", {type: "value", content: blk.variable}])
     let cmd = blk.command
     if(cmd.type == "run"){
-        env.set(blk.variable, clrun(env, blk.options, cmd.content.cmd, cmd.content.dependencies))
+        env.set(blk.variable, clrun(env, options, cmd.content.cmd, cmd.content.dependencies))
     }
     if(cmd.type == "lit"){
         env.set(blk.variable, resolveJRes(env, cmd.content))
     }
     if(cmd.type == "make"){
-        env.set(blk.variable, clmake(env, cmd.content))
+        env.set(blk.variable, clmake(env, options, cmd.content))
     }
     if(cmd.type == "cat"){
         env.set(blk.variable, clcat(env, cmd.content))

@@ -32,7 +32,7 @@ export type JCmd = JCat | JMake | JRun | JLit
 
 export type CMDEle = JNormalRes | {root: string, path: string[]}
 
-export type ClOption = [string, JNormalRes]
+export type ClOption = [string, JVar | JVerbatim]
 export type JBlock = {variable: string, options: ClOption[], command: JCmd}
 
 export type JLang = {result: JRes, blocks: JBlock[]}
@@ -60,12 +60,12 @@ export type TaskListElementId = string
 export type TaskListElement = {name: string; taskid?: TaskId; parent?: TaskListElementId; id: TaskListElementId; description: string}
 
 // requests
-export type LoginRequest = (username: string, password: string) => Promise<{}>
+export type LoginRequest = (username: string, password: string) => Promise<void>
 export type TaskListRequest = () => Promise<TaskListElement[]>
 export type TaskInfoRequest = (taskid: TaskId) => Promise<Task>
 export type CompileRequest = (nodes: ToolNode[]) => Promise<JLang>
 export type ClRequest = (worsheet: string, command: string) => Promise<string>
-export type clWaitRequest = (path: string) => Promise<string>
+export type ClWaitRequest = (path: string) => Promise<string>
 
 // graph representation
 export type ToolPort = {taskid: TaskId, label: string}

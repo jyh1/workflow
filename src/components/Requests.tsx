@@ -63,7 +63,8 @@ export const clReq: T.ClRequest = (worksheet, command) => (
         .then(res => (res.output as string).trim())
 )
 
-export const clWait: T.clWaitRequest = (path) => {
+// simulate waiting by polling the bundle status
+export const clWait: T.ClWaitRequest = (path) => {
     let uuid = path.split('/')[0]
     return (fetch(T.endPointPath.codalab + 'bundles/' + uuid,
         {
