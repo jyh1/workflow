@@ -1,6 +1,7 @@
 import {LoginRequest, TaskInfoRequest, Task, TaskListRequest, TaskElement, TaskId, TaskListElement} from "./Types"
 import Cookies from 'universal-cookie';
 import * as T from "./Types"
+import { delay } from "q";
 
 export const loginReq: LoginRequest = (username, password) => {
     let req = fetch('/login', 
@@ -46,7 +47,7 @@ export const taskReq: TaskInfoRequest = (taskid) => (
 
 
 export const clReq: T.ClRequest = (worksheet, command) => (
-    fetch(T.endPointPath.codalab,
+    fetch(T.endPointPath.codalab + 'cli/command',
         {
           headers: {"Content-Type":'application/json'}
         , credentials: 'same-origin'
@@ -61,3 +62,28 @@ export const clReq: T.ClRequest = (worksheet, command) => (
         })
         .then(res => (res.output as string).trim())
 )
+
+export const clWait: T.clWaitRequest = (path) => {
+    let uuid = path.split('/')[0]
+    return (fetch(T.endPointPath.codalab + 'bundles/' + uuid,
+        {
+          headers: {"Content-Type":'application/json'}
+        , credentials: 'same-origin'
+        })
+        .then((res) => {
+            if (res.status !== 200){
+                return Promise.reject(res);
+            }
+            return (res.json())
+        })
+        .then(res => {
+            let status = res.data.attributes.metadata.run_status
+            if (status == "Finished"){
+                // console.log('finished')
+                return path
+            } else {
+                // wait for 5s
+                return (delay(5000).then(x => clWait(path)))
+            }
+        }))
+}

@@ -14,6 +14,7 @@ import {
     } from "./Types"
 import * as T from "./Types"
 import * as _ from "lodash"
+import { executionAsyncId } from "async_hooks";
 
 let latency = 3000
 let reqtime = () => latency * Math.random()
@@ -111,7 +112,7 @@ const testRes: JVar = {
     // , content: 
     //     {"key1": makeVar("x"), "key2": makeVar("y")}
       type: "variable"
-    , content: "y"
+    , content: "z"
 }
 
 function tc<T1, T2>(a:T1, b:T2): T.JObject<T1, T2>{
@@ -133,6 +134,7 @@ function blk(s: string, cmd: T.JCmd): T.JBlock{
 const testBlocks: JBlock[] = [
       blk("x", tc("lit", val("0x0cf40bf4b76246bc9d0545e13524a174")))
     , blk("y", tc("run", {dependencies: [["x", jv("x")]], cmd: [val("bash"), val("x"), val("x")]}))
+    , blk("z", tc("cat", tc("dir", {root: jv("y"), path: ["stdout"]})))
 ]
 
 export const clReq: T.ClRequest = (worksheet, command) => (
@@ -145,6 +147,14 @@ export const clReq: T.ClRequest = (worksheet, command) => (
                     resolve()
                 }
             }
+        , reqtime())
+    })
+)
+
+export const clWait: T.clWaitRequest = (bundle) => (
+    new Promise((executor, resolve) => {
+        setTimeout(
+            () => resolve()
         , reqtime())
     })
 )

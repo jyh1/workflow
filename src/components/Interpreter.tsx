@@ -1,7 +1,7 @@
 import * as T from './Types'
 import * as _ from 'lodash'
 import {quote} from './algorithms'
-import {clReq} from './Requests'
+import {clReq, clWait} from './Requests'
 
 
 type Env = Map<string, Promise<string>>
@@ -89,7 +89,12 @@ function clmake(env: Env, deps: T.Deps): Promise<string>{
 }
 
 function clcat(env: Env, bundle: T.JNormalRes): Promise<string>{
-    throw "not implemented"
+    return (
+        resolveJNormalRes(env, bundle)
+        .then(clWait)
+        .then(x => (quote(["cl", "cat", x])))
+        .then(x => clReq(worksheet, x))
+    )
 }
 
 

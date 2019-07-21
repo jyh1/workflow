@@ -65,6 +65,7 @@ export type TaskListRequest = () => Promise<TaskListElement[]>
 export type TaskInfoRequest = (taskid: TaskId) => Promise<Task>
 export type CompileRequest = (nodes: ToolNode[]) => Promise<JLang>
 export type ClRequest = (worsheet: string, command: string) => Promise<string>
+export type clWaitRequest = (path: string) => Promise<string>
 
 // graph representation
 export type ToolPort = {taskid: TaskId, label: string}
@@ -79,5 +80,5 @@ export type ToolNode = ToolNodeInterface<ToolPort>
 export const endPointPath = {
       login: "/login"
     , mainapp: "/"
-    , codalab: "rest/cli/command"
+    , codalab: "rest/"
 }
