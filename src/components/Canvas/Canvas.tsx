@@ -66,7 +66,7 @@ export class Canvas extends React.Component<Props, State>{
             if (uniqName.has(name)){
                 const count = uniqName.get(name)
                 uniqName.set(name, count + 1)
-                name = count + '-' + name
+                name = name + '-' + count
             } else {
                 uniqName.set(name, 0)
             }
