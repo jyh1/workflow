@@ -68,7 +68,7 @@ export type ClRequest = (worsheet: string, command: string) => Promise<string>
 export type ClWaitRequest = (path: string) => Promise<string>
 
 // graph representation
-export type ToolPort = {taskid: TaskId, label: string}
+export type ToolPort = {nodeid: TaskId, label: string}
 export interface ToolNodeInterface<PortType> {
     name: string; 
     id: string; 

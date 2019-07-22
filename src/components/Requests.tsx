@@ -88,3 +88,20 @@ export const clWait: T.ClWaitRequest = (path) => {
             }
         }))
 }
+
+
+export const compileReq: T.CompileRequest = (ts) => {
+    let req = fetch('tool/compile', 
+        {
+          headers: {"Content-Type":'application/json'}
+        , credentials: 'same-origin'
+        , method: 'POST'
+        ,  body: JSON.stringify(ts)
+        }).then((res) => {
+            if (res.status == 401){
+                return Promise.reject(res);
+            }
+            return res.json()
+        })
+    return req
+}

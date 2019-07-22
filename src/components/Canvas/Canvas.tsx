@@ -5,7 +5,7 @@ import {TaskNodeModel, TaskNodeFactory, TaskLinkFactory} from "./TaskNodeModel"
 import {Graph} from '../algorithms'
 import * as _ from "lodash"
 import * as S from 'semantic-ui-react'
-import {compileReq} from "../MockRequests"
+import {compileReq} from "../Requests"
 import {evalJLang} from "../Interpreter"
 import { object } from "prop-types";
 
@@ -68,7 +68,7 @@ export class Canvas extends React.Component<Props, State>{
                 let portname = (p as any).label
                 portIdToName[p.id] = portname
                 if((p as any).in){
-                    // if (p.links.length !== 1){ throw "unfilled argument"} //TODO: use a error class
+                    if (p.links.length !== 1){ throw "unfilled argument"} //TODO: use a error class
                     if (p.links.length !== 1){ continue} //TODO: use a error class
                     let link = p.links[0]
                     argDic[portname] = link
@@ -80,7 +80,7 @@ export class Canvas extends React.Component<Props, State>{
         // console.log(processedNodes)
         let tools = _.mapValues(processedNodes, (n) => {
                 let toToolPort: (linkid: string) => ToolPort = (linkid) => (
-                    {taskid: linkDic[linkid].taskid, label: portIdToName[linkDic[linkid].portid]}
+                    {nodeid: linkDic[linkid].taskid, label: portIdToName[linkDic[linkid].portid]}
                 )
                 return ({...n, arguments: _.mapValues(n.arguments, toToolPort)})
             })
