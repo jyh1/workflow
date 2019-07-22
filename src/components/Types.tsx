@@ -27,7 +27,7 @@ export type Dep = [string, JNormalRes]
 export type Deps = Dep[]
 export type JMake = JObject<"make", Deps>
 export type JRun = JObject<"run", {dependencies: Deps, cmd: CMDEle[]}>
-export type JLit = JObject<"lit", JNormalRes>
+export type JLit = JObject<"lit", string>
 export type JCmd = JCat | JMake | JRun | JLit
 
 export type CMDEle = JNormalRes | {root: string, path: string[]}

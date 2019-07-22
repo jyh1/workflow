@@ -15,6 +15,7 @@ function buildPath(r: string, ps: string[]):string{
 }
 
 function resolveJNormalRes(env: Env, res: T.JNormalRes): Promise<string>{
+    console.log(res)
     if (res.type === "variable"){
         return (env.get(res.content))
     }
@@ -32,6 +33,7 @@ function resolveJNormalRes(env: Env, res: T.JNormalRes): Promise<string>{
 
 function resolveDep(env: Env, dep: T.Dep): Promise<string>{
     let name = dep[0]
+    console.log(dep)
     return (resolveJNormalRes(env, dep[1])
         .then(val => name+":"+val)
     )
@@ -113,7 +115,7 @@ function resolveJBlock(env: Env, blk: T.JBlock): void{
         env.set(blk.variable, clrun(env, options, cmd.content.cmd, cmd.content.dependencies))
     }
     if(cmd.type == "lit"){
-        env.set(blk.variable, resolveJRes(env, cmd.content))
+        env.set(blk.variable, Promise.resolve(cmd.content))
     }
     if(cmd.type == "make"){
         env.set(blk.variable, clmake(env, options, cmd.content))
