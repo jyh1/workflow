@@ -72,7 +72,7 @@ function resolveCMDEle(env: Env, e: T.CMDEle): Promise<string>{
 function resolveCMDEles(env: Env, es: T.CMDEle[]): Promise<string>{
     return(
         Promise.all(_.map(es, x => resolveCMDEle(env, x)))
-        .then(ss => quote(ss))
+        .then(ss => ss.join(' '))
     )
 }
 
