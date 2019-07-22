@@ -15,7 +15,7 @@ function buildPath(r: string, ps: string[]):string{
 }
 
 function resolveJNormalRes(env: Env, res: T.JNormalRes): Promise<string>{
-    console.log(res)
+    // console.log(res)
     if (res.type === "variable"){
         return (env.get(res.content))
     }
@@ -33,7 +33,7 @@ function resolveJNormalRes(env: Env, res: T.JNormalRes): Promise<string>{
 
 function resolveDep(env: Env, dep: T.Dep): Promise<string>{
     let name = dep[0]
-    console.log(dep)
+    // console.log(dep)
     return (resolveJNormalRes(env, dep[1])
         .then(val => name+":"+val)
     )
@@ -127,7 +127,7 @@ function resolveJBlock(env: Env, blk: T.JBlock): void{
 
 function resolveJRes(env: Env, res: T.JRes):Promise<string>{
     if (res.type == "record"){
-        throw "not implemented"
+        return Promise.resolve('record result')
     } else {
         return (resolveJNormalRes(env, res))
     }
@@ -135,7 +135,7 @@ function resolveJRes(env: Env, res: T.JRes):Promise<string>{
 
 export function evalJLang(code: T.JLang): Promise<string>{
     let env: Env = new Map()
-    console.log(code)
+    // console.log(code)
     _.map(code.blocks, b => resolveJBlock(env, b))
     return resolveJRes(env, code.result)
 }

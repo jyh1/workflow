@@ -50,18 +50,26 @@ export class Canvas extends React.Component<Props, State>{
         let g = this.model.serializeDiagram()
         let graphModel = new Graph()
         let {links, nodes} = g
-        let linkDic : {[linkid: string]: {taskid: string, portid: string}} = {} //linkid to source [taskid, portid]
+        let linkDic : {[linkid: string]: {nodeid: string, portid: string}} = {} //linkid to source [nodeid, portid]
         for(let l of links){
-            linkDic[l.id] = {taskid: l.source, portid: l.sourcePort}
+            linkDic[l.id] = {nodeid: l.source, portid: l.sourcePort}
             graphModel.addEdge(l.source, l.target)
         }
         let portIdToName: {[portid: string]: string} = {}
         type ArgDic = {[arg: string]: string} //argumentname to linkid
         let processedNodes: {[nodeid: string]: ToolNodeInterface<string>} = {}
+        let uniqName: Map<string, number> = new Map()
         for(let n of nodes){
             let {id, ports, extras} = n
             graphModel.addNode(id)
             let name: string = (n as any).name
+            if (uniqName.has(name)){
+                const count = uniqName.get(name)
+                uniqName.set(name, count + 1)
+                name = count + '-' + name
+            } else {
+                uniqName.set(name, 0)
+            }
             let taskid = extras.taskid as string
             let argDic: ArgDic = {} // portname to linkid
             for (let p of ports){
@@ -74,14 +82,15 @@ export class Canvas extends React.Component<Props, State>{
                     argDic[portname] = link
                 }
             }
-            processedNodes[id]= {id, taskid, arguments: argDic, name}
+            processedNodes[id]= {id, taskid, arguments: argDic, name: name}
         }
         let sortedOrder = graphModel.topoSort()
         // console.log(processedNodes)
         let tools = _.mapValues(processedNodes, (n) => {
-                let toToolPort: (linkid: string) => ToolPort = (linkid) => (
-                    {nodeid: linkDic[linkid].taskid, label: portIdToName[linkDic[linkid].portid]}
-                )
+                let toToolPort: (linkid: string) => ToolPort = (linkid) => {
+                    let nodeid = linkDic[linkid].nodeid
+                    return {nodeid, nodename: processedNodes[nodeid].name, label: portIdToName[linkDic[linkid].portid]}
+                }
                 return ({...n, arguments: _.mapValues(n.arguments, toToolPort)})
             })
         return (_.map(sortedOrder, k => tools[k]))
