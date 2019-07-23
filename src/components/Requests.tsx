@@ -11,7 +11,7 @@ export const loginReq: LoginRequest = (username, password) => {
         , method: 'POST'
         ,  body: JSON.stringify({username, password})
         }).then((res) => {
-            if (res.status == 401){
+            if (!res.ok){
                 return Promise.reject(res);
             }
             return
@@ -55,7 +55,7 @@ export const clReq: T.ClRequest = (worksheet, command) => (
         , body: JSON.stringify({worksheet_uuid: worksheet, command})
         })
         .then((res) => {
-            if (res.status !== 200){
+            if (!res.ok){
                 return Promise.reject(res);
             }
             return (res.json())
@@ -72,7 +72,7 @@ export const clWait: T.ClWaitRequest = (path) => {
         , credentials: 'same-origin'
         })
         .then((res) => {
-            if (res.status !== 200){
+            if (!res.ok){
                 return Promise.reject(res);
             }
             return (res.json())
@@ -98,7 +98,7 @@ export const compileReq: T.CompileRequest = (ts) => {
         , method: 'POST'
         ,  body: JSON.stringify(ts)
         }).then((res) => {
-            if (res.status == 401){
+            if (!res.ok){
                 return Promise.reject(res);
             }
             return res.json()

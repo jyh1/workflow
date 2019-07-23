@@ -66,6 +66,7 @@ export type TaskInfoRequest = (taskid: TaskId) => Promise<Task>
 export type CompileRequest = (nodes: ToolNode[]) => Promise<JLang>
 export type ClRequest = (worsheet: string, command: string) => Promise<string>
 export type ClWaitRequest = (path: string) => Promise<string>
+export type WorksheetItemsRequest = (worksheet: string) => Promise<WorksheetItems>
 
 // graph representation
 export type ToolPort = {nodeid: TaskId, nodename: string, label: string}
@@ -76,6 +77,22 @@ export interface ToolNodeInterface<PortType> {
     arguments: {[arg: string]: PortType}
 }
 export type ToolNode = ToolNodeInterface<ToolPort>
+
+// bundle list in worksheet
+export type BundleInfo = {
+      uuid: string
+    , args?: string
+    , bundle_type: "run" | "dataset"
+    , command?: string
+    , metadata: BundleMeta
+    , state: "ready" | "preparing" | "running" | "failed"
+}
+export type BundleMeta = {
+      run_status?: "Finished"
+    , data_size: number
+    , name: string
+}
+export type WorksheetItems = {items: {bundles_spec: {bundle_infos: BundleInfo[]}}[]}
 
 export const endPointPath = {
       login: "/login"

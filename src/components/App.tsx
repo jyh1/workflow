@@ -9,16 +9,20 @@ import { Router, Route, Link, Redirect, withRouter, Switch, RouteProps } from 'r
 import {getLoginStatus} from "./Requests"
 import { createBrowserHistory } from 'history';
 import {Login} from "./Login";
+import {WorksheetList} from './Worksheet/BundleList'
 
 
 export const HomeApp = () => (
     <Grid celled divided="vertically" style={{height: "100%"}}>
-        <Grid.Row columns={2}>
+        <Grid.Row columns={3}>
             <Grid.Column width={3}>
                 <TaskElementListWidget/>
             </Grid.Column>
             <Grid.Column width={10}>        
                 <Canvas nodes = {[]} />
+            </Grid.Column>
+            <Grid.Column width={3}>
+                <WorksheetList worksheet="0xba3f48f99f02449c823257672d85ab55"/>
             </Grid.Column>
         </Grid.Row>
     </Grid>

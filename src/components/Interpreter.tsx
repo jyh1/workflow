@@ -2,6 +2,7 @@ import * as T from './Types'
 import * as _ from 'lodash'
 import {quote} from './algorithms'
 import {clReq, clWait} from './Requests'
+import { string } from 'prop-types';
 
 
 type Env = Map<string, Promise<string>>
@@ -12,6 +13,10 @@ function buildPath(r: string, ps: string[]):string{
     let psc = ps.slice()
     psc.unshift(r)
     return (psc.join('/'))
+}
+
+function buildDep(n: string, b: string): string{
+    return (n + ":" + b)
 }
 
 function resolveJNormalRes(env: Env, res: T.JNormalRes): Promise<string>{
@@ -31,15 +36,35 @@ function resolveJNormalRes(env: Env, res: T.JNormalRes): Promise<string>{
     }
 }
 
-function resolveDep(env: Env, dep: T.Dep): Promise<string>{
+function resolveDep(env: Env, dep: T.Dep): Promise<[string, string]>{
     let name = dep[0]
     // console.log(dep)
     return (resolveJNormalRes(env, dep[1])
-        .then(val => name+":"+val)
+        .then(val => [name, val])
     )
 }
 
-function resolveDeps(env: Env, deps: T.Deps): Promise<string[]>{
+type DepResult = {alias: Map<string, string>, deps: string[]}
+
+function uniqDeps(deps: [string, string][]): DepResult {
+    type Bundle = string
+    type Name = string
+    let newdeps: string[] = []
+    let alias: Map<Name, Name> = new Map()
+    let uniqName: Map<Bundle, Name> = new Map()
+    for(let [name, bundle] of deps){
+        if(uniqName.has(bundle)){
+            alias.set(name, uniqName.get(bundle))
+        } else {
+            alias.set(name, name)
+            uniqName.set(bundle, name)
+            newdeps.push(buildDep(name, bundle))
+        }
+    }
+    return {alias, deps: newdeps}
+}
+
+function resolveDeps(env: Env, deps: T.Deps): Promise<[string, string][]>{
     return (
         Promise.all(_.map(deps, x => resolveDep(env, x)))
     )
@@ -60,26 +85,27 @@ function resolveClOpts(env: Env, opts: T.ClOption[]): Promise<string[]>{
     )
 }
 
-function resolveCMDEle(env: Env, e: T.CMDEle): Promise<string>{
+function resolveCMDEle(env: Env, alias: Map<string, string>, e: T.CMDEle): Promise<string>{
     if('root' in e){
-        return Promise.resolve(buildPath(e.root, e.path))
+        return Promise.resolve(buildPath(alias.get(e.root), e.path))
     }
     if('type' in e){
         return (resolveJNormalRes(env, e))
     }
 }
 
-function resolveCMDEles(env: Env, es: T.CMDEle[]): Promise<string>{
+function resolveCMDEles(env: Env, alias: Map<string, string>, es: T.CMDEle[]): Promise<string>{
     return(
-        Promise.all(_.map(es, x => resolveCMDEle(env, x)))
+        Promise.all(_.map(es, x => resolveCMDEle(env, alias, x)))
         .then(ss => ss.join(' '))
     )
 }
 
-function clrun(env: Env, opts: T.ClOption[], cmd: T.CMDEle[], deps: T.Deps): Promise<string>{
-    let depstr = resolveDeps(env, deps)
+function clrun(env: Env, opts: T.ClOption[], cmd: T.CMDEle[], deps: T.Deps): Promise<string>{        
+    let depres = resolveDeps(env, deps).then (x => uniqDeps(x))
+    let depstr = depres.then(x => x.deps)
     let optstr = resolveClOpts(env, opts)
-    let cmdstr = resolveCMDEles(env, cmd)
+    let cmdstr = depres.then(x => resolveCMDEles(env, x.alias, cmd))
     return (Promise.all([optstr, depstr, cmdstr])
     .then (xs => quote(["cl", "run"].concat(...xs)))
     .then (xs => clReq(worksheet, xs))
@@ -88,7 +114,7 @@ function clrun(env: Env, opts: T.ClOption[], cmd: T.CMDEle[], deps: T.Deps): Pro
 
 function clmake(env: Env, opts: T.ClOption[], deps: T.Deps): Promise<string>{
     return(
-        Promise.all([resolveClOpts(env, opts), resolveDeps(env, deps)])
+        Promise.all([resolveClOpts(env, opts), resolveDeps(env, deps).then(xs => _.map(xs, arr => buildDep(...arr)))])
         .then(xs => quote(["cl", "make"].concat(...xs)))
         .then(x => clReq(worksheet, x))
     )

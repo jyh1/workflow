@@ -14,6 +14,7 @@ import {
     } from "./Types"
 import * as T from "./Types"
 import * as _ from "lodash"
+import {bundlelist} from './TestData'
 
 let latency = 3000
 let reqtime = () => latency * Math.random()
@@ -154,21 +155,15 @@ export const clReq: T.ClRequest = (worksheet, command) => (
 export const clWait: T.ClWaitRequest = (bundle) => (
     new Promise((executor, resolve) => {
         setTimeout(
-            () => resolve()
+            () => executor()
         , reqtime())
     })
 )
 
-// let testtasks: TaskElement[] = [
-//       ...defTaskLis(["s1", "s2", "s3"])
-//     , taskfoldr
-//     , ...defTaskLis(["q1", "q2", "q3"])
-// ]
-
-// export let requestTask:RequestTask = (taskid) => (
-//     new Promise((executor, resolve) => {
-//         setTimeout(function() {
-//             executor(newTask(taskid));
-//         }, 300);
-//     })
-// )
+export const worksheetItemsReq: T.WorksheetItemsRequest = (worksheet) => (
+    new Promise((executor, resolve) => {
+        setTimeout(
+            () => executor(bundlelist)
+        , reqtime())
+    })
+)
