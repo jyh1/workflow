@@ -1,7 +1,7 @@
 import {taskTag, TaskElement, TaskId, TaskListElement, TaskDragType} from "../Types"
 import * as React from "react"
 import * as _ from "lodash"
-import {List, Divider, Header, Dimmer, Loader} from 'semantic-ui-react'
+import {List, Container, Header, Dimmer, Loader} from 'semantic-ui-react'
 // import {taskListReq} from "../MockRequests"
 import {taskListReq} from "../Requests"
 
@@ -68,7 +68,7 @@ export class TaskElementListWidget extends React.Component<{}, {tasks: TaskEleme
     render(){
         let eles = this.state.tasks
         return(
-            <React.Fragment>
+            <Container fluid>
                 <Header as="h2">Tools</Header>
                 <List divided relaxed>
                     <Dimmer active={this.state.loading} inverted>
@@ -76,7 +76,7 @@ export class TaskElementListWidget extends React.Component<{}, {tasks: TaskEleme
                     </Dimmer>
                     {...renderTaskElementList(eles)}
                 </List>
-            </React.Fragment>
+            </Container>
         )
     }
     componentDidMount(){

@@ -12,6 +12,8 @@ import {Login} from "./Login";
 import {WorksheetList} from './Worksheet/BundleList'
 import * as T from './Types'
 import {worksheetItemsReq} from './Requests'
+import SplitPane from 'react-split-pane'
+import '../theme/layout.scss'
 
 type Props = {}
 type State = {bundlelist: T.BundleInfo[]}
@@ -35,19 +37,13 @@ export class HomeApp extends React.Component<Props, State>{
     render(){
         let refreshBundle = this.refreshBundle.bind(this)
         return (
-            <Grid celled divided="vertically" style={{height: "100%"}}>
-                <Grid.Row columns={3}>
-                    <Grid.Column width={3}>
-                        <TaskElementListWidget/>
-                    </Grid.Column>
-                    <Grid.Column width={10}>        
-                        <Canvas nodes = {[]} refreshBundle={refreshBundle} />
-                    </Grid.Column>
-                    <Grid.Column width={3}>
-                        <WorksheetList bundles={this.state.bundlelist} refreshBundle={refreshBundle} />
-                    </Grid.Column>
-                </Grid.Row>
-            </Grid>
+            <SplitPane split="vertical" defaultSize="16%" pane1Style={{overflowY: "auto"}}>
+                <TaskElementListWidget/>
+                <SplitPane split="vertical" defaultSize="72%" pane2Style={{overflowY: "auto"}}>
+                    <Canvas nodes = {[]} refreshBundle={refreshBundle} />
+                    <WorksheetList bundles={this.state.bundlelist} refreshBundle={refreshBundle} />
+                </SplitPane>
+            </SplitPane>
         )
     }
 }

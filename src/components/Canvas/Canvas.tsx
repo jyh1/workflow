@@ -45,7 +45,7 @@ export class Canvas extends React.Component<Props, State>{
         this.engine.setDiagramModel(model);
 
         // refresh bundlelist after submitting request
-        this.refreshBundle = debounce(this.props.refreshBundle, 1000)
+        this.refreshBundle = debounce(this.props.refreshBundle, 2000)
     }
 
     refresh(){

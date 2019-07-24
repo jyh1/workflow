@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Icon, Table } from 'semantic-ui-react'
+import { Container, Table } from 'semantic-ui-react'
 import * as _ from 'lodash'
 import * as T from '../Types'
 // import {worksheetItemsReq} from '../MockRequests'
@@ -19,7 +19,7 @@ export class WorksheetList extends React.Component<Props, State>{
 
     render(){
         return(
-            <div>
+            <Container fluid>
                 <SelectWorksheet selectWorksheet={this.changeWorksheet.bind(this)} />
                 <Table selectable celled striped>
                     <Table.Header>
@@ -42,7 +42,7 @@ export class WorksheetList extends React.Component<Props, State>{
                         }
                     </Table.Body>
                 </Table>
-            </div>
+            </Container>
         )
     }
 }

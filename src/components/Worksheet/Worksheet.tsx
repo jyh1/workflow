@@ -23,7 +23,7 @@ export class SelectWorksheet extends React.Component <Props, State>{
                 placeholder='Select Worksheet'
                 search
                 selection
-                // fluid
+                defaultValue={localStorage.getItem("worksheet")}
                 options={options}
                 onChange={(event, data) => this.props.selectWorksheet(data.value as string)}
             />
