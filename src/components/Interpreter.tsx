@@ -5,9 +5,7 @@ import {clReq, clWait} from './Requests'
 import { string } from 'prop-types';
 
 
-type Env = Map<string, Promise<string>>
-
-const worksheet = "0x4329e2c6d58c4312aad5a0df042eea95"
+type Env = {env: Map<string, Promise<string>>, worksheet: string}
 
 function buildPath(r: string, ps: string[]):string{
     let psc = ps.slice()
@@ -22,7 +20,7 @@ function buildDep(n: string, b: string): string{
 function resolveJNormalRes(env: Env, res: T.JNormalRes): Promise<string>{
     // console.log(res)
     if (res.type === "variable"){
-        return (env.get(res.content))
+        return (env.env.get(res.content))
     }
     if (res.type === "value"){
         return (Promise.resolve(res.content))
@@ -108,7 +106,7 @@ function clrun(env: Env, opts: T.ClOption[], cmd: T.CMDEle[], deps: T.Deps): Pro
     let cmdstr = depres.then(x => resolveCMDEles(env, x.alias, cmd))
     return (Promise.all([optstr, depstr, cmdstr])
     .then (xs => quote(["cl", "run"].concat(...xs)))
-    .then (xs => clReq(worksheet, xs))
+    .then (xs => clReq(env.worksheet, xs))
     )
 }
 
@@ -116,7 +114,7 @@ function clmake(env: Env, opts: T.ClOption[], deps: T.Deps): Promise<string>{
     return(
         Promise.all([resolveClOpts(env, opts), resolveDeps(env, deps).then(xs => _.map(xs, arr => buildDep(...arr)))])
         .then(xs => quote(["cl", "make"].concat(...xs)))
-        .then(x => clReq(worksheet, x))
+        .then(x => clReq(env.worksheet, x))
     )
 }
 
@@ -125,7 +123,7 @@ function clcat(env: Env, bundle: T.JNormalRes): Promise<string>{
         resolveJNormalRes(env, bundle)
         .then(clWait)
         .then(x => (quote(["cl", "cat", x])))
-        .then(x => clReq(worksheet, x))
+        .then(x => clReq(env.worksheet, x))
         .then(res => {let strs = res.split('\n'); strs.pop(); return strs.join('\n')})
     )
 }
@@ -138,16 +136,16 @@ function resolveJBlock(env: Env, blk: T.JBlock): void{
     options.unshift(["name", {type: "value", content: blk.variable}])
     let cmd = blk.command
     if(cmd.type == "run"){
-        env.set(blk.variable, clrun(env, options, cmd.content.cmd, cmd.content.dependencies))
+        env.env.set(blk.variable, clrun(env, options, cmd.content.cmd, cmd.content.dependencies))
     }
     if(cmd.type == "lit"){
-        env.set(blk.variable, Promise.resolve(cmd.content))
+        env.env.set(blk.variable, Promise.resolve(cmd.content))
     }
     if(cmd.type == "make"){
-        env.set(blk.variable, clmake(env, options, cmd.content))
+        env.env.set(blk.variable, clmake(env, options, cmd.content))
     }
     if(cmd.type == "cat"){
-        env.set(blk.variable, clcat(env, cmd.content))
+        env.env.set(blk.variable, clcat(env, cmd.content))
     }
 }
 
@@ -160,7 +158,11 @@ function resolveJRes(env: Env, res: T.JRes):Promise<string>{
 }
 
 export function evalJLang(code: T.JLang): Promise<string>{
-    let env: Env = new Map()
+    let worksheet = localStorage.getItem("worksheet")
+    if (worksheet == null){
+        throw "No worksheet"
+    }
+    let env: Env = {env: new Map(), worksheet}
     // console.log(code)
     _.map(code.blocks, b => resolveJBlock(env, b))
     return resolveJRes(env, code.result)

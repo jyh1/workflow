@@ -1,6 +1,7 @@
 import {LoginRequest, TaskInfoRequest, Task, TaskListRequest, TaskElement, TaskId, TaskListElement} from "./Types"
 import Cookies from 'universal-cookie';
 import * as T from "./Types"
+import * as _ from "lodash"
 import { delay } from "q";
 
 export const loginReq: LoginRequest = (username, password) => {
@@ -105,3 +106,37 @@ export const compileReq: T.CompileRequest = (ts) => {
         })
     return req
 }
+
+export const worksheetItemsReq: T.WorksheetItemsRequest = (worksheet) => {
+    let req = fetch(T.endPointPath.codalab + 'interpret/worksheet/' + worksheet + '?include=items.bundles', 
+        {credentials: 'same-origin'})
+        .then((res) => {
+            if (!res.ok){
+                return Promise.reject(res);
+            }
+            return res.json()
+        })
+        .then(res => {
+            let items = res.items
+            if (items.length == 0){
+                return []
+            }
+            let item = items[items.length - 1]
+            if(item.mode == "table_block"){
+                return(item.bundles_spec.bundle_infos)
+            }
+            return []
+        })
+    return req
+}
+
+export const worksheetsReq: T.WorksheetsRequest = () => (
+    fetch(T.endPointPath.codalab + 'worksheets?keywords=.mine', {credentials: 'same-origin'})
+    .then(res => {
+        if (!res.ok){
+            return Promise.reject(res);
+        }
+        let list = res.json().then(data => _.map(data.data, w => ({uuid: w.id, name: w.attributes.name, title: w.attributes.title})))
+        return list
+    })
+)

@@ -67,6 +67,7 @@ export type CompileRequest = (nodes: ToolNode[]) => Promise<JLang>
 export type ClRequest = (worsheet: string, command: string) => Promise<string>
 export type ClWaitRequest = (path: string) => Promise<string>
 export type WorksheetItemsRequest = (worksheet: string) => Promise<WorksheetItems>
+export type WorksheetsRequest = () => Promise<Worksheet[]>
 
 // graph representation
 export type ToolPort = {nodeid: TaskId, nodename: string, label: string}
@@ -92,7 +93,10 @@ export type BundleMeta = {
     , data_size: number
     , name: string
 }
-export type WorksheetItems = {items: {bundles_spec: {bundle_infos: BundleInfo[]}}[]}
+export type WorksheetItems = BundleInfo[]
+// {items: {bundles_spec: {bundle_infos: BundleInfo[]}}[]}
+
+export type Worksheet = {uuid: string, name: string, title?: string}
 
 export const endPointPath = {
       login: "/login"

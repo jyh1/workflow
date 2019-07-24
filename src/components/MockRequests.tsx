@@ -14,7 +14,7 @@ import {
     } from "./Types"
 import * as T from "./Types"
 import * as _ from "lodash"
-import {bundlelist} from './TestData'
+import * as Data from './TestData'
 
 let latency = 3000
 let reqtime = () => latency * Math.random()
@@ -163,7 +163,21 @@ export const clWait: T.ClWaitRequest = (bundle) => (
 export const worksheetItemsReq: T.WorksheetItemsRequest = (worksheet) => (
     new Promise((executor, resolve) => {
         setTimeout(
-            () => executor(bundlelist)
+            () => executor(Data.bundlelist.items[0].bundles_spec.bundle_infos)
         , reqtime())
+    })
+)
+
+export const worksheetsReq: T.WorksheetsRequest = () => (
+    new Promise((executor, resolve) => {
+        setTimeout(
+            () => {
+                let data = _.map(Data.myworksheets.data, w => ({uuid: w.id, name: w.attributes.name, title: w.attributes.title}))
+                console.log(data)
+                executor(data)
+            }
+
+        , reqtime()
+        )
     })
 )

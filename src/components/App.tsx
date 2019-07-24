@@ -22,7 +22,7 @@ export const HomeApp = () => (
                 <Canvas nodes = {[]} />
             </Grid.Column>
             <Grid.Column width={3}>
-                <WorksheetList worksheet="0xba3f48f99f02449c823257672d85ab55"/>
+                <WorksheetList/>
             </Grid.Column>
         </Grid.Row>
     </Grid>
