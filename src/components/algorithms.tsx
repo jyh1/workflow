@@ -66,3 +66,12 @@ export let quote = function (xs: string[]) {
     })
     return strs.join(" ")
 };
+
+
+export const debounce = (func: () => void, delay: number) => {
+    let inDebounce: NodeJS.Timeout
+    return function() {
+      clearTimeout(inDebounce)
+      inDebounce = setTimeout(func, delay)
+    }
+}

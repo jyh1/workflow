@@ -3,28 +3,20 @@ import { Icon, Table } from 'semantic-ui-react'
 import * as _ from 'lodash'
 import * as T from '../Types'
 // import {worksheetItemsReq} from '../MockRequests'
-import {worksheetItemsReq} from '../Requests'
 import {SelectWorksheet} from './Worksheet'
 
-type Props = {}
-type State = {bundles: T.BundleInfo[]}
+type Props = {refreshBundle: () => void, bundles: T.BundleInfo[]}
+type State = {}
 
 export class WorksheetList extends React.Component<Props, State>{
     constructor(props: Props){
         super(props)
-        this.state = {bundles: []}
-    }
-    componentDidMount(){
-        let worksheet = localStorage.getItem("worksheet")
-        if (worksheet){
-            this.changeWorksheet(worksheet)
-        }
     }
     changeWorksheet(uuid: string){
         localStorage.setItem("worksheet", uuid)
-        worksheetItemsReq(uuid)
-        .then(res => this.setState(prev => Object.assign(prev, {bundles: res})))
+        this.props.refreshBundle()
     }
+
     render(){
         return(
             <div>
@@ -38,7 +30,7 @@ export class WorksheetList extends React.Component<Props, State>{
                         </Table.Row>
                     </Table.Header>
                     <Table.Body>
-                        {... _.map(this.state.bundles, 
+                        {... _.map(this.props.bundles, 
                             b => 
                                 (<BundleEntry 
                                     uuid={b.uuid} 

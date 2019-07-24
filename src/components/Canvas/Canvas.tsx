@@ -2,15 +2,18 @@ import {Node, taskTag, TaskDragType, ToolPort, ToolNode, ToolNodeInterface, JLan
 import * as React from "react"
 import * as SRD from "storm-react-diagrams"
 import {TaskNodeModel, TaskNodeFactory, TaskLinkFactory} from "./TaskNodeModel"
-import {Graph} from '../algorithms'
+import {Graph, debounce} from '../algorithms'
 import * as _ from "lodash"
 import * as S from 'semantic-ui-react'
 import {compileReq} from "../Requests"
 import {evalJLang} from "../Interpreter"
 import { object } from "prop-types";
+import {clReq} from '../Requests'
+import * as T from '../Types'
 
 type Props = {
       nodes: Node[]
+    , refreshBundle: () => void
 };
 
 type State = {
@@ -22,6 +25,7 @@ type State = {
 export class Canvas extends React.Component<Props, State>{
     engine: SRD.DiagramEngine;
     model: SRD.DiagramModel
+    refreshBundle: () => void
     // refresh: () => void;
     constructor(props: Props){
         super(props);
@@ -39,6 +43,9 @@ export class Canvas extends React.Component<Props, State>{
             })
         model.addAll(... nodes);
         this.engine.setDiagramModel(model);
+
+        // refresh bundlelist after submitting request
+        this.refreshBundle = debounce(this.props.refreshBundle, 1000)
     }
 
     refresh(){
@@ -108,11 +115,18 @@ export class Canvas extends React.Component<Props, State>{
         } )
     }
 
+    reqAndRefresh(worksheet: string, command: string): Promise<string>{
+        let req = clReq(worksheet, command)
+        req.then(this.refreshBundle)
+        return req
+    }
+
     run(){
         let jlang =  this.state.compiled
         this.setState(prev => Object.assign(prev, {running: true}))
         if (jlang){
-            evalJLang(jlang).then(console.log).then(()=>{this.setState(prev => Object.assign(prev, {running: false}))})
+            evalJLang(jlang, this.reqAndRefresh.bind(this))
+            .then(console.log).then(()=>{this.setState(prev => Object.assign(prev, {running: false}))})
         }
     }
 

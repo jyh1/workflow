@@ -10,23 +10,48 @@ import {getLoginStatus} from "./Requests"
 import { createBrowserHistory } from 'history';
 import {Login} from "./Login";
 import {WorksheetList} from './Worksheet/BundleList'
+import * as T from './Types'
+import {worksheetItemsReq} from './Requests'
 
+type Props = {}
+type State = {bundlelist: T.BundleInfo[]}
 
-export const HomeApp = () => (
-    <Grid celled divided="vertically" style={{height: "100%"}}>
-        <Grid.Row columns={3}>
-            <Grid.Column width={3}>
-                <TaskElementListWidget/>
-            </Grid.Column>
-            <Grid.Column width={10}>        
-                <Canvas nodes = {[]} />
-            </Grid.Column>
-            <Grid.Column width={3}>
-                <WorksheetList/>
-            </Grid.Column>
-        </Grid.Row>
-    </Grid>
-    )
+export class HomeApp extends React.Component<Props, State>{
+    constructor(props: Props){
+        super(props)
+        this.state = {bundlelist: []}
+    }
+    componentDidMount(){
+        this.refreshBundle()
+    }
+    refreshBundle(){
+        let uuid = localStorage.getItem("worksheet")
+        if (uuid){
+            worksheetItemsReq(uuid)
+            .then(res => this.setState(prev => Object.assign(prev, {bundlelist: res})))
+        }
+    }
+
+    render(){
+        let refreshBundle = this.refreshBundle.bind(this)
+        return (
+            <Grid celled divided="vertically" style={{height: "100%"}}>
+                <Grid.Row columns={3}>
+                    <Grid.Column width={3}>
+                        <TaskElementListWidget/>
+                    </Grid.Column>
+                    <Grid.Column width={10}>        
+                        <Canvas nodes = {[]} refreshBundle={refreshBundle} />
+                    </Grid.Column>
+                    <Grid.Column width={3}>
+                        <WorksheetList bundles={this.state.bundlelist} refreshBundle={refreshBundle} />
+                    </Grid.Column>
+                </Grid.Row>
+            </Grid>
+        )
+    }
+}
+
 
 export const mainapp = () => (
     <Router history={createBrowserHistory({})}>

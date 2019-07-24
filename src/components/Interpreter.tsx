@@ -5,7 +5,7 @@ import {clReq, clWait} from './Requests'
 import { string } from 'prop-types';
 
 
-type Env = {env: Map<string, Promise<string>>, worksheet: string}
+type Env = {env: Map<string, Promise<string>>, worksheet: string, clReq: T.ClRequest}
 
 function buildPath(r: string, ps: string[]):string{
     let psc = ps.slice()
@@ -106,7 +106,7 @@ function clrun(env: Env, opts: T.ClOption[], cmd: T.CMDEle[], deps: T.Deps): Pro
     let cmdstr = depres.then(x => resolveCMDEles(env, x.alias, cmd))
     return (Promise.all([optstr, depstr, cmdstr])
     .then (xs => quote(["cl", "run"].concat(...xs)))
-    .then (xs => clReq(env.worksheet, xs))
+    .then (xs => env.clReq(env.worksheet, xs))
     )
 }
 
@@ -114,7 +114,7 @@ function clmake(env: Env, opts: T.ClOption[], deps: T.Deps): Promise<string>{
     return(
         Promise.all([resolveClOpts(env, opts), resolveDeps(env, deps).then(xs => _.map(xs, arr => buildDep(...arr)))])
         .then(xs => quote(["cl", "make"].concat(...xs)))
-        .then(x => clReq(env.worksheet, x))
+        .then(x => env.clReq(env.worksheet, x))
     )
 }
 
@@ -123,7 +123,7 @@ function clcat(env: Env, bundle: T.JNormalRes): Promise<string>{
         resolveJNormalRes(env, bundle)
         .then(clWait)
         .then(x => (quote(["cl", "cat", x])))
-        .then(x => clReq(env.worksheet, x))
+        .then(x => env.clReq(env.worksheet, x))
         .then(res => {let strs = res.split('\n'); strs.pop(); return strs.join('\n')})
     )
 }
@@ -157,12 +157,12 @@ function resolveJRes(env: Env, res: T.JRes):Promise<string>{
     }
 }
 
-export function evalJLang(code: T.JLang): Promise<string>{
+export function evalJLang(code: T.JLang, req: T.ClRequest = clReq): Promise<string>{
     let worksheet = localStorage.getItem("worksheet")
     if (worksheet == null){
         throw "No worksheet"
     }
-    let env: Env = {env: new Map(), worksheet}
+    let env: Env = {env: new Map(), worksheet, clReq:req}
     // console.log(code)
     _.map(code.blocks, b => resolveJBlock(env, b))
     return resolveJRes(env, code.result)
