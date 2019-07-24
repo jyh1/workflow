@@ -1,8 +1,7 @@
 import * as React from "react";
-import {Header, List, Grid, Divider, Container} from 'semantic-ui-react'
 import {Canvas} from "./Canvas/Canvas"
 import {TaskElementListWidget} from "./TaskList/TaskList"
-import {Node, Task, TaskElement, endPointPath} from "./Types"
+import {endPointPath} from "./Types"
 import * as _ from "lodash"
 import { Router, Route, Link, Redirect, withRouter, Switch, RouteProps } from 'react-router-dom';
 // import {getLoginStatus} from "./MockRequests"
@@ -14,6 +13,7 @@ import * as T from './Types'
 import {worksheetItemsReq} from './Requests'
 import SplitPane from 'react-split-pane'
 import '../theme/layout.scss'
+import * as localforage from 'localforage'
 
 type Props = {}
 type State = {bundlelist: T.BundleInfo[]}
@@ -27,11 +27,9 @@ export class HomeApp extends React.Component<Props, State>{
         this.refreshBundle()
     }
     refreshBundle(){
-        let uuid = localStorage.getItem("worksheet")
-        if (uuid){
-            worksheetItemsReq(uuid)
-            .then(res => this.setState(prev => Object.assign(prev, {bundlelist: res})))
-        }
+        localforage.getItem("worksheet")
+        .then(uuid => ( uuid? worksheetItemsReq(uuid as string) : Promise.resolve([]) ))
+        .then(res => this.setState(prev => Object.assign(prev, {bundlelist: res})))
     }
 
     render(){

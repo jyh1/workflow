@@ -90,7 +90,7 @@ export type BundleInfo = {
 }
 export type BundleMeta = {
       run_status?: "Finished"
-    , data_size: number
+    , data_size?: number
     , name: string
 }
 export type WorksheetItems = BundleInfo[]

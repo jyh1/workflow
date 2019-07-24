@@ -75,3 +75,18 @@ export const debounce = (func: () => void, delay: number) => {
       inDebounce = setTimeout(func, delay)
     }
 }
+
+// https://stackoverflow.com/a/14919494
+export function humanFileSize(bytes: number) {
+    var thresh = 1024;
+    if(Math.abs(bytes) < thresh) {
+        return bytes + ' b';
+    }
+    var units = ['k','m','g','t','p','e','z','y']
+    var u = -1;
+    do {
+        bytes /= thresh;
+        ++u;
+    } while(Math.abs(bytes) >= thresh && u < units.length - 1);
+    return bytes.toFixed(1)+' '+units[u];
+}

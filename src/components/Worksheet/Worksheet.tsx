@@ -3,6 +3,7 @@ import { Icon, Table, Dropdown } from 'semantic-ui-react'
 import * as _ from 'lodash'
 import * as T from '../Types'
 import {worksheetsReq} from '../Requests'
+import * as localforage from 'localforage'
 
 type Props = {selectWorksheet: (uuid: string) => void}
 type State = {worksheets: T.Worksheet[]}
@@ -23,7 +24,6 @@ export class SelectWorksheet extends React.Component <Props, State>{
                 placeholder='Select Worksheet'
                 search
                 selection
-                defaultValue={localStorage.getItem("worksheet")}
                 options={options}
                 onChange={(event, data) => this.props.selectWorksheet(data.value as string)}
             />
