@@ -107,6 +107,16 @@ export const compileReq: T.CompileRequest = (ts) => {
     return req
 }
 
+
+function parseWorksheetItem(item: any): T.WorksheetItem{
+    if (item.mode == "markup_block"){
+        return {type: "markup", content: item.text}
+    }
+    if (item.mode == "table_block"){
+        return {type: "bundles", content: item.bundles_spec.bundle_infos}
+    }
+    return null
+}
 export const worksheetItemsReq: T.WorksheetItemsRequest = (worksheet) => {
     let req = fetch(T.endPointPath.codalab + 'interpret/worksheet/' + worksheet + '?include=items.bundles', 
         {credentials: 'same-origin'})
@@ -117,15 +127,14 @@ export const worksheetItemsReq: T.WorksheetItemsRequest = (worksheet) => {
             return res.json()
         })
         .then(res => {
-            let items = res.items
-            if (items.length == 0){
-                return []
+            let worksheetItems: T.WorksheetItem[] = []
+            for (let item of res.items){
+                let parsedItem = parseWorksheetItem(item)
+                if(parsedItem){
+                    worksheetItems.push(parsedItem)
+                }
             }
-            let item = items[items.length - 1]
-            if(item.mode == "table_block"){
-                return(item.bundles_spec.bundle_infos)
-            }
-            return []
+            return {items: worksheetItems, uuid: worksheet}
         })
     return req
 }

@@ -66,7 +66,7 @@ export type TaskInfoRequest = (taskid: TaskId) => Promise<Task>
 export type CompileRequest = (nodes: ToolNode[]) => Promise<JLang>
 export type ClRequest = (worsheet: string, command: string) => Promise<string>
 export type ClWaitRequest = (path: string) => Promise<string>
-export type WorksheetItemsRequest = (worksheet: string) => Promise<WorksheetItems>
+export type WorksheetItemsRequest = (worksheet: string) => Promise<WorksheetContent>
 export type WorksheetsRequest = () => Promise<Worksheet[]>
 
 // graph representation
@@ -93,8 +93,10 @@ export type BundleMeta = {
     , data_size?: number
     , name: string
 }
-export type WorksheetItems = BundleInfo[]
-// {items: {bundles_spec: {bundle_infos: BundleInfo[]}}[]}
+
+export type WorksheetItem = JObject<"bundles", BundleInfo[]> | JObject<"markup", string>
+
+export type WorksheetContent = {items: WorksheetItem[], uuid: string}
 
 export type Worksheet = {uuid: string, name: string, title?: string}
 

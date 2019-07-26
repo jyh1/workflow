@@ -16,20 +16,20 @@ import '../theme/layout.scss'
 import * as localforage from 'localforage'
 
 type Props = {}
-type State = {bundlelist: T.BundleInfo[]}
+type State = {currentWorksheet: T.WorksheetContent}
 
 export class HomeApp extends React.Component<Props, State>{
     constructor(props: Props){
         super(props)
-        this.state = {bundlelist: []}
+        this.state = {currentWorksheet: {items: [], uuid: ""}}
     }
     componentDidMount(){
         this.refreshBundle()
     }
     refreshBundle(){
         localforage.getItem("worksheet")
-        .then(uuid => ( uuid? worksheetItemsReq(uuid as string) : Promise.resolve([]) ))
-        .then(res => this.setState(prev => Object.assign(prev, {bundlelist: res})))
+        .then(uuid => ( uuid? worksheetItemsReq(uuid as string) : Promise.resolve({items: [], uuid: ""}) ))
+        .then(res => this.setState(prev => Object.assign(prev, {currentWorksheet: res})))
     }
 
     render(){
@@ -39,7 +39,7 @@ export class HomeApp extends React.Component<Props, State>{
                 <TaskElementListWidget/>
                 <SplitPane split="vertical" defaultSize="72%" pane2Style={{overflowY: "auto"}}>
                     <Canvas nodes = {[]} refreshBundle={refreshBundle} />
-                    <WorksheetList bundles={this.state.bundlelist} refreshBundle={refreshBundle} />
+                    <WorksheetList content={this.state.currentWorksheet} refreshBundle={refreshBundle} />
                 </SplitPane>
             </SplitPane>
         )

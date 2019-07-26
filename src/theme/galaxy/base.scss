@@ -205,3 +205,22 @@ div.form-row-input label {
     @extend .unselectable;
     cursor: grab;
 }
+
+.ws-item {
+    position: relative;
+    margin-bottom: 20px;
+  }
+   .ws-item .ws-checkbox {
+    margin: 0;
+    position: absolute;
+    left: -24px;
+    top: 4px;
+    font-size: 16px;
+  }
+   .ws-item > .focused {
+    background-color: #e2f0f5;
+    box-shadow: 0 0 5px 5px #e2f0f5;
+  }
+  .editable .ws-item {
+    margin-left: 24px;
+  }

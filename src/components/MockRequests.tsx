@@ -170,7 +170,7 @@ export const clWait: T.ClWaitRequest = (bundle) => (
 export const worksheetItemsReq: T.WorksheetItemsRequest = (worksheet) => (
     new Promise((executor, resolve) => {
         setTimeout(
-            () => executor(Data.bundlelist.items[0].bundles_spec.bundle_infos)
+            () => executor({uuid: worksheet, items: [{type: "bundles", content: Data.worksheetitems.items[0].bundles_spec.bundle_infos}]})
         , reqtime())
     })
 )

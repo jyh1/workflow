@@ -6,8 +6,9 @@ import * as T from '../Types'
 import {SelectWorksheet} from './Worksheet'
 import * as localforage from 'localforage'
 import {humanFileSize} from '../algorithms'
+import * as marked from 'marked';
 
-type Props = {refreshBundle: () => void, bundles: T.BundleInfo[]}
+type Props = {refreshBundle: () => void, content: T.WorksheetContent}
 type State = {}
 
 export class WorksheetList extends React.Component<Props, State>{
@@ -20,9 +21,33 @@ export class WorksheetList extends React.Component<Props, State>{
     }
 
     render(){
+        // console.log(this.props.items)
+        let {content} = this.props
         return(
             <Container fluid>
                 <SelectWorksheet selectWorksheet={this.changeWorksheet.bind(this)} />
+                    {... _.map(content.items, (item, ind) => <WorksheetItem key={content.uuid + ind} item={item} />)}
+            </Container>
+        )
+    }
+}
+
+const WorksheetItem: React.SFC<{item: T.WorksheetItem}> = (props) => {
+    // console.log(props.item)
+    if (props.item.type == "bundles"){
+        return( <BundleTable bundles={props.item.content} />)
+    }
+    if (props.item.type == "markup"){
+        return( <MarkupText text={props.item.content}/> )
+    }
+}
+
+// bundle table
+type BTProps = {bundles: T.BundleInfo[]}
+type BTState = {}
+class BundleTable extends React.Component<BTProps, BTState>{
+    render(){
+        return (
                 <Table selectable fixed singleLine compact='very'>
                     <Table.Header>
                         <Table.Row>
@@ -44,14 +69,15 @@ export class WorksheetList extends React.Component<Props, State>{
                         }
                     </Table.Body>
                 </Table>
-            </Container>
         )
     }
 }
 
+
+// bundle entry
 type BundleProps = {uuid: string, name: string, size: number, state: string}
 type BundleState = {state: string}
-export class BundleEntry extends React.Component<BundleProps, BundleState>{
+class BundleEntry extends React.Component<BundleProps, BundleState>{
     constructor(props: BundleProps){
         super(props)
         this.state = {state: this.props.state ? this.props.state : "ready"}
@@ -67,4 +93,13 @@ export class BundleEntry extends React.Component<BundleProps, BundleState>{
             </Table.Row>
         )
     }
+}
+
+const MarkupText: React.SFC<{text: string}> = (props) => {
+    let content = marked(props.text)
+    return (
+        <div className={"ws-item"}>
+            <div dangerouslySetInnerHTML={{ __html: content }} />
+        </div>
+    )
 }
