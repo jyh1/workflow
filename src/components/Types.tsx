@@ -30,7 +30,7 @@ export type JRun = JObject<"run", {dependencies: Deps, cmd: CMDEle[]}>
 export type JLit = JObject<"lit", string>
 export type JCmd = JCat | JMake | JRun | JLit
 
-export type CMDEle = JNormalRes | {root: string, path: string[]}
+export type CMDEle = JObject<"plain", string> | JObject<"bundle", string> | JObject<"quote", JNormalRes>
 
 export type ClOption = [string, JVar | JVerbatim]
 export type JBlock = {variable: string, options: ClOption[], command: JCmd}

@@ -3,6 +3,7 @@ import * as _ from 'lodash'
 import {quote} from './algorithms'
 import {clReq, clWait} from './Requests'
 import { string } from 'prop-types';
+import * as localforage from 'localforage'
 
 
 type Env = {env: Map<string, Promise<string>>, worksheet: string, clReq: T.ClRequest}
@@ -84,18 +85,19 @@ function resolveClOpts(env: Env, opts: T.ClOption[]): Promise<string[]>{
 }
 
 function resolveCMDEle(env: Env, alias: Map<string, string>, e: T.CMDEle): Promise<string>{
-    if('root' in e){
-        return Promise.resolve(buildPath(alias.get(e.root), e.path))
-    }
-    if('type' in e){
-        return (resolveJNormalRes(env, e))
+    if (e.type == "quote"){
+        return (resolveJNormalRes(env, e.content)
+                .then(str => quote([str]))
+            )
+    } else {
+        return Promise.resolve(e.content)
     }
 }
 
 function resolveCMDEles(env: Env, alias: Map<string, string>, es: T.CMDEle[]): Promise<string>{
     return(
         Promise.all(_.map(es, x => resolveCMDEle(env, alias, x)))
-        .then(ss => ss.join(' '))
+        .then(ss => ss.join(''))
     )
 }
 
@@ -158,12 +160,15 @@ function resolveJRes(env: Env, res: T.JRes):Promise<string>{
 }
 
 export function evalJLang(code: T.JLang, req: T.ClRequest = clReq): Promise<string>{
-    let worksheet = localStorage.getItem("worksheet")
-    if (worksheet == null){
-        throw "No worksheet"
-    }
-    let env: Env = {env: new Map(), worksheet, clReq:req}
-    // console.log(code)
-    _.map(code.blocks, b => resolveJBlock(env, b))
-    return resolveJRes(env, code.result)
+    return (localforage.getItem("worksheet")
+            .then(worksheet => {
+                if (worksheet == null){
+                    throw "No worksheet"
+                }
+                let env: Env = {env: new Map(), worksheet: worksheet as string, clReq:req}
+                // console.log(code)
+                _.map(code.blocks, b => resolveJBlock(env, b))
+                return resolveJRes(env, code.result)
+            } )
+    )
 }

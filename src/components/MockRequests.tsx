@@ -131,9 +131,16 @@ function blk(s: string, cmd: T.JCmd): T.JBlock{
     return {variable: s, options: [], command: cmd}
 }
 
+function plainE(s: string): T.CMDEle{
+    return {type: "plain", content: s}
+}
+function cmdBundle(uuid: string): T.CMDEle{
+    return {type: "bundle", content: uuid}
+}
+
 const testBlocks: JBlock[] = [
       blk("x", tc("lit", "0x0cf40bf4b76246bc9d0545e13524a174"))
-    , blk("y", tc("run", {dependencies: [["x", jv("x")]], cmd: [val("bash"), val("x"), val("x")]}))
+    , blk("y", tc("run", {dependencies: [["x", jv("x")]], cmd: [plainE("bash"), cmdBundle("x"), cmdBundle("x")]}))
     , blk("z", tc("cat", tc("dir", {root: jv("y"), path: ["stdout"]})))
     , blk('dir', tc('make', [["res", tc("dir", {root:jv("y"), path: ["stdout"]})], ["code", jv("x")]]))
 ]
