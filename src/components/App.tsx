@@ -8,7 +8,7 @@ import { Router, Route, Link, Redirect, withRouter, Switch, RouteProps } from 'r
 import {getLoginStatus} from "./Requests"
 import { createBrowserHistory } from 'history';
 import {Login} from "./Login";
-import {WorksheetList} from './Worksheet/BundleList'
+import {WorksheetPanel} from './Worksheet/WorksheetPanel'
 import * as T from './Types'
 import {worksheetItemsReq} from './Requests'
 import SplitPane from 'react-split-pane'
@@ -39,7 +39,7 @@ export class HomeApp extends React.Component<Props, State>{
                 <TaskElementListWidget/>
                 <SplitPane split="vertical" defaultSize="72%" pane2Style={{overflowY: "auto"}}>
                     <Canvas nodes = {[]} refreshBundle={refreshBundle} />
-                    <WorksheetList content={this.state.currentWorksheet} refreshBundle={refreshBundle} />
+                    <WorksheetPanel content={this.state.currentWorksheet} refreshBundle={refreshBundle} />
                 </SplitPane>
             </SplitPane>
         )

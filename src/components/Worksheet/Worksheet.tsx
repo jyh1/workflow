@@ -1,32 +1,32 @@
 import * as React from 'react'
-import { Icon, Table, Dropdown } from 'semantic-ui-react'
 import * as _ from 'lodash'
 import * as T from '../Types'
-import {worksheetsReq} from '../Requests'
-import * as localforage from 'localforage'
+import {BundleTable} from './BundleTable'
+import {MarkupText} from './Markup'
 
-type Props = {selectWorksheet: (uuid: string) => void}
-type State = {worksheets: T.Worksheet[]}
+type Props = {items: T.WorksheetItem[], uuid: string}
+type State = {}
 
-export class SelectWorksheet extends React.Component <Props, State>{
+export class Worksheet extends React.Component<Props, State>{
     constructor(props: Props){
         super(props)
-        this.state = {worksheets: []}
-    }
-    componentDidMount(){
-        worksheetsReq()
-        .then(res => this.setState(prev => Object.assign(prev, {worksheets: res})))
     }
     render(){
-        let options = _.map(this.state.worksheets, res => ({key: res.uuid, value: res.uuid, text: res.name}))
+        let {items, uuid} = this.props
         return(
-            <Dropdown
-                placeholder='Select Worksheet'
-                search
-                selection
-                options={options}
-                onChange={(event, data) => this.props.selectWorksheet(data.value as string)}
-            />
+            <div>
+                {... _.map(items, (item, ind) => <WorksheetItem key={uuid + ind} item={item} />)}
+            </div>
         )
+    }
+}
+
+const WorksheetItem: React.SFC<{item: T.WorksheetItem}> = (props) => {
+    // console.log(props.item)
+    if (props.item.type == "bundles"){
+        return( <BundleTable bundles={props.item.content} />)
+    }
+    if (props.item.type == "markup"){
+        return( <MarkupText text={props.item.content}/> )
     }
 }

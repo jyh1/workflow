@@ -1,51 +1,13 @@
 import * as React from 'react'
-import { Container, Table } from 'semantic-ui-react'
+import {Table} from 'semantic-ui-react'
 import * as _ from 'lodash'
 import * as T from '../Types'
-// import {worksheetItemsReq} from '../MockRequests'
-import {SelectWorksheet} from './Worksheet'
-import * as localforage from 'localforage'
 import {humanFileSize} from '../algorithms'
-import * as marked from 'marked';
-
-type Props = {refreshBundle: () => void, content: T.WorksheetContent}
-type State = {}
-
-export class WorksheetList extends React.Component<Props, State>{
-    constructor(props: Props){
-        super(props)
-    }
-    changeWorksheet(uuid: string){
-        localforage.setItem("worksheet", uuid)
-        .then(this.props.refreshBundle)
-    }
-
-    render(){
-        // console.log(this.props.items)
-        let {content} = this.props
-        return(
-            <Container fluid>
-                <SelectWorksheet selectWorksheet={this.changeWorksheet.bind(this)} />
-                    {... _.map(content.items, (item, ind) => <WorksheetItem key={content.uuid + ind} item={item} />)}
-            </Container>
-        )
-    }
-}
-
-const WorksheetItem: React.SFC<{item: T.WorksheetItem}> = (props) => {
-    // console.log(props.item)
-    if (props.item.type == "bundles"){
-        return( <BundleTable bundles={props.item.content} />)
-    }
-    if (props.item.type == "markup"){
-        return( <MarkupText text={props.item.content}/> )
-    }
-}
 
 // bundle table
 type BTProps = {bundles: T.BundleInfo[]}
 type BTState = {}
-class BundleTable extends React.Component<BTProps, BTState>{
+export class BundleTable extends React.Component<BTProps, BTState>{
     render(){
         return (
                 <Table selectable fixed singleLine compact='very'>
@@ -93,13 +55,4 @@ class BundleEntry extends React.Component<BundleProps, BundleState>{
             </Table.Row>
         )
     }
-}
-
-const MarkupText: React.SFC<{text: string}> = (props) => {
-    let content = marked(props.text)
-    return (
-        <div className={"ws-item"}>
-            <div dangerouslySetInnerHTML={{ __html: content }} />
-        </div>
-    )
 }
