@@ -1,10 +1,11 @@
 import * as React from 'react'
 import * as _ from 'lodash'
+import {Header, Segment} from 'semantic-ui-react'
 import * as T from '../Types'
 import {BundleTable} from './BundleTable'
 import {MarkupText} from './Markup'
 
-type Props = {items: T.WorksheetItem[], uuid: string}
+type Props = T.WorksheetContent
 type State = {}
 
 export class Worksheet extends React.Component<Props, State>{
@@ -12,10 +13,17 @@ export class Worksheet extends React.Component<Props, State>{
         super(props)
     }
     render(){
-        let {items, uuid} = this.props
+        const {items, uuid, name, title} = this.props
+        const headername = title? title: name
         return(
             <div>
-                {... _.map(items, (item, ind) => <WorksheetItem key={uuid + ind} item={item} />)}
+                <Header as='h2' dividing textAlign='center' attached='top' color="blue">
+                    {headername}
+                    <Header.Subheader>{uuid}</Header.Subheader>
+                </Header>
+                <Segment attached>
+                    {... _.map(items, (item, ind) => <WorksheetItem key={uuid + ind} item={item} />)}
+                </Segment>
             </div>
         )
     }

@@ -134,7 +134,7 @@ export const worksheetItemsReq: T.WorksheetItemsRequest = (worksheet) => {
                     worksheetItems.push(parsedItem)
                 }
             }
-            return {items: worksheetItems, uuid: worksheet}
+            return {items: worksheetItems, uuid: res.uuid, name: res.name, title: res.title}
         })
     return req
 }

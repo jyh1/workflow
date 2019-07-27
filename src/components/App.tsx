@@ -21,7 +21,7 @@ type State = {currentWorksheet: T.WorksheetContent}
 export class HomeApp extends React.Component<Props, State>{
     constructor(props: Props){
         super(props)
-        this.state = {currentWorksheet: {items: [], uuid: ""}}
+        this.state = {currentWorksheet: {items: [], uuid: "", name: ""}}
     }
     componentDidMount(){
         this.refreshBundle()
@@ -37,7 +37,7 @@ export class HomeApp extends React.Component<Props, State>{
         return (
             <SplitPane split="vertical" defaultSize="16%" pane1Style={{overflowY: "auto"}}>
                 <TaskElementListWidget/>
-                <SplitPane split="vertical" defaultSize="72%" pane2Style={{overflowY: "auto"}}>
+                <SplitPane split="vertical" defaultSize="28%" primary="second" minSize={385} pane2Style={{overflowY: "auto"}}>
                     <Canvas nodes = {[]} refreshBundle={refreshBundle} />
                     <WorksheetPanel content={this.state.currentWorksheet} refreshBundle={refreshBundle} />
                 </SplitPane>
