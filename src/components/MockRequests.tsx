@@ -188,3 +188,14 @@ export const worksheetsReq: T.WorksheetsRequest = () => (
         )
     })
 )
+
+export const bundleInfoReq: T.BundleInfoRequest = (uuid: string) => (
+    new Promise((executor, resolve) => {
+        setTimeout(
+            () => executor({uuid: uuid, args: "python test.py test.in", bundle_type: "run"
+                            , command: "run python "
+                            , metadata: {name: "testbundle"}
+                            , state: coin()? "ready" : "failed"})
+        , reqtime())
+    })
+) 

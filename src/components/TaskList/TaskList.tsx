@@ -1,7 +1,7 @@
 import {taskTag, TaskElement, TaskId, TaskListElement, TaskDragType} from "../Types"
 import * as React from "react"
 import * as _ from "lodash"
-import {List, Container, Header, Dimmer, Loader} from 'semantic-ui-react'
+import {List, Container, Header, Dimmer, Loader, SegmentGroup, Segment} from 'semantic-ui-react'
 // import {taskListReq} from "../MockRequests"
 import {taskListReq} from "../Requests"
 

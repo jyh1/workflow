@@ -68,6 +68,7 @@ export type ClRequest = (worsheet: string, command: string) => Promise<string>
 export type ClWaitRequest = (path: string) => Promise<string>
 export type WorksheetItemsRequest = (worksheet: string) => Promise<WorksheetContent>
 export type WorksheetsRequest = () => Promise<Worksheet[]>
+export type BundleInfoRequest = (uuid: string) => Promise<BundleInfo>
 
 // graph representation
 export type ToolPort = {nodeid: TaskId, nodename: string, label: string}
@@ -80,13 +81,14 @@ export interface ToolNodeInterface<PortType> {
 export type ToolNode = ToolNodeInterface<ToolPort>
 
 // bundle list in worksheet
+export type BundleState = "created" | "ready" | "preparing" | "running" | "failed"
 export type BundleInfo = {
       uuid: string
     , args?: string
     , bundle_type: "run" | "dataset"
     , command?: string
     , metadata: BundleMeta
-    , state: "ready" | "preparing" | "running" | "failed"
+    , state: BundleState
 }
 export type BundleMeta = {
       run_status?: "Finished"

@@ -149,3 +149,15 @@ export const worksheetsReq: T.WorksheetsRequest = () => (
         return list
     })
 )
+
+export const bundleInfoReq: T.BundleInfoRequest = (uuid: string) => (
+    fetch(T.endPointPath.codalab + 'bundles/' + uuid,
+        {credentials: 'same-origin'})
+    .then((res) => {
+        if (!res.ok){
+            return Promise.reject(res);
+        }
+        return (res.json())
+    })
+    .then(res => res.data.attributes)
+) 

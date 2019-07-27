@@ -1,8 +1,10 @@
 import * as React from 'react'
-import {Table} from 'semantic-ui-react'
+import {Table, Loader} from 'semantic-ui-react'
 import * as _ from 'lodash'
 import * as T from '../Types'
 import {humanFileSize} from '../algorithms'
+import {bundleInfoReq} from '../Requests'
+import { delay } from "q";
 
 // bundle table
 type BTProps = {bundles: T.BundleInfo[]}
@@ -35,23 +37,39 @@ export class BundleTable extends React.Component<BTProps, BTState>{
     }
 }
 
+let isRunning: ((s: T.BundleState) => boolean) = s => s == "preparing" || s == "running" || s == "created"
 
 // bundle entry
-type BundleProps = {uuid: string, name: string, size: number, state: string}
-type BundleState = {state: string}
+type BundleProps = {uuid: string, name: string, size: number, state: T.BundleState}
+type BundleState = {state: T.BundleState, size: number}
 class BundleEntry extends React.Component<BundleProps, BundleState>{
     constructor(props: BundleProps){
         super(props)
-        this.state = {state: this.props.state ? this.props.state : "ready"}
+        this.state = {state: props.state, size: props.size}
+    }
+    updateState(){
+        const {state} = this.state
+        const running = isRunning(state)
+        if (running){
+            delay(5000)
+            .then(() => bundleInfoReq(this.props.uuid))
+            .then(res => this.setState(prev => Object.assign(prev, {state: res.state, size: res.metadata.data_size})))
+            .then(this.updateState.bind(this))
+        }
+    }
+    componentDidMount(){
+        this.updateState()
     }
     render(){
-        let {uuid, name} = this.props
-        let data_size = this.props.size? humanFileSize(this.props.size) : "null"
+        const {uuid, name} = this.props
+        const {state} = this.state
+        const running = isRunning(state)
+        const data_size = running? state : (this.state.size? humanFileSize(this.state.size) : "null")
         return(
-            <Table.Row draggable={true} onClick={() => console.log('click')}>
+            <Table.Row error={state == "failed"} draggable={true} onClick={() => console.log('click')}>
                 <Table.Cell collapsing>{uuid.substring(0, 8)}</Table.Cell>
                 <Table.Cell collapsing>{name}</Table.Cell>
-                <Table.Cell collapsing>{data_size}</Table.Cell>
+                <Table.Cell collapsing><Loader size="mini" active={running} inline />{data_size}</Table.Cell>
             </Table.Row>
         )
     }

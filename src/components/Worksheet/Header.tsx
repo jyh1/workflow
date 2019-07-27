@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {Dropdown, Segment, Button, Icon, Grid } from 'semantic-ui-react'
+import {Dropdown, Segment, Button, Icon, Grid, Input } from 'semantic-ui-react'
 import * as _ from 'lodash'
 import * as T from '../Types'
 import {worksheetsReq} from '../Requests'
@@ -17,18 +17,22 @@ export class PanelHeader extends React.Component <Props, State>{
         .then(res => this.setState(prev => Object.assign(prev, {worksheets: res, uuid: this.props.uuid})))
     }
     render(){
-        let options = _.map(this.state.worksheets, res => ({key: res.uuid, value: res.uuid, text: res.name}))
+        let options = 
+                _.map(
+                    this.state.worksheets
+                    , res => ({key: res.uuid, value: res.uuid, text: res.name})
+                )
         return(
                 <Segment>
-                            <span>
-                                Current worksheet: {' '}
-                                <Dropdown
-                                    inline
-                                    options={options}
-                                    onChange={(event, data) => {this.props.selectWorksheet(data.value as string)}}
-                                    value={this.props.uuid}
-                                />  
-                            </span>  
+                    <span>
+                        Current worksheet: {' '}
+                        <Dropdown
+                            inline
+                            options={options}
+                            onChange={(event, data) => {this.props.selectWorksheet(data.value as string)}}
+                            value={this.props.uuid}
+                        />  
+                    </span>
                 </Segment>              
         )
     }
