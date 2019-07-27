@@ -1,11 +1,12 @@
 import * as React from 'react'
-import { Container, SegmentGroup} from 'semantic-ui-react'
+import { Container, SegmentGroup, Placeholder, Segment} from 'semantic-ui-react'
 import * as T from '../Types'
 import * as localforage from 'localforage'
 import {PanelHeader} from './Header'
+import * as _ from "lodash"
 import {Worksheet} from './Worksheet'
 
-type Props = {refreshBundle: () => void, content: T.WorksheetContent}
+type Props = {refreshBundle: () => void, content: T.WorksheetContent, loading: boolean}
 type State = {}
 
 export class WorksheetPanel extends React.Component<Props, State>{
@@ -19,14 +20,16 @@ export class WorksheetPanel extends React.Component<Props, State>{
 
     render(){
         // console.log(this.props.items)
-        let {content} = this.props
+        const {content, loading} = this.props
         return(
-            <SegmentGroup >
-                <PanelHeader selectWorksheet={this.changeWorksheet.bind(this)} uuid={content.uuid} />
+            <div>
                 <SegmentGroup>
-                    <Worksheet {...content} />
+                    <PanelHeader selectWorksheet={this.changeWorksheet.bind(this)} uuid={content.uuid} />
+                    <SegmentGroup>
+                        <Worksheet {...content} loading={this.props.loading} />
+                    </SegmentGroup>
                 </SegmentGroup>
-            </SegmentGroup>
+            </div>
         )
     }
 }

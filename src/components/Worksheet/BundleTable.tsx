@@ -66,7 +66,7 @@ class BundleEntry extends React.Component<BundleProps, BundleState>{
         const running = isRunning(state)
         const data_size = running? state : (this.state.size? humanFileSize(this.state.size) : "null")
         return(
-            <Table.Row error={state == "failed"} draggable={true} onClick={() => console.log('click')}>
+            <Table.Row warning={running} error={state == "failed"} draggable={true} onClick={() => console.log('click')}>
                 <Table.Cell collapsing>{uuid.substring(0, 8)}</Table.Cell>
                 <Table.Cell collapsing>{name}</Table.Cell>
                 <Table.Cell collapsing><Loader size="mini" active={running} inline />{data_size}</Table.Cell>

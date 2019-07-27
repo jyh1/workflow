@@ -1,11 +1,11 @@
 import * as React from 'react'
 import * as _ from 'lodash'
-import {Header, Segment} from 'semantic-ui-react'
+import {Header, Segment, SegmentGroup} from 'semantic-ui-react'
 import * as T from '../Types'
 import {BundleTable} from './BundleTable'
 import {MarkupText} from './Markup'
 
-type Props = T.WorksheetContent
+type Props = T.WorksheetContent & {loading: boolean}
 type State = {}
 
 export class Worksheet extends React.Component<Props, State>{
@@ -21,7 +21,7 @@ export class Worksheet extends React.Component<Props, State>{
                     {headername}
                     <Header.Subheader>{uuid}</Header.Subheader>
                 </Header>
-                <Segment attached>
+                <Segment attached loading={this.props.loading}>
                     {... _.map(items, (item, ind) => <WorksheetItem key={uuid + ind} item={item} />)}
                 </Segment>
             </div>

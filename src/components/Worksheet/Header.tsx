@@ -23,9 +23,13 @@ export class PanelHeader extends React.Component <Props, State>{
                     , res => ({key: res.uuid, value: res.uuid, text: res.name})
                 )
         return(
+            <React.Fragment>
                 <Segment>
+                    <Button basic color="blue" icon="plus" content="New Worksheet"/>
+                    <Button basic color="blue" icon="barcode" content="Input UUID"/>                    
+                    <br/>
                     <span>
-                        Current worksheet: {' '}
+                        Your worksheet: {' '}
                         <Dropdown
                             inline
                             options={options}
@@ -33,7 +37,8 @@ export class PanelHeader extends React.Component <Props, State>{
                             value={this.props.uuid}
                         />  
                     </span>
-                </Segment>              
+                </Segment>
+            </React.Fragment>            
         )
     }
 }

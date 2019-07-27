@@ -16,20 +16,21 @@ import '../theme/layout.scss'
 import * as localforage from 'localforage'
 
 type Props = {}
-type State = {currentWorksheet: T.WorksheetContent}
+type State = {currentWorksheet: T.WorksheetContent, loadingWorksheet: boolean}
 
 export class HomeApp extends React.Component<Props, State>{
     constructor(props: Props){
         super(props)
-        this.state = {currentWorksheet: {items: [], uuid: "", name: ""}}
+        this.state = {currentWorksheet: {items: [], uuid: "", name: ""}, loadingWorksheet: false}
     }
     componentDidMount(){
         this.refreshBundle()
     }
     refreshBundle(){
+        this.setState(prev => Object.assign(prev, {loadingWorksheet: true}))
         localforage.getItem("worksheet")
         .then(uuid => ( uuid? worksheetItemsReq(uuid as string) : Promise.resolve({items: [], uuid: ""}) ))
-        .then(res => this.setState(prev => Object.assign(prev, {currentWorksheet: res})))
+        .then(res => this.setState(prev => Object.assign(prev, {currentWorksheet: res, loadingWorksheet: false})))
     }
 
     render(){
@@ -37,9 +38,9 @@ export class HomeApp extends React.Component<Props, State>{
         return (
             <SplitPane split="vertical" defaultSize="16%" pane1Style={{overflowY: "auto"}}>
                 <TaskElementListWidget/>
-                <SplitPane split="vertical" defaultSize="28%" primary="second" minSize={385} pane2Style={{overflowY: "auto"}}>
+                <SplitPane split="vertical" defaultSize={385} primary="second" minSize={385} pane2Style={{overflowY: "auto"}}>
                     <Canvas nodes = {[]} refreshBundle={refreshBundle} />
-                    <WorksheetPanel content={this.state.currentWorksheet} refreshBundle={refreshBundle} />
+                    <WorksheetPanel content={this.state.currentWorksheet} refreshBundle={refreshBundle} loading={this.state.loadingWorksheet} />
                 </SplitPane>
             </SplitPane>
         )
