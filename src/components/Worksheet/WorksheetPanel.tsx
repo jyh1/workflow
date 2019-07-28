@@ -6,7 +6,7 @@ import {PanelHeader} from './Header'
 import * as _ from "lodash"
 import {Worksheet} from './Worksheet'
 
-type Props = {refreshBundle: () => void, content: T.WorksheetContent, loading: boolean}
+type Props = {changeWorksheet: () => void, content: T.WorksheetContent, loading: boolean}
 type State = {}
 
 export class WorksheetPanel extends React.Component<Props, State>{
@@ -15,7 +15,7 @@ export class WorksheetPanel extends React.Component<Props, State>{
     }
     changeWorksheet(uuid: string){
         localforage.setItem("worksheet", uuid)
-        .then(this.props.refreshBundle)
+        .then(this.props.changeWorksheet)
     }
 
     render(){
@@ -26,7 +26,7 @@ export class WorksheetPanel extends React.Component<Props, State>{
                 <SegmentGroup>
                     <PanelHeader selectWorksheet={this.changeWorksheet.bind(this)} uuid={content.uuid} />
                     <SegmentGroup>
-                        <Worksheet {...content} loading={this.props.loading} />
+                        <Worksheet {...content} loading={loading} />
                     </SegmentGroup>
                 </SegmentGroup>
             </div>

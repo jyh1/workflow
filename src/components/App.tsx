@@ -24,23 +24,27 @@ export class HomeApp extends React.Component<Props, State>{
         this.state = {currentWorksheet: {items: [], uuid: "", name: ""}, loadingWorksheet: false}
     }
     componentDidMount(){
-        this.refreshBundle()
+        this.changeWorksheet()
     }
     refreshBundle(){
-        this.setState(prev => Object.assign(prev, {loadingWorksheet: true}))
-        localforage.getItem("worksheet")
+        return (localforage.getItem("worksheet")
         .then(uuid => ( uuid? worksheetItemsReq(uuid as string) : Promise.resolve({items: [], uuid: ""}) ))
-        .then(res => this.setState(prev => Object.assign(prev, {currentWorksheet: res, loadingWorksheet: false})))
+        .then(res => this.setState(prev => Object.assign(prev, {currentWorksheet: res}))))
+    }
+    changeWorksheet(){
+        this.setState(prev => Object.assign(prev, {loadingWorksheet: true}))
+        this.refreshBundle().then(() => this.setState(prev => Object.assign(prev, {loadingWorksheet: false})))
     }
 
     render(){
-        let refreshBundle = this.refreshBundle.bind(this)
+        const refreshBundle = this.refreshBundle.bind(this)
+        const changeWorksheet = this.changeWorksheet.bind(this)
         return (
             <SplitPane split="vertical" defaultSize="16%" pane1Style={{overflowY: "auto"}}>
                 <TaskElementListWidget/>
                 <SplitPane split="vertical" defaultSize={385} primary="second" minSize={385} pane2Style={{overflowY: "auto"}}>
                     <Canvas nodes = {[]} refreshBundle={refreshBundle} />
-                    <WorksheetPanel content={this.state.currentWorksheet} refreshBundle={refreshBundle} loading={this.state.loadingWorksheet} />
+                    <WorksheetPanel content={this.state.currentWorksheet} changeWorksheet={changeWorksheet} loading={this.state.loadingWorksheet} />
                 </SplitPane>
             </SplitPane>
         )
