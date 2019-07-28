@@ -13,32 +13,41 @@ import {
     } from "storm-react-diagrams";
 import * as React from "react";
 import * as _ from "lodash";
-import {Node} from "../Types"
+import {NodeInfo, TaskBody, Task} from "../Types"
+import * as T from "../Types"
 import {Button, Icon, Divider, Dimmer, Loader} from 'semantic-ui-react'
 // import {taskReq} from "../MockRequests"
-import {taskReq} from "../Requests"
+import {taskReq, parseReq} from "../Requests"
 
 export class TaskNodeModel extends DefaultNodeModel {
-    extras : {taskbody: string}
+    extras : T.ToolModelExtra
     inports : TaskPortModel[]
 	outports: TaskPortModel[]
 	loading: boolean
 	refresh: () => void
-    constructor(node: Node, refresh: () => void){
+    constructor(node: NodeInfo, refresh: () => void){
         super(node.name);
 		[this.x, this.y] = [node.pos.x, node.pos.y];
-        this.extras = {
-            taskbody: node.taskbody as string
-        }
 		this.inports = []
 		this.outports = []
 		this.loading = true
-		taskReq(node.taskbody as string).then((task) => {
+		let taskreq: Promise<Task>
+
+		if(node.taskinfo.type == "taskid"){
+			taskreq = taskReq(node.taskinfo.content)
+		}
+		if(node.taskinfo.type == "codaval"){
+			taskreq = parseReq(node.taskinfo.content)
+		}
+
+		taskreq.then((task) => {
 			this.inports = _.map(task.inports, (val) => this.addPort(new TaskPortModel(true, Toolkit.UID(), val)));
 			this.outports = _.map(task.outports, (val) => this.addPort(new TaskPortModel(false, Toolkit.UID(), val)));
 			this.loading = false;
+			this.extras = {taskbody: task.taskbody, taskid: task.taskid}
 			refresh()
 		})
+
 		this.refresh = refresh;
 	}
 	removeAndRefresh(){

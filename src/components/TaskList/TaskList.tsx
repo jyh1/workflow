@@ -43,7 +43,7 @@ export class TaskWidget extends React.Component<TaskProps, {}>{
 
     dragStart: React.DragEventHandler = (event) => {
         // console.log(this.props.element)
-        let dragData : TaskDragType = {id: this.props.taskid, name: this.props.name}
+        let dragData : TaskDragType = {taskinfo: {type: "taskid", content: this.props.taskid}, name: this.props.name}
         event.dataTransfer.setData(taskTag, JSON.stringify(dragData)); 
     }
 

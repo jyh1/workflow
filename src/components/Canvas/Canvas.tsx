@@ -1,4 +1,4 @@
-import {Node, taskTag, TaskDragType, ToolPort, ToolNode, ToolNodeInterface, JLang} from "../Types"
+import {NodeInfo, taskTag, TaskDragType, ToolPort, ToolNode, ToolNodeInterface, JLang} from "../Types"
 import * as React from "react"
 import * as SRD from "storm-react-diagrams"
 import {TaskNodeModel, TaskNodeFactory, TaskLinkFactory} from "./TaskNodeModel"
@@ -12,7 +12,7 @@ import {clReq} from '../Requests'
 import * as T from '../Types'
 
 type Props = {
-      nodes: Node[]
+      nodes: NodeInfo[]
     , refreshBundle: () => void
 };
 
@@ -67,7 +67,8 @@ export class Canvas extends React.Component<Props, State>{
         let processedNodes: {[nodeid: string]: ToolNodeInterface<string>} = {}
         let uniqName: Map<string, number> = new Map()
         for(let n of nodes){
-            let {id, ports, extras} = n
+            let {id, ports} = n
+            let extras = n.extras as T.ToolModelExtra
             graphModel.addNode(id)
             let name: string = (n as any).name
             if (uniqName.has(name)){
@@ -77,7 +78,7 @@ export class Canvas extends React.Component<Props, State>{
             } else {
                 uniqName.set(name, 0)
             }
-            let taskbody = extras.taskbody as string
+            let taskbody = extras.taskbody
             let argDic: ArgDic = {} // portname to linkid
             for (let p of ports){
                 let portname = (p as any).label
@@ -139,7 +140,7 @@ export class Canvas extends React.Component<Props, State>{
                 dragged = JSON.parse(data);
             } catch (e) {return}
         const pos = this.engine.getRelativeMousePoint(event)
-        let node : Node = {pos, name: dragged.name, taskbody: dragged.id}
+        let node : NodeInfo = {pos, name: dragged.name, taskinfo: dragged.taskinfo}
         this.engine.getDiagramModel().addNode(new TaskNodeModel(node, this.refresh.bind(this)))
         this.refresh()
         // console.log(node)

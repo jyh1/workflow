@@ -37,23 +37,26 @@ export type JBlock = {variable: string, options: ClOption[], command: JCmd}
 
 export type JLang = {result: JRes, blocks: JBlock[]}
 
-export interface Node {
+export type TaskInfo = JObject<"taskid", TaskId> | JObject<"codaval", string>
+
+export interface NodeInfo {
     name: string
     pos: {x: number; y: number}
-    taskbody: TaskBody
+    taskinfo: TaskInfo
 }
 
 export type TaskId = string
-export type TaskBody = TaskId | Object
+export type TaskBody = Object
 
 export interface Task {
     taskbody: TaskBody;
     inports: Arguments;
     outports: Arguments;
+    taskid?: string
 }
 
 export const taskTag = "task"
-export type TaskDragType = {name: string, id: string}
+export type TaskDragType = {name: string, taskinfo: TaskInfo}
 
 export type TaskElement = {name: string, id: string, description: string} & ({children: TaskElement[]} | {taskid: TaskId})
 
@@ -70,17 +73,19 @@ export type ClWaitRequest = (path: string) => Promise<string>
 export type WorksheetItemsRequest = (worksheet: string) => Promise<WorksheetContent>
 export type WorksheetsRequest = () => Promise<Worksheet[]>
 export type BundleInfoRequest = (uuid: string) => Promise<BundleInfo>
-export type ParseRquest = (program: string) => Promise<Object>
+export type ParseRquest = (program: string) => Promise<Task>
 
 // graph representation
 export type ToolPort = {nodeid: string, nodename: string, label: string}
 export interface ToolNodeInterface<PortType> {
     name: string; 
     id: string; 
-    taskbody: TaskId; 
+    taskbody: TaskBody; 
     arguments: {[arg: string]: PortType}
 }
 export type ToolNode = ToolNodeInterface<ToolPort>
+
+export type ToolModelExtra = {taskbody: Object, taskid?: string}
 
 // bundle list in worksheet
 export type BundleState = "created" | "ready" | "preparing" | "running" | "failed"
