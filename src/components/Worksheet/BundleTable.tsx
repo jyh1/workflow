@@ -63,7 +63,7 @@ class BundleEntry extends React.Component<BundleProps, BundleState>{
     
     dragStart: React.DragEventHandler = (event) => {
         // console.log(this.props.element)
-        let dragData : T.TaskDragType = {taskinfo: {type: "codaval", content: this.props.uuid}, name: this.props.name}
+        let dragData : T.TaskDragType = {taskinfo: {type: "task", content: T.makeLitTask(this.props.uuid.slice(2))}, name: this.props.name}
         event.dataTransfer.setData(T.taskTag, JSON.stringify(dragData)); 
     }
 

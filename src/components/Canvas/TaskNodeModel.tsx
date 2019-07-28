@@ -39,6 +39,9 @@ export class TaskNodeModel extends DefaultNodeModel {
 		if(node.taskinfo.type == "codaval"){
 			taskreq = parseReq(node.taskinfo.content)
 		}
+		if(node.taskinfo.type == "task"){
+			taskreq = Promise.resolve(node.taskinfo.content)
+		}
 
 		taskreq.then((task) => {
 			this.inports = _.map(task.inports, (val) => this.addPort(new TaskPortModel(true, Toolkit.UID(), val)));

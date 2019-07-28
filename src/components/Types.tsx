@@ -5,7 +5,7 @@ export interface Tool {
     node: Node;
 }
 
-export interface CodaVal {};
+export type CodaVal = Object;
 
 export type Arguments = string[]
 
@@ -37,7 +37,7 @@ export type JBlock = {variable: string, options: ClOption[], command: JCmd}
 
 export type JLang = {result: JRes, blocks: JBlock[]}
 
-export type TaskInfo = JObject<"taskid", TaskId> | JObject<"codaval", string>
+export type TaskInfo = JObject<"taskid", TaskId> | JObject<"codaval", string> | JObject<"task", Task>
 
 export interface NodeInfo {
     name: string
@@ -113,4 +113,10 @@ export const endPointPath = {
       login: "/login"
     , mainapp: "/"
     , codalab: "rest/"
+}
+
+export function makeLitTask(uuid: string): Task{
+    return ({
+        "outports":["data"],"inports":[],
+        "taskbody":{"tag":"Dict","contents":{"data":{"tag":"Lit","contents":{"tag":"UUID","contents":uuid}}}}})
 }
