@@ -77,7 +77,7 @@ export class Canvas extends React.Component<Props, State>{
             } else {
                 uniqName.set(name, 0)
             }
-            let taskid = extras.taskid as string
+            let taskbody = extras.taskbody as string
             let argDic: ArgDic = {} // portname to linkid
             for (let p of ports){
                 let portname = (p as any).label
@@ -89,7 +89,7 @@ export class Canvas extends React.Component<Props, State>{
                     argDic[portname] = link
                 }
             }
-            processedNodes[id]= {id, taskid, arguments: argDic, name: name}
+            processedNodes[id]= {id, taskbody, arguments: argDic, name: name}
         }
         let sortedOrder = graphModel.topoSort()
         // console.log(processedNodes)
@@ -139,7 +139,7 @@ export class Canvas extends React.Component<Props, State>{
                 dragged = JSON.parse(data);
             } catch (e) {return}
         const pos = this.engine.getRelativeMousePoint(event)
-        let node : Node = {pos, name: dragged.name, taskid: dragged.id}
+        let node : Node = {pos, name: dragged.name, taskbody: dragged.id}
         this.engine.getDiagramModel().addNode(new TaskNodeModel(node, this.refresh.bind(this)))
         this.refresh()
         // console.log(node)

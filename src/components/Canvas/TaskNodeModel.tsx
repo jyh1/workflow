@@ -19,7 +19,7 @@ import {Button, Icon, Divider, Dimmer, Loader} from 'semantic-ui-react'
 import {taskReq} from "../Requests"
 
 export class TaskNodeModel extends DefaultNodeModel {
-    extras : {taskid: string}
+    extras : {taskbody: string}
     inports : TaskPortModel[]
 	outports: TaskPortModel[]
 	loading: boolean
@@ -28,12 +28,12 @@ export class TaskNodeModel extends DefaultNodeModel {
         super(node.name);
 		[this.x, this.y] = [node.pos.x, node.pos.y];
         this.extras = {
-            taskid: node.taskid
+            taskbody: node.taskbody as string
         }
 		this.inports = []
 		this.outports = []
 		this.loading = true
-		taskReq(node.taskid).then((task) => {
+		taskReq(node.taskbody as string).then((task) => {
 			this.inports = _.map(task.inports, (val) => this.addPort(new TaskPortModel(true, Toolkit.UID(), val)));
 			this.outports = _.map(task.outports, (val) => this.addPort(new TaskPortModel(false, Toolkit.UID(), val)));
 			this.loading = false;

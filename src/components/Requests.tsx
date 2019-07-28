@@ -161,3 +161,19 @@ export const bundleInfoReq: T.BundleInfoRequest = (uuid: string) => (
     })
     .then(res => res.data.attributes)
 ) 
+
+export const parseReq: T.ParseRquest = (program: string) => (
+    fetch('tool/parse',
+        {
+          headers: {"Content-Type":'text/plain;charset=utf-8'}
+        , credentials: 'same-origin'
+        , method: 'POST'
+        , body: program
+        }
+    ).then((res) => {
+        if (!res.ok){
+            return Promise.reject(res);
+        }
+        return (res.json())
+    })
+)

@@ -61,7 +61,7 @@ export const taskListReq: TaskListRequest = () => (
 
 let defTask = (i:TaskId):Task => (
     {
-        taskid: i
+        taskbody: i
       , inports: ["dataset1", "dataset2"]
       , outports: ["result"]
   }
@@ -196,6 +196,14 @@ export const bundleInfoReq: T.BundleInfoRequest = (uuid: string) => (
                             , command: "run python "
                             , metadata: {name: "testbundle"}
                             , state: coin()? "ready" : "failed"})
+        , reqtime())
+    })
+) 
+
+export const parseReq: T.ParseRquest = (program: string) => (
+    new Promise((executor, resolve) => {
+        setTimeout(
+            () => executor({"outports":["data"],"inports":[],"taskbody":{"tag":"Dict","contents":{"data":{"tag":"Lit","contents":{"tag":"UUID","contents":"234"}}}}})
         , reqtime())
     })
 ) 

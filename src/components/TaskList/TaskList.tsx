@@ -35,7 +35,7 @@ export class TaskFolderWidget extends React.Component<Props, {expand: boolean}>{
     }
 }
 
-type TaskProps = {name: string, taskid: TaskId, description: string}
+type TaskProps = {name: string, taskid: string, description: string}
 export class TaskWidget extends React.Component<TaskProps, {}>{
     constructor(props: TaskProps){
         super(props)

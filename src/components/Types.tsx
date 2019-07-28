@@ -40,13 +40,14 @@ export type JLang = {result: JRes, blocks: JBlock[]}
 export interface Node {
     name: string
     pos: {x: number; y: number}
-    taskid: TaskId
+    taskbody: TaskBody
 }
 
 export type TaskId = string
+export type TaskBody = TaskId | Object
 
 export interface Task {
-    taskid: TaskId;
+    taskbody: TaskBody;
     inports: Arguments;
     outports: Arguments;
 }
@@ -57,7 +58,7 @@ export type TaskDragType = {name: string, id: string}
 export type TaskElement = {name: string, id: string, description: string} & ({children: TaskElement[]} | {taskid: TaskId})
 
 export type TaskListElementId = string
-export type TaskListElement = {name: string; taskid?: TaskId; parent?: TaskListElementId; id: TaskListElementId; description: string}
+export type TaskListElement = {name: string; taskid?: string; parent?: TaskListElementId; id: TaskListElementId; description: TaskId}
 
 // requests
 export type LoginRequest = (username: string, password: string) => Promise<void>
@@ -69,13 +70,14 @@ export type ClWaitRequest = (path: string) => Promise<string>
 export type WorksheetItemsRequest = (worksheet: string) => Promise<WorksheetContent>
 export type WorksheetsRequest = () => Promise<Worksheet[]>
 export type BundleInfoRequest = (uuid: string) => Promise<BundleInfo>
+export type ParseRquest = (program: string) => Promise<Object>
 
 // graph representation
-export type ToolPort = {nodeid: TaskId, nodename: string, label: string}
+export type ToolPort = {nodeid: string, nodename: string, label: string}
 export interface ToolNodeInterface<PortType> {
     name: string; 
     id: string; 
-    taskid: TaskId; 
+    taskbody: TaskId; 
     arguments: {[arg: string]: PortType}
 }
 export type ToolNode = ToolNodeInterface<ToolPort>
