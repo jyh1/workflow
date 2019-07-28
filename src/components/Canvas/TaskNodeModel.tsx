@@ -94,6 +94,8 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, {}> {
 	}
 
 	render() {
+		const inports = this.props.node.getInPorts()
+		const outports = this.props.node.getOutPorts()
 		return (
             <div className={"toolForm toolFormInCanvas " + (this.props.node.selected ? "toolForm-active" : "")}>
 				{/* title */}
@@ -110,15 +112,15 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, {}> {
                 {/* inputs */}
                 <div>
                     <div className={"toolFormBody"}>
-                        {_.map(this.props.node.getInPorts(), this.generatePort.bind(this))}
+                        {_.map(inports, this.generatePort.bind(this))}
                     </div>
                 </div>
                 {/* divider */}
-                <Divider />
+                {inports.length > 0 ? <Divider /> : <React.Fragment/>}
                 {/* outputs */}
                 <div>
                     <div className={"toolFormBody"}>
-                        {_.map(this.props.node.getOutPorts(), this.generatePort.bind(this))}
+                        {_.map(outports, this.generatePort.bind(this))}
                     </div>
                 </div>
             </div>
