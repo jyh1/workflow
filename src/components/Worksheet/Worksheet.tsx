@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as _ from 'lodash'
-import {Header, Segment, SegmentGroup} from 'semantic-ui-react'
+import {Header, Segment, SegmentGroup, Dimmer, Loader} from 'semantic-ui-react'
 import * as T from '../Types'
 import {BundleTable} from './BundleTable'
 import {MarkupText} from './Markup'
@@ -16,15 +16,18 @@ export class Worksheet extends React.Component<Props, State>{
         const {items, uuid, name, title} = this.props
         const headername = title? title: name
         return(
-            <div>
+            <React.Fragment>
                 <Header as='h2' dividing textAlign='center' attached='top' color="blue">
                     {headername}
                     <Header.Subheader>{uuid}</Header.Subheader>
                 </Header>
-                <Segment attached loading={this.props.loading}>
+                <Segment attached>
                     {... _.map(items, (item, ind) => <WorksheetItem key={uuid + ind} item={item} />)}
                 </Segment>
-            </div>
+                <Dimmer active={this.props.loading} inverted>
+					<Loader inverted content='Loading' />
+				</Dimmer>
+            </React.Fragment>
         )
     }
 }
