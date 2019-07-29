@@ -43,8 +43,10 @@ let isRunning: ((s: T.BundleState) => boolean) = s => s == "preparing" || s == "
 type BundleProps = {uuid: string, name: string, size: number, state: T.BundleState}
 type BundleState = {state: T.BundleState, size: number}
 class BundleEntry extends React.Component<BundleProps, BundleState>{
+    _isMounted: boolean
     constructor(props: BundleProps){
         super(props)
+        this._isMounted = false;
         this.state = {state: props.state, size: props.size}
     }
     updateState(){
@@ -53,11 +55,16 @@ class BundleEntry extends React.Component<BundleProps, BundleState>{
         if (running){
             delay(5000)
             .then(() => bundleInfoReq(this.props.uuid))
-            .then(res => this.setState(prev => Object.assign(prev, {state: res.state, size: res.metadata.data_size})))
-            .then(this.updateState.bind(this))
+            .then(res => this._isMounted && this.setState(prev => Object.assign(prev, {state: res.state, size: res.metadata.data_size})))
+            .then(() => this._isMounted && this.updateState())
         }
     }
+    componentWillUnmount() {
+        this._isMounted = false;
+    }
+
     componentDidMount(){
+        this._isMounted = true;
         this.updateState()
     }
     
