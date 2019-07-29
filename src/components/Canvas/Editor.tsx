@@ -1,20 +1,20 @@
 import * as React from "react";
 import * as Brace from "brace";
 import AceEditor from "react-ace";
-import {Modal, Button, Icon } from 'semantic-ui-react'
+import {Modal, Button, Icon, Input } from 'semantic-ui-react'
 import * as T from '../Types'
 import {parseReq, compileReq} from "../Requests"
 
 import "brace/mode/haskell";
 import "brace/theme/github";
 
-type Props = {name: string, close: () => void, save: (task: T.Task) => void, code: string}
+type Props = {name: string, close: () => void, save: (task: T.Task) => void, body: T.Task}
 type State = {value: string, codaval?: T.Task}
 
 export class CodaEditor extends React.Component<Props, State>{
     constructor(props: Props){
         super(props)
-        this.state = {value: props.code}
+        this.state = {value: props.body.taskcode, codaval: props.body}
     }
     handleInput = (val: string) => {
         this.setState(p => Object.assign(p, {value: val, codaval: null}))
@@ -35,7 +35,7 @@ export class CodaEditor extends React.Component<Props, State>{
         const compiled = codaval? true : false
         return(
             <Modal open={true} id="editormodal" onDrag={(e:any) => {console.log(232); e.stopPropagation}}>
-                <Modal.Header>Edit: {this.props.name}</Modal.Header>
+                <Modal.Header><div>Task Name: {<div contentEditable={true} style={{display:"inline"}} >{this.props.name}</div>}</div></Modal.Header>
                 <Modal.Content>
                     <AceEditor
                         mode="haskell"

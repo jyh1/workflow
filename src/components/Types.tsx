@@ -87,7 +87,7 @@ export interface ToolNodeInterface<PortType> {
 }
 export type ToolNode = ToolNodeInterface<ToolPort>
 
-export type ToolModelExtra = {taskbody: Object, taskid?: string, code: string}
+export type ToolModelExtra = Task
 
 // bundle list in worksheet
 export type BundleState = "created" | "ready" | "preparing" | "running" | "failed"

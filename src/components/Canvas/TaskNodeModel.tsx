@@ -36,7 +36,7 @@ export class TaskNodeModel extends DefaultNodeModel {
 		this.outports = []
 		this.loading = true
 		let taskreq: Promise<Task>
-		
+
 		if(node.taskinfo.type == "taskid"){
 			taskreq = taskReq(node.taskinfo.content)
 		}
@@ -65,7 +65,7 @@ export class TaskNodeModel extends DefaultNodeModel {
 			this.inports = _.map(task.inports, (val) => this.addPort(new TaskPortModel(true, Toolkit.UID(), val)));
 			this.outports = _.map(task.outports, (val) => this.addPort(new TaskPortModel(false, Toolkit.UID(), val)));
 			this.loading = false;
-			this.extras = {taskbody: task.taskbody, taskid: task.taskid, code: task.taskcode}
+			this.extras = task
 			this.refresh()
 		})
 	}
@@ -163,7 +163,7 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 						  name={node.name}
 						  close={this.closeEditor.bind(this)}
 						  save={(task) => node.updateTask(Promise.resolve(task))}
-						  code={node.extras.code}
+						  body={node.extras}
 					  /> 
 					: <React.Fragment/>
 				}
