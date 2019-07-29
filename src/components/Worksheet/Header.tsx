@@ -27,7 +27,7 @@ export class PanelHeader extends React.Component <Props, State>{
         const {newworksheet} = this.state
         return(
             <React.Fragment>
-                <Segment>
+                <Segment className="worksheetheader">
                     <NewWorsheetModal close = {this.modalState(false)} isopen={newworksheet}/>
                     <Button basic color="blue" icon="plus" content="New Worksheet" onClick={this.modalState(true)} />
                     <Button basic color="blue" icon="barcode" content="Input UUID"/>                    
