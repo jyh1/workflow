@@ -35,7 +35,7 @@ export class CodaEditor extends React.Component<Props, State>{
         const compiled = codaval? true : false
         return(
             <Modal open={true} id="editormodal" onDrag={(e:any) => {console.log(232); e.stopPropagation}}>
-                <Modal.Header><div>Task Name: {<div contentEditable={true} style={{display:"inline"}} >{this.props.name}</div>}</div></Modal.Header>
+                <Modal.Header>Edit: {this.props.name}</Modal.Header>
                 <Modal.Content>
                     <AceEditor
                         mode="haskell"

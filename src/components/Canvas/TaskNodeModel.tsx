@@ -69,11 +69,9 @@ export class TaskNodeModel extends DefaultNodeModel {
 			this.refresh()
 		})
 	}
-	updateTask(taskreq: Promise<Task>){
-		taskreq
-		.then(task => ({name: this.name, pos: {x: this.x, y: this.y}, taskinfo: {type: "task", content: task}} as NodeInfo))
-		.then(this.newNode)
-
+	updateTask(task: Task){
+		const node: NodeInfo = {name: this.name, pos: {x: this.x, y: this.y}, taskinfo: {type: "task", content: task}}
+		this.newNode(node)
 		this.removeAndRefresh()
 	}
 }
@@ -162,7 +160,7 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 					  <CodaEditor 
 						  name={node.name}
 						  close={this.closeEditor.bind(this)}
-						  save={(task) => node.updateTask(Promise.resolve(task))}
+						  save={(task) => node.updateTask(task)}
 						  body={node.extras}
 					  /> 
 					: <React.Fragment/>
