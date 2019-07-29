@@ -25,6 +25,7 @@ export class TaskNodeModel extends DefaultNodeModel {
     inports : TaskPortModel[]
 	outports: TaskPortModel[]
 	loading: boolean
+	toggleEditor: boolean
 	refresh: () => void
 	lockModel: () => void
 	unlockModel: () => void
@@ -37,6 +38,11 @@ export class TaskNodeModel extends DefaultNodeModel {
 		this.loading = true
 		let taskreq: Promise<Task>
 
+		this.refresh = refresh;
+		this.lockModel = lock;
+		this.unlockModel = unlock;
+		this.newNode = newNode;
+		this.toggleEditor = false
 		if(node.taskinfo.type == "taskid"){
 			taskreq = taskReq(node.taskinfo.content)
 		}
@@ -47,13 +53,12 @@ export class TaskNodeModel extends DefaultNodeModel {
 		if(node.taskinfo.type == "task"){
 			taskreq = Promise.resolve(node.taskinfo.content)
 		}
+		if(node.taskinfo.type == "empty"){
+			this.toggleEditor = true
+			taskreq = Promise.resolve({taskbody: {}, inports: [], outports: [], taskcode: ""})
+		}
 
 		this.loadTask(taskreq)
-
-		this.refresh = refresh;
-		this.lockModel = lock;
-		this.unlockModel = unlock;
-		this.newNode = newNode;
 	}
 	removeAndRefresh(){
 		this.remove()
@@ -100,11 +105,10 @@ export interface TaskNodeProps extends BaseWidgetProps {
 	diagramEngine: DiagramEngine;
 }
 
-type TaskNodeState = {toggleEditor: boolean}
+type TaskNodeState = {}
 export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 	constructor(props: TaskNodeProps) {
 		super("srd-default-node", props);
-		this.state = {toggleEditor: false};
 	}
 
 	generatePort(port: TaskPortModel) {
@@ -112,12 +116,14 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 	}
 
 	toggleEditor(){
-		this.setState(p => Object.assign(p, {toggleEditor: true}))
+		this.props.node.toggleEditor = true
 		this.props.node.lockModel()
+		this.forceUpdate()
 	}
 	closeEditor(){
-		this.setState(p => Object.assign(p, {toggleEditor: false}))
-		this.props.node.unlockModel()		
+		this.props.node.toggleEditor = false		
+		this.props.node.unlockModel()
+		this.forceUpdate()
 	}
 
 	render() {
@@ -156,7 +162,7 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 					</div>
 				</div>
 				{/* modal */}
-				{this.state.toggleEditor? 
+				{node.toggleEditor? 
 					  <CodaEditor 
 						  name={node.name}
 						  close={this.closeEditor.bind(this)}
