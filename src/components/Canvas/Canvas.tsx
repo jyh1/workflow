@@ -141,6 +141,11 @@ export class Canvas extends React.Component<Props, State>{
         }
     }
 
+    dragStart: React.DragEventHandler = (event) => {
+        let dragData : TaskDragType = {taskinfo: {type: "empty", content: {}}, name: "New Task"}
+        event.dataTransfer.setData(taskTag, JSON.stringify(dragData)); 
+    }
+
     processDrop: React.DragEventHandler = (event) => {
         event.preventDefault()
         let data = event.dataTransfer.getData(taskTag);
@@ -164,7 +169,7 @@ export class Canvas extends React.Component<Props, State>{
         const dropDown = (
             <S.Dropdown item icon='plus' simple>
                 <S.Dropdown.Menu>
-                    <S.Dropdown.Item draggable>
+                    <S.Dropdown.Item draggable onDragStart={this.dragStart}>
                         <S.Icon name="code"/>Empty Tool
                     </S.Dropdown.Item>
                 </S.Dropdown.Menu>
