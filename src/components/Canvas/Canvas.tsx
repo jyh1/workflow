@@ -161,41 +161,43 @@ export class Canvas extends React.Component<Props, State>{
     }
 
     render(){
+        const dropDown = (
+            <S.Dropdown item icon='plus' simple>
+                <S.Dropdown.Menu>
+                    <S.Dropdown.Item draggable>
+                        <S.Icon name="code"/>Empty Tool
+                    </S.Dropdown.Item>
+                </S.Dropdown.Menu>
+            </S.Dropdown>
+        )
         return(
-            <div className="srd-demo-workspace">
-                <div className="srd-demo-workspace__toolbar">
-                    <button
-                        onClick={() => {
-                            // console.log(this.engine.getDiagramModel().serializeDiagram());
-                            console.log(this.serializeTaskGraph());
-                        }}
-                    >
-                        Print Graph
-                    </button>
-                    <S.Button primary loading={this.state.loading} onClick={this.compile.bind(this)}>
-                        Compile
-                    </S.Button>
-                    <S.Button primary loading={this.state.running} disabled={this.state.compiled === undefined? true : false} onClick={this.run.bind(this)}>
-                        Run
-                    </S.Button>
+            <div style={{height: "100%"}}>
+                <S.Menu style={{marginBottom: 0}}>
+                    <S.Menu.Menu position='right'>
+                        <S.Button color='blue' icon='cogs' labelPosition='left' content="Build" loading={this.state.loading} onClick={this.compile.bind(this)}/>
+                        <S.Button color='blue' icon='play' labelPosition='left' content="Run" loading={this.state.running} disabled={this.state.compiled === undefined? true : false} onClick={this.run.bind(this)}/>
+                        {dropDown}
+                    </S.Menu.Menu>
 
-                </div>
-                <div
-                    style={{height: "100%"}}
-                    onDragOver={(e) => e.preventDefault()}
-                    onDrop={this.processDrop}
-                >
-                    <div className = "srd-demo-workspace__content">
-                        <SRD.DiagramWidget 
-                            className="srd-demo-canvas" 
-                            allowLooseLinks={false} 
-                            diagramEngine={this.engine} 
-                            allowCanvasZoom={false}
-                            allowCanvasTranslation={!this.state.locked}
-                            // maxNumberPointsPerLink={0}
-                        />
+                </S.Menu>
+                <S.Segment attached='bottom' className="canvas-segment">
+                    <div
+                        style={{height: "100%"}}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={this.processDrop}
+                    >
+                        <div className = "srd-demo-workspace__content">
+                            <SRD.DiagramWidget
+                                className="srd-demo-canvas" 
+                                allowLooseLinks={false} 
+                                diagramEngine={this.engine} 
+                                allowCanvasZoom={false}
+                                allowCanvasTranslation={!this.state.locked}
+                                // maxNumberPointsPerLink={0}
+                            />
+                        </div>
                     </div>
-                </div>
+                </S.Segment>
             </div>
         )
     }
