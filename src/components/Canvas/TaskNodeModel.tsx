@@ -32,12 +32,14 @@ export class TaskNodeModel extends DefaultNodeModel {
 		this.outports = []
 		this.loading = true
 		let taskreq: Promise<Task>
+		let code: string
 
 		if(node.taskinfo.type == "taskid"){
 			taskreq = taskReq(node.taskinfo.content)
 		}
 		if(node.taskinfo.type == "codaval"){
-			taskreq = parseReq(node.taskinfo.content)
+			code = node.taskinfo.content
+			taskreq = parseReq(code)
 		}
 		if(node.taskinfo.type == "task"){
 			taskreq = Promise.resolve(node.taskinfo.content)
@@ -47,7 +49,7 @@ export class TaskNodeModel extends DefaultNodeModel {
 			this.inports = _.map(task.inports, (val) => this.addPort(new TaskPortModel(true, Toolkit.UID(), val)));
 			this.outports = _.map(task.outports, (val) => this.addPort(new TaskPortModel(false, Toolkit.UID(), val)));
 			this.loading = false;
-			this.extras = {taskbody: task.taskbody, taskid: task.taskid}
+			this.extras = {taskbody: task.taskbody, taskid: task.taskid, code}
 			refresh()
 		})
 

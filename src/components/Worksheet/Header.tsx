@@ -69,7 +69,7 @@ class NewWorsheetModal extends React.Component<MProps, MState>{
     render(){
         const {close, isopen} = this.props
         return(
-            <Modal open={isopen} onClose={close} style={{top: "50%", left: "50%", position: "fixed", width: "500px", height: "220px", marginLeft: "-250px", marginTop:"-110px"}}>
+            <Modal open={isopen} onClose={close} id="newworksheetmodal">
                 <Header as="h2" icon='plus square outline' content='Create New Worksheet' />
                 <Modal.Content>
                     <Input fluid icon='file' iconPosition='left' placeholder='New worksheet name' onChange={this.handleInput}/>

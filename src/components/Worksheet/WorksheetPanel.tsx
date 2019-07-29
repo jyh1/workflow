@@ -23,7 +23,7 @@ export class WorksheetPanel extends React.Component<Props, State>{
         const {content, loading} = this.props
         return(
             <div>
-                <SegmentGroup>
+                <SegmentGroup className="newsegment">
                     <PanelHeader selectWorksheet={this.changeWorksheet.bind(this)} uuid={content.uuid} />
                     <SegmentGroup>
                         <Worksheet {...content} loading={loading} />

@@ -176,6 +176,7 @@ export class Canvas extends React.Component<Props, State>{
                             className="srd-demo-canvas" 
                             allowLooseLinks={false} 
                             diagramEngine={this.engine} 
+                            allowCanvasZoom={false}
                             // maxNumberPointsPerLink={0}
                         />
                     </div>
