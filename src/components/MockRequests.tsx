@@ -64,6 +64,7 @@ let defTask = (i:TaskId):Task => (
         taskbody: i
       , inports: ["dataset1", "dataset2"]
       , outports: ["result"]
+      , taskcode: "test  code"
   }
 )
 

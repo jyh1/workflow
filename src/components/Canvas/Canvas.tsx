@@ -20,6 +20,7 @@ type State = {
     compiled?: JLang
     loading: boolean
     running: boolean
+    locked: boolean
 }
 
 export class Canvas extends React.Component<Props, State>{
@@ -29,26 +30,26 @@ export class Canvas extends React.Component<Props, State>{
     // refresh: () => void;
     constructor(props: Props){
         super(props);
-        this.state = {loading: false, running: false};
+        this.state = {loading: false, running: false, locked: false};
         this.engine = new SRD.DiagramEngine();
         this.engine.installDefaultFactories();
         this.engine.registerNodeFactory(new TaskNodeFactory());
         this.engine.registerLinkFactory(new TaskLinkFactory());
         let model = new SRD.DiagramModel();
         this.model = model
-        let nodes = _.map(
-            this.props.nodes,
-            (val) => {
-                return (new TaskNodeModel(val, this.refresh.bind(this)))
-            })
-        model.addAll(... nodes);
+        // let nodes = _.map(
+        //     this.props.nodes,
+        //     (val) => {
+        //         return (new TaskNodeModel(val, this.refresh, this.lockModel, this.unlockModel))
+        //     })
+        // model.addAll(... nodes);
         this.engine.setDiagramModel(model);
 
         // refresh bundlelist after submitting request
         this.refreshBundle = debounce(this.props.refreshBundle, 2000)
     }
 
-    refresh(){
+    refresh = () => {
         this.forceUpdate()
         this.setState((prev) => Object.assign(prev, {compiled: undefined}))
     }
@@ -104,14 +105,23 @@ export class Canvas extends React.Component<Props, State>{
         return (_.map(sortedOrder, k => tools[k]))
     }
 
+    lockModel = () => {
+        this.model.setLocked(true)
+        this.setState(p => Object.assign(p, {locked: true}))
+    }
+    unlockModel = () => {
+        this.model.setLocked(false)
+        this.setState(p => Object.assign(p, {locked: false}))
+    }
+
     compile(){
         let nodes = this.serializeTaskGraph()
-        this.model.setLocked(true)
+        this.lockModel()
         this.setState(obj => Object.assign(obj, {loading: true, compiled: undefined}))
         compileReq(nodes)
         .then((res) => {
             this.setState(obj => Object.assign(obj, {compiled: res, loading: false}))
-            this.model.setLocked(false)
+            this.unlockModel()
             console.log(res)
         } )
     }
@@ -141,9 +151,13 @@ export class Canvas extends React.Component<Props, State>{
             } catch (e) {return}
         const pos = this.engine.getRelativeMousePoint(event)
         let node : NodeInfo = {pos, name: dragged.name, taskinfo: dragged.taskinfo}
-        this.engine.getDiagramModel().addNode(new TaskNodeModel(node, this.refresh.bind(this)))
-        this.refresh()
+        this.newNode(node)
         // console.log(node)
+    }
+
+    newNode = (node: NodeInfo) => {
+        this.engine.getDiagramModel().addNode(new TaskNodeModel(node, this.refresh, this.lockModel, this.unlockModel, this.newNode))
+        this.refresh()
     }
 
     render(){
@@ -177,6 +191,7 @@ export class Canvas extends React.Component<Props, State>{
                             allowLooseLinks={false} 
                             diagramEngine={this.engine} 
                             allowCanvasZoom={false}
+                            allowCanvasTranslation={!this.state.locked}
                             // maxNumberPointsPerLink={0}
                         />
                     </div>

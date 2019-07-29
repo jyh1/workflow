@@ -22,7 +22,7 @@ div.toolForm {
     z-index: 100;
     font-weight: 700;
     font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif;
-    min-width: 10em;
+    min-width: 13em;
     position: absolute;
     border-width: medium;
     border-color: $brand-primary;
@@ -240,3 +240,13 @@ div.form-row-input label {
     -webkit-box-shadow: none;
     box-shadow: none
 }
+
+#editormodal {
+    left: 50%; 
+    top: 50%;
+    width: 550px;
+    height: 670px;
+    margin-left: -275px;
+    margin-top: -335px;
+    position: fixed;
+  }

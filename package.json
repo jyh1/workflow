@@ -38,6 +38,7 @@
     "localforage": "^1.7.3",
     "marked": "^0.7.0",
     "react": "^16.8.6",
+    "react-ace": "^7.0.2",
     "react-dom": "^16.8.6",
     "react-router-dom": "^5.0.1",
     "react-split-pane": "^0.1.87",

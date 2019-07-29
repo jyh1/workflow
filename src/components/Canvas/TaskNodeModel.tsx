@@ -18,6 +18,7 @@ import * as T from "../Types"
 import {Button, Icon, Divider, Dimmer, Loader} from 'semantic-ui-react'
 // import {taskReq} from "../MockRequests"
 import {taskReq, parseReq} from "../Requests"
+import {CodaEditor} from './Editor'
 
 export class TaskNodeModel extends DefaultNodeModel {
     extras : T.ToolModelExtra
@@ -25,39 +26,55 @@ export class TaskNodeModel extends DefaultNodeModel {
 	outports: TaskPortModel[]
 	loading: boolean
 	refresh: () => void
-    constructor(node: NodeInfo, refresh: () => void){
+	lockModel: () => void
+	unlockModel: () => void
+	newNode: (node: NodeInfo) => void
+    constructor(node: NodeInfo, refresh: () => void, lock: () => void, unlock: () => void, newNode: (node: NodeInfo) => void){
         super(node.name);
 		[this.x, this.y] = [node.pos.x, node.pos.y];
 		this.inports = []
 		this.outports = []
 		this.loading = true
 		let taskreq: Promise<Task>
-		let code: string
-
+		
 		if(node.taskinfo.type == "taskid"){
 			taskreq = taskReq(node.taskinfo.content)
 		}
 		if(node.taskinfo.type == "codaval"){
-			code = node.taskinfo.content
-			taskreq = parseReq(code)
+			let code = node.taskinfo.content
+			taskreq = parseReq(code).then(t => Object.assign(t, {"taskcode": code}))
 		}
 		if(node.taskinfo.type == "task"){
 			taskreq = Promise.resolve(node.taskinfo.content)
 		}
 
-		taskreq.then((task) => {
-			this.inports = _.map(task.inports, (val) => this.addPort(new TaskPortModel(true, Toolkit.UID(), val)));
-			this.outports = _.map(task.outports, (val) => this.addPort(new TaskPortModel(false, Toolkit.UID(), val)));
-			this.loading = false;
-			this.extras = {taskbody: task.taskbody, taskid: task.taskid, code}
-			refresh()
-		})
+		this.loadTask(taskreq)
 
 		this.refresh = refresh;
+		this.lockModel = lock;
+		this.unlockModel = unlock;
+		this.newNode = newNode;
 	}
 	removeAndRefresh(){
 		this.remove()
 		this.refresh()
+	}
+
+	loadTask(taskreq: Promise<Task>){
+		taskreq.then((task) => {
+			this.inports = _.map(task.inports, (val) => this.addPort(new TaskPortModel(true, Toolkit.UID(), val)));
+			this.outports = _.map(task.outports, (val) => this.addPort(new TaskPortModel(false, Toolkit.UID(), val)));
+			this.loading = false;
+			this.extras = {taskbody: task.taskbody, taskid: task.taskid, code: task.taskcode}
+			this.refresh()
+		})
+	}
+	updateTask(taskreq: Promise<Task>){
+		taskreq
+		.then(task => ({name: this.name, pos: {x: this.x, y: this.y}, taskinfo: {type: "task", content: task}} as NodeInfo))
+		.then(this.newNode)
+
+		this.removeAndRefresh()
 	}
 }
 
@@ -85,47 +102,72 @@ export interface TaskNodeProps extends BaseWidgetProps {
 	diagramEngine: DiagramEngine;
 }
 
-export class TaskNodeWidget extends BaseWidget<TaskNodeProps, {}> {
+type TaskNodeState = {toggleEditor: boolean}
+export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 	constructor(props: TaskNodeProps) {
 		super("srd-default-node", props);
-		this.state = {};
+		this.state = {toggleEditor: false};
 	}
 
 	generatePort(port: TaskPortModel) {
 		return ( <TaskPortWidget model={port} key={port.id} />)
 	}
 
+	toggleEditor(){
+		this.setState(p => Object.assign(p, {toggleEditor: true}))
+		this.props.node.lockModel()
+	}
+	closeEditor(){
+		this.setState(p => Object.assign(p, {toggleEditor: false}))
+		this.props.node.unlockModel()		
+	}
+
 	render() {
 		const inports = this.props.node.getInPorts()
 		const outports = this.props.node.getOutPorts()
+		const node = this.props.node
 		return (
-            <div className={"toolForm toolFormInCanvas " + (this.props.node.selected ? "toolForm-active" : "")}>
-				{/* title */}
-				<Dimmer active={this.props.node.loading} inverted>
-					<Loader inverted content='Loading' />
-				</Dimmer>
-                <div className={"toolFormTitle"}>
-					<Button.Group basic size="small" style={{float: "right"}}>
-						<Button icon='close' style={{padding: "0"}}  onClick={()=>this.props.node.removeAndRefresh()}/>
-					</Button.Group>
-                    <i className={"code icon"}/>
-                    <span>{this.props.node.name}</span>
-                </div>
-                {/* inputs */}
-                <div>
-                    <div className={"toolFormBody"}>
-                        {_.map(inports, this.generatePort.bind(this))}
-                    </div>
-                </div>
-                {/* divider */}
-                {inports.length > 0 ? <Divider /> : <React.Fragment/>}
-                {/* outputs */}
-                <div>
-                    <div className={"toolFormBody"}>
-                        {_.map(outports, this.generatePort.bind(this))}
-                    </div>
-                </div>
-            </div>
+			<React.Fragment>
+				{/* task node */}
+				<div className={"toolForm toolFormInCanvas " + (this.props.node.selected ? "toolForm-active" : "")}>
+					{/* title */}
+					<Dimmer active={node.loading} inverted>
+						<Loader inverted content='Loading' />
+					</Dimmer>
+					<div className={"toolFormTitle"}>
+						<Button.Group size="medium" floated="right">
+							<Button icon='edit outline'  style={{padding: "3px"}} onClick={this.toggleEditor.bind(this)}/>
+							<Button icon='times' style={{padding: "3px"}}  onClick={()=>this.props.node.removeAndRefresh()}/>
+						</Button.Group>
+						<i className={"code icon"}/>
+						<span>{node.name}</span>
+					</div>
+					{/* inputs */}
+					<div>
+						<div className={"toolFormBody"}>
+							{_.map(inports, this.generatePort.bind(this))}
+						</div>
+					</div>
+					{/* divider */}
+					{inports.length > 0 ? <Divider /> : <React.Fragment/>}
+					{/* outputs */}
+					<div>
+						<div className={"toolFormBody"}>
+							{_.map(outports, this.generatePort.bind(this))}
+						</div>
+					</div>
+				</div>
+				{/* modal */}
+				{this.state.toggleEditor? 
+					  <CodaEditor 
+						  name={node.name}
+						  close={this.closeEditor.bind(this)}
+						  save={(task) => node.updateTask(Promise.resolve(task))}
+						  code={node.extras.code}
+					  /> 
+					: <React.Fragment/>
+				}
+			</React.Fragment>
 		);
 	}
 }

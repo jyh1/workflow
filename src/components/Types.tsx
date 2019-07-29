@@ -48,12 +48,14 @@ export interface NodeInfo {
 export type TaskId = string
 export type TaskBody = Object
 
-export interface Task {
-    taskbody: TaskBody;
-    inports: Arguments;
-    outports: Arguments;
-    taskid?: string
+export type ParseResult = {
+      taskbody: TaskBody
+    , inports: Arguments
+    , outports: Arguments
+    , taskid?: string
 }
+
+export type Task = ParseResult & {taskcode: string}
 
 export const taskTag = "task"
 export type TaskDragType = {name: string, taskinfo: TaskInfo}
@@ -73,7 +75,7 @@ export type ClWaitRequest = (path: string) => Promise<string>
 export type WorksheetItemsRequest = (worksheet: string) => Promise<WorksheetContent>
 export type WorksheetsRequest = () => Promise<Worksheet[]>
 export type BundleInfoRequest = (uuid: string) => Promise<BundleInfo>
-export type ParseRquest = (program: string) => Promise<Task>
+export type ParseRquest = (program: string) => Promise<ParseResult>
 
 // graph representation
 export type ToolPort = {nodeid: string, nodename: string, label: string}
@@ -85,7 +87,7 @@ export interface ToolNodeInterface<PortType> {
 }
 export type ToolNode = ToolNodeInterface<ToolPort>
 
-export type ToolModelExtra = {taskbody: Object, taskid?: string, code?: string}
+export type ToolModelExtra = {taskbody: Object, taskid?: string, code: string}
 
 // bundle list in worksheet
 export type BundleState = "created" | "ready" | "preparing" | "running" | "failed"
@@ -118,5 +120,5 @@ export const endPointPath = {
 export function makeLitTask(uuid: string): Task{
     return ({
         "outports":["data"],"inports":[],
-        "taskbody":{"tag":"Dict","contents":{"data":{"tag":"Lit","contents":{"tag":"UUID","contents":uuid}}}}})
+        "taskbody":{"tag":"Dict","contents":{"data":{"tag":"Lit","contents":{"tag":"UUID","contents":uuid}}}}, "taskcode": ("0x"+uuid)})
 }
