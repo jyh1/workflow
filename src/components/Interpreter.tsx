@@ -43,7 +43,7 @@ function resolveDep(env: Env, dep: T.Dep): Promise<[string, string]>{
     )
 }
 
-type DepResult = {alias: Map<string, string>, deps: string[]}
+type DepResult = {alias: Map<string, string>, deps: string}
 
 function uniqDeps(deps: [string, string][]): DepResult {
     type Bundle = string
@@ -60,7 +60,7 @@ function uniqDeps(deps: [string, string][]): DepResult {
             newdeps.push(buildDep(name, bundle))
         }
     }
-    return {alias, deps: newdeps}
+    return {alias, deps: quote(newdeps)}
 }
 
 function resolveDeps(env: Env, deps: T.Deps): Promise<[string, string][]>{
@@ -70,11 +70,11 @@ function resolveDeps(env: Env, deps: T.Deps): Promise<[string, string][]>{
 }
 
 
-function resolveClOpts(env: Env, opts: T.ClOption[]): Promise<string[]>{
+function resolveClOpts(env: Env, opts: T.ClOption[]): Promise<string>{
     let emptDep = new Map()
     return(
         Promise.all(_.map(opts, opt => resolveCMDEle(env, emptDep, opt)))
-        .then(res => [].concat(...res))
+        .then(res => res.join(''))
     )
 }
 
@@ -83,15 +83,17 @@ function resolveCMDEle(env: Env, alias: Map<string, string>, e: T.CMDEle): Promi
         return (resolveJNormalRes(env, e.content)
                 .then(str => quote([str]))
             )
-    } else {
-        return Promise.resolve(e.content)
+    } 
+    if (e.type == "bundle"){
+        return Promise.resolve(alias.get(e.content))
     }
+    return Promise.resolve(e.content)
 }
 
 function resolveCMDEles(env: Env, alias: Map<string, string>, es: T.CMDEle[]): Promise<string>{
     return(
         Promise.all(_.map(es, x => resolveCMDEle(env, alias, x)))
-        .then(ss => ss.join(''))
+        .then(ss => quote([ss.join('')]))
     )
 }
 
@@ -101,7 +103,7 @@ function clrun(env: Env, opts: T.ClOption[], cmd: T.CMDEle[], deps: T.Deps): Pro
     let optstr = resolveClOpts(env, opts)
     let cmdstr = depres.then(x => resolveCMDEles(env, x.alias, cmd))
     return (Promise.all([optstr, depstr, cmdstr])
-    .then (xs => quote(["cl", "run"].concat(...xs)))
+    .then (xs => ["cl run", ...xs].join(" "))
     .then (xs => env.clReq(env.worksheet, xs))
     )
 }
@@ -109,7 +111,7 @@ function clrun(env: Env, opts: T.ClOption[], cmd: T.CMDEle[], deps: T.Deps): Pro
 function clmake(env: Env, opts: T.ClOption[], deps: T.Deps): Promise<string>{
     return(
         Promise.all([resolveClOpts(env, opts), resolveDeps(env, deps).then(xs => _.map(xs, arr => buildDep(...arr)))])
-        .then(xs => quote(["cl", "make"].concat(...xs)))
+        .then(xs => ["cl", "make", xs[0], quote(xs[1])].join(" "))
         .then(x => env.clReq(env.worksheet, x))
     )
 }
