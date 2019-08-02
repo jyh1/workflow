@@ -201,6 +201,11 @@ div.form-row-input label {
     cursor: pointer;
 }
 
+.folder-elem-selected {
+    @extend .folder-elem;
+    background-color: #dfeefd;
+}
+
 .file-elem{
     @extend .unselectable;
     cursor: grab;

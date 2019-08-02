@@ -5,7 +5,14 @@ import {List, Container, Header, Dimmer, Loader, SegmentGroup, Segment} from 'se
 // import {taskListReq} from "../MockRequests"
 import {taskListReq} from "../Requests"
 
-type Props = {name: string, children: TaskElement[], description: string}
+type Props = {
+      name: string
+    , children: TaskElement[]
+    , description: string
+    , current?: string
+    , id: string
+    , cd: CD
+    }
 
 export class TaskFolderWidget extends React.Component<Props, {expand: boolean}>{
     constructor(props: Props){
@@ -14,20 +21,29 @@ export class TaskFolderWidget extends React.Component<Props, {expand: boolean}>{
     }
 
     toggle = () => {
+        const selected = this.props.id == this.props.current
+        const expand = this.state.expand
+        if (expand && !selected){
+            this.props.cd(this.props.id)
+            return
+        }
         this.setState((prevState) => ({...prevState, expand: !prevState.expand}))
+        this.props.cd(this.props.id)
     }
 
     render(){
         const {expand} = this.state
+        const {children, current, cd, description, id} = this.props
+        const selected = current == id
         return (
             <List.Item>
                 <List.Icon className="folder-elem" onClick = {this.toggle} name={expand ? 'folder open outline' : 'folder outline'}/>
-                <List.Content className="folder-elem">
+                <List.Content className={"folder-elem" + (selected? "-selected" : "")}>
                     <List.Header onClick = {this.toggle} >{this.props.name}</List.Header>
-                    <List.Description>{this.props.description}</List.Description>
+                    <List.Description>{description}</List.Description>
                 </List.Content>
                 <List.List className={"ui relaxed divided"} style = {{display: (expand? "block" : "none")}}>
-                    {...renderTaskElementList(this.props.children)}
+                    {...renderTaskElementList(children, current, cd)}
                 </List.List>
 
             </List.Item>
@@ -60,23 +76,28 @@ export class TaskWidget extends React.Component<TaskProps, {}>{
     }
 }
 
-export class TaskElementListWidget extends React.Component<{}, {tasks: TaskElement[], loading: boolean}>{
+type TaskListState = {tasks: TaskElement[], loading: boolean, current?: string}
+type CD = (dir: string) => void
+export class TaskElementListWidget extends React.Component<{}, TaskListState>{
     constructor(props: {}){
         super(props)
         this.state = {tasks: [], loading: true}
     }
+    cd = (dir: string) => {
+        this.setState(p => Object.assign(p, {current: dir}))
+    }
     render(){
         let eles = this.state.tasks
         return(
-            <Container fluid>
-                <Header as="h2">Tools</Header>
+            <Segment>
+                <Header color='blue' as="h2">Tools</Header>
                 <List divided relaxed>
                     <Dimmer active={this.state.loading} inverted>
                         <Loader inverted content='Loading' />
                     </Dimmer>
-                    {...renderTaskElementList(eles)}
+                    {...renderTaskElementList(eles, this.state.current, this.cd)}
                 </List>
-            </Container>
+            </Segment>
         )
     }
     componentDidMount(){
@@ -118,19 +139,19 @@ export class TaskElementListWidget extends React.Component<{}, {tasks: TaskEleme
     }
 }
 
-function renderTaskElementList(eles: readonly TaskElement[]):JSX.Element[]{
-    return(_.map(eles, (t) => <TaskElementWidget element={t} key={t.id}></TaskElementWidget>))
+function renderTaskElementList(eles: readonly TaskElement[], current: string, cd: CD ):JSX.Element[]{
+    return(_.map(eles, (t) => <TaskElementWidget element={t} key={t.id} current={current} cd={cd}></TaskElementWidget>))
 }
 
-type TaskElementProps = {element: TaskElement}
+type TaskElementProps = {element: TaskElement, current: string, cd: CD}
 export class TaskElementWidget extends React.Component<TaskElementProps, {}>{
     constructor(props: TaskElementProps){
         super(props)
     }
     render(){
-        let element = this.props.element;
+        let {element, current, cd} = this.props;
         if ("children" in element){
-            return(<TaskFolderWidget {...element}></TaskFolderWidget>)
+            return(<TaskFolderWidget {...element} current={current} cd={cd}></TaskFolderWidget>)
         } 
         else {
             return(<TaskWidget {...element}></TaskWidget>)
