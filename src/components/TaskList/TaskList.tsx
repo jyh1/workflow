@@ -1,49 +1,67 @@
 import {taskTag, TaskElement, TaskId, TaskListElement, TaskDragType} from "../Types"
 import * as React from "react"
 import * as _ from "lodash"
-import {List, Container, Header, Dimmer, Loader, SegmentGroup, Segment} from 'semantic-ui-react'
-// import {taskListReq} from "../MockRequests"
-import {taskListReq} from "../Requests"
+import {List, Breadcrumb, Header, Dimmer, Loader, SegmentGroup, Segment} from 'semantic-ui-react'
+import {taskListReq} from "../MockRequests"
+// import {taskListReq} from "../Requests"
 
+type Path = {name: string, id: string}[]
+type CD = (dir: Path) => void
 type Props = {
       name: string
     , children: TaskElement[]
     , description: string
-    , current?: string
+    , current: Path
     , id: string
     , cd: CD
+    , parentPath: Path
     }
 
+function currentid(path: Path){
+    if (path.length == 0){
+        return null
+    }
+    return path[path.length - 1].id
+}
+
 export class TaskFolderWidget extends React.Component<Props, {expand: boolean}>{
+    path: Path
     constructor(props: Props){
         super(props)
         this.state = {expand: false}
+        this.path = this.props.parentPath.concat({id: this.props.id, name: this.props.name})
     }
-
+    
     toggle = () => {
-        const selected = this.props.id == this.props.current
+        const {id, current} = this.props
+        const selected = currentid(current) == id
         const expand = this.state.expand
         if (expand && !selected){
-            this.props.cd(this.props.id)
+            this.props.cd(this.path)
+            return
+        }
+        if (expand && selected){
+            this.setState((prevState) => ({...prevState, expand: false}))
+            this.props.cd([])
             return
         }
         this.setState((prevState) => ({...prevState, expand: !prevState.expand}))
-        this.props.cd(this.props.id)
+        this.props.cd(this.path)
     }
 
     render(){
         const {expand} = this.state
-        const {children, current, cd, description, id} = this.props
-        const selected = current == id
+        const {children, current, cd, description, id, name} = this.props
+        const selected = currentid(current) == id
         return (
             <List.Item>
                 <List.Icon className="folder-elem" onClick = {this.toggle} name={expand ? 'folder open outline' : 'folder outline'}/>
-                <List.Content className={"folder-elem" + (selected? "-selected" : "")}>
-                    <List.Header onClick = {this.toggle} >{this.props.name}</List.Header>
+                <List.Content onClick = {this.toggle} className={"folder-elem" + (selected? "-selected" : "")}>
+                    <List.Header >{name}</List.Header>
                     <List.Description>{description}</List.Description>
                 </List.Content>
                 <List.List className={"ui relaxed divided"} style = {{display: (expand? "block" : "none")}}>
-                    {...renderTaskElementList(children, current, cd)}
+                    {...renderTaskElementList(children, current, cd, this.path)}
                 </List.List>
 
             </List.Item>
@@ -76,26 +94,40 @@ export class TaskWidget extends React.Component<TaskProps, {}>{
     }
 }
 
-type TaskListState = {tasks: TaskElement[], loading: boolean, current?: string}
-type CD = (dir: string) => void
+type TaskListState = {tasks: TaskElement[], loading: boolean, current?: Path}
 export class TaskElementListWidget extends React.Component<{}, TaskListState>{
     constructor(props: {}){
         super(props)
-        this.state = {tasks: [], loading: true}
+        this.state = {tasks: [], loading: true, current: []}
     }
-    cd = (dir: string) => {
+    cd = (dir: Path) => {
         this.setState(p => Object.assign(p, {current: dir}))
     }
     render(){
-        let eles = this.state.tasks
+        const eles = this.state.tasks
+        const {current} = this.state
+        const length = current.length
+        const breadcrumb = length == 0? 
+            (<Breadcrumb.Divider>/</Breadcrumb.Divider>) :
+            (_.map(current, (p, index) => 
+                <React.Fragment key={p.id}>
+                    <Breadcrumb.Divider>/</Breadcrumb.Divider>
+                    <Breadcrumb.Section onClick={() => this.cd(current.slice(0, index + 1))} link={index != length - 1} active={index == length - 1}>
+                        {p.name}
+                    </Breadcrumb.Section>
+                </React.Fragment>
+            ))
         return(
             <Segment>
                 <Header color='blue' as="h2">Tools</Header>
+                <Breadcrumb className="panel">
+                    {breadcrumb}
+                </Breadcrumb>
                 <List divided relaxed>
                     <Dimmer active={this.state.loading} inverted>
                         <Loader inverted content='Loading' />
                     </Dimmer>
-                    {...renderTaskElementList(eles, this.state.current, this.cd)}
+                    {...renderTaskElementList(eles, this.state.current, this.cd, [])}
                 </List>
             </Segment>
         )
@@ -139,19 +171,19 @@ export class TaskElementListWidget extends React.Component<{}, TaskListState>{
     }
 }
 
-function renderTaskElementList(eles: readonly TaskElement[], current: string, cd: CD ):JSX.Element[]{
-    return(_.map(eles, (t) => <TaskElementWidget element={t} key={t.id} current={current} cd={cd}></TaskElementWidget>))
+function renderTaskElementList(eles: readonly TaskElement[], current: Path, cd: CD, parentPath: Path ):JSX.Element[]{
+    return(_.map(eles, (t) => <TaskElementWidget element={t} key={t.id} current={current} cd={cd} parentPath={parentPath}></TaskElementWidget>))
 }
 
-type TaskElementProps = {element: TaskElement, current: string, cd: CD}
+type TaskElementProps = {element: TaskElement, current: Path, cd: CD, parentPath: Path}
 export class TaskElementWidget extends React.Component<TaskElementProps, {}>{
     constructor(props: TaskElementProps){
         super(props)
     }
     render(){
-        let {element, current, cd} = this.props;
+        let {element, current, cd, parentPath} = this.props;
         if ("children" in element){
-            return(<TaskFolderWidget {...element} current={current} cd={cd}></TaskFolderWidget>)
+            return(<TaskFolderWidget {...element} current={current} cd={cd} parentPath={parentPath}></TaskFolderWidget>)
         } 
         else {
             return(<TaskWidget {...element}></TaskWidget>)
