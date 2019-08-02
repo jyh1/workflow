@@ -32,7 +32,7 @@ export type JCmd = JCat | JMake | JRun | JLit
 
 export type CMDEle = JObject<"plain", string> | JObject<"bundle", string> | JObject<"quote", JNormalRes>
 
-export type ClOption = [string, JVar | JVerbatim]
+export type ClOption = CMDEle
 export type JBlock = {variable: string, options: ClOption[], command: JCmd}
 
 export type JLang = {result: JRes, blocks: JBlock[]}

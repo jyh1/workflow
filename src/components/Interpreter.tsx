@@ -69,17 +69,11 @@ function resolveDeps(env: Env, deps: T.Deps): Promise<[string, string][]>{
     )
 }
 
-function resolveClOpt(env: Env, opt: T.ClOption): Promise<[string, string]>{
-    let name = "--" + opt[0]
-    return (
-        resolveJNormalRes(env, opt[1])
-        .then(res => [name, res])
-    )
-}
 
 function resolveClOpts(env: Env, opts: T.ClOption[]): Promise<string[]>{
+    let emptDep = new Map()
     return(
-        Promise.all(_.map(opts, opt => resolveClOpt(env, opt)))
+        Promise.all(_.map(opts, opt => resolveCMDEle(env, emptDep, opt)))
         .then(res => [].concat(...res))
     )
 }
@@ -135,7 +129,7 @@ function resolveJBlock(env: Env, blk: T.JBlock): void{
     // console.log(blk)
     // console.log(blk.command)
     let options = blk.options.slice()
-    options.unshift(["name", {type: "value", content: blk.variable}])
+    options.unshift({type: "plain", content: "--name " + blk.variable})
     let cmd = blk.command
     if(cmd.type == "run"){
         env.env.set(blk.variable, clrun(env, options, cmd.content.cmd, cmd.content.dependencies))
