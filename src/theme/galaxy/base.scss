@@ -267,6 +267,12 @@ div.form-row-input label {
 }
 
 .ui.breadcrumb.panel{
-    padding: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
     background-color: transparent
+}
+
+.ui.attached.segment.toolpanel{
+    padding-top: 4px;
 }

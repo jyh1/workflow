@@ -1,6 +1,6 @@
 import * as React from "react";
 import {Canvas} from "./Canvas/Canvas"
-import {TaskElementListWidget} from "./TaskList/TaskList"
+import {ToolPanel} from "./Tool/ToolPanel"
 import {endPointPath} from "./Types"
 import * as _ from "lodash"
 import { Router, Route, Link, Redirect, withRouter, Switch, RouteProps } from 'react-router-dom';
@@ -41,7 +41,7 @@ export class HomeApp extends React.Component<Props, State>{
         const changeWorksheet = this.changeWorksheet.bind(this)
         return (
             <SplitPane split="vertical" defaultSize="16%" pane1Style={{overflowY: "auto"}}>
-                <TaskElementListWidget/>
+                <ToolPanel/>
                 <SplitPane split="vertical" defaultSize={385} primary="second" minSize={385} pane2Style={{overflowY: "auto"}}>
                     <Canvas nodes = {[]} refreshBundle={refreshBundle} />
                     <WorksheetPanel content={this.state.currentWorksheet} changeWorksheet={changeWorksheet} loading={this.state.loadingWorksheet} />
