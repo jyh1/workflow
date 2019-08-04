@@ -1,7 +1,7 @@
-import {taskTag, TaskElement, TaskId, TaskListElement, TaskDragType} from "../Types"
+import {TaskListElement} from "../Types"
 import * as React from "react"
 import * as _ from "lodash"
-import {Header, Button, Segment, Icon, Sticky, Ref} from 'semantic-ui-react'
+import {Header, Button, Segment, Icon, Sticky, Ref, Popup} from 'semantic-ui-react'
 import {taskListReq} from "../MockRequests"
 // import {taskListReq} from "../Requests"
 
@@ -38,25 +38,19 @@ export class ToolPanel extends React.Component<{}, ToolPanelState>{
                     <Segment attached loading={this.state.loading} className="toolpanel">
                         <Sticky context={this.contextRef}>
                             <div className="panelsticky">
-                            <Button.Group floated="right" size="small" basic color='blue'>
-                                <Button icon>
-                                    <Icon name='add' />
-                                    New Folder
-                                </Button>
-                                <Button icon>
-                                    <Icon name='add square' />
-                                    New File
-                                </Button>
-                                <Button icon>
-                                    <Icon name='trash alternate outline' />
-                                    Delete
-                                </Button>
-                            </Button.Group>
-                            <br style={{clear: "both"}} />
-                            <ToolPath 
-                            current={current}
-                            cd={this.cd}
-                            />
+                                <Button.Group floated="right" size="small" basic color='blue'>
+                                    <Popup content='New Folder' trigger = {<Button icon><Icon name='add' /></Button>}
+                                    />
+                                    <Popup content='New Tool' trigger = {<Button icon><Icon name='add square' /></Button>}
+                                    />
+                                    <Popup position='bottom right' content='Delete' trigger = {<Button icon><Icon name='trash alternate outline' /></Button>}
+                                    />
+                                </Button.Group>
+                                <br style={{clear: "both"}} />
+                                <ToolPath 
+                                current={current}
+                                cd={this.cd}
+                                />
                             </div>
                         </Sticky>                                       
                         <ToolList
