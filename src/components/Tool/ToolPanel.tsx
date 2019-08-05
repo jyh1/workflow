@@ -10,17 +10,21 @@ import {ToolPath} from './ToolHeader'
 import {Path} from './Types'
 
 
-type ToolPanelState = {tasks: TaskListElement[], loading: boolean, current?: Path}
+type ToolPanelState = {tasks: TaskListElement[], loading: boolean, current?: Path, editing: boolean}
 export class ToolPanel extends React.Component<{}, ToolPanelState>{
     contextRef: React.Ref<any>
     constructor(props: {}){
         super(props)
-        this.state = {tasks: [], loading: true, current: []}
+        this.state = {tasks: [], loading: true, current: [], editing: false}
         this.contextRef = React.createRef()
     }
 
     cd = (dir: Path) => {
         this.setState(p => Object.assign(p, {current: dir}))
+    }
+
+    save = (name: string, desc: string) => {
+        this.setState(p => Object.assign(p, {editing: false}))
     }
 
     updateList = (tlis: Promise<TaskListElement[]>) => {
@@ -37,6 +41,7 @@ export class ToolPanel extends React.Component<{}, ToolPanelState>{
     render(){
         const {current} = this.state
         const pid = currentid(current)
+        const eleprops = {editing: this.state.editing, current, cd: this.cd, save: this.save}
         return(
             <React.Fragment>
                 <Header color='blue' as="h2" attached='top'>Tools</Header> 
@@ -48,8 +53,8 @@ export class ToolPanel extends React.Component<{}, ToolPanelState>{
                                     <Popup content='New Folder' trigger = 
                                         {<Button icon onClick={() => this.updateList(newToolReq({name: "test", parent: pid}))}><Icon name='add' /></Button>}
                                     />
-                                    <Popup content='New Tool' trigger = 
-                                        {<Button icon><Icon name='add square' /></Button>}
+                                    <Popup content='Edit' trigger = 
+                                        {<Button icon onClick={() => this.setState(p => Object.assign(p, {editing: true}))}><Icon name='edit' /></Button>}
                                     />
                                     <Popup position='bottom right' content='Delete' trigger = {<Button icon><Icon name='trash alternate outline' /></Button>}
                                     />
@@ -62,8 +67,7 @@ export class ToolPanel extends React.Component<{}, ToolPanelState>{
                             </div>
                         </Sticky>                                       
                         <ToolList
-                            current={current}
-                            cd={this.cd}
+                            eleprops={eleprops}
                             tasks={this.state.tasks}
                         />
                 

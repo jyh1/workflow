@@ -1,10 +1,10 @@
 import {taskTag, TaskElement, TaskListElement, TaskDragType} from "../Types"
 import * as React from "react"
 import * as _ from "lodash"
-import {List, Segment, Header} from 'semantic-ui-react'
-import {Path, CD} from './Types'
+import {List, Button, Form, TextArea} from 'semantic-ui-react'
+import {Path, CD, EleProps} from './Types'
 
-type TaskListProps = {current?: Path, cd: CD, tasks: TaskListElement[]}
+type TaskListProps = {tasks: TaskListElement[], eleprops: EleProps}
 type State = {}
 export class ToolList extends React.Component<TaskListProps, State>{
     constructor(props: TaskListProps){
@@ -43,58 +43,33 @@ export class ToolList extends React.Component<TaskListProps, State>{
     }
 
     render(){
-        const {current, cd} = this.props
+        const {eleprops} = this.props
         return(
             <List divided relaxed>
-                {...renderTaskElementList(this.toTaskElement(this.props.tasks), current, cd, [])}
+                {...renderTaskElementList(this.toTaskElement(this.props.tasks), [], eleprops)}
             </List>
         )
     }
 }
 
-function renderTaskElementList(eles: TaskElement[], current: Path, cd: CD, parentPath: Path ):JSX.Element[]{
-    return(_.map(eles, (t) => <TaskElementWidget element={t} key={t.id} current={current} cd={cd} parentPath={parentPath}></TaskElementWidget>))
+function renderTaskElementList(eles: TaskElement[], parentPath: Path, eleprops: EleProps ):JSX.Element[]{
+    return(_.map(eles, (t) => 
+        <TaskElementWidget 
+            element={t} 
+            key={t.id} 
+            parentPath={parentPath}
+            eleprops={eleprops}
+        />))
 }
 
-type TaskElementProps = {element: TaskElement, current: Path, cd: CD, parentPath: Path}
+type TaskElementProps = {element: TaskElement, parentPath: Path, eleprops: EleProps}
 class TaskElementWidget extends React.Component<TaskElementProps, {}>{
     constructor(props: TaskElementProps){
         super(props)
     }
     render(){
-        let {element, current, cd, parentPath} = this.props;
-        if ("children" in element){
-            return(<TaskFolderWidget {...element} current={current} cd={cd} parentPath={parentPath}></TaskFolderWidget>)
-        } 
-        else {
-            return(<TaskWidget {...element}></TaskWidget>)
-        }
-    }
-}
-
-// tool
-type TaskProps = {name: string, taskid: string, description: string}
-class TaskWidget extends React.Component<TaskProps, {}>{
-    constructor(props: TaskProps){
-        super(props)
-    }
-
-    dragStart: React.DragEventHandler = (event) => {
-        // console.log(this.props.element)
-        let dragData : TaskDragType = {taskinfo: {type: "taskid", content: this.props.taskid}, name: this.props.name}
-        event.dataTransfer.setData(taskTag, JSON.stringify(dragData)); 
-    }
-
-    render(){
-        return(
-            <List.Item draggable={true} className="file-elem" onDragStart={this.dragStart}>
-                <List.Icon name="code"/>
-                <List.Content>
-                    <List.Header>{this.props.name}</List.Header>
-                    <List.Description>{this.props.description}</List.Description>
-                </List.Content>
-            </List.Item>
-        )
+        const {element, parentPath, eleprops} = this.props;
+        return(<ToolElementWidget {...element} parentPath={parentPath} eleprops={eleprops}/>)
     }
 }
 
@@ -109,53 +84,104 @@ export function currentid(path: Path){
 
 type Props = {
     name: string
-  , children: TaskElement[]
+  , children?: TaskElement[]
   , description: string
-  , current: Path
   , id: string
-  , cd: CD
   , parentPath: Path
+  , eleprops: EleProps
+  , taskid?: string
   }
 
-class TaskFolderWidget extends React.Component<Props, {expand: boolean}>{
+class ToolElementWidget extends React.Component<Props, {expand: boolean, name: string, description: string}>{
     path: Path
+    dragStart: React.DragEventHandler
+    toggle: () => void
+    isfolder: boolean
+    handleEditChange: (e: React.ChangeEvent<HTMLInputElement>) => void
     constructor(props: Props){
         super(props)
-        this.state = {expand: false}
+        this.state = {expand: false, name: this.props.name, description: this.props.description}
         this.path = this.props.parentPath.concat({id: this.props.id, name: this.props.name})
+        this.dragStart = this.dragStartF.bind(this)
+        this.toggle = this.toggleF.bind(this)
+        this.isfolder = this.props.taskid? false : true
+        this.handleEditChange = this.handleEditChangeF.bind(this)
+    }
+
+    dragStartF(event: React.DragEvent<Element>){
+        // console.log(this.props.element)
+        event.stopPropagation()
+        let dragData : TaskDragType = {taskinfo: {type: "taskid", content: this.props.taskid}, name: this.props.name}
+        event.dataTransfer.setData(taskTag, JSON.stringify(dragData)); 
     }
     
-    toggle = () => {
-        const {id, current} = this.props
+    toggleF() {
+        if (this.props.eleprops.editing) {return}
+        const {id, eleprops} = this.props
+        const {cd, current} = eleprops
         const selected = currentid(current) == id
         const expand = this.state.expand
         if (expand && !selected){
-            this.props.cd(this.path)
+            cd(this.path)
             return
         }
         if (expand && selected){
             this.setState((prevState) => ({...prevState, expand: false}))
-            this.props.cd([])
+            cd([])
             return
         }
         this.setState((prevState) => ({...prevState, expand: !prevState.expand}))
-        this.props.cd(this.path)
+        cd(this.path)
+    }
+
+    handleEditChangeF(event: React.ChangeEvent<HTMLInputElement>){
+        const target = event.target
+        const {value, name} = target
+        this.setState((prev) => Object.assign(prev, {[name]: value}));
     }
 
     render(){
         const {expand} = this.state
-        const {children, current, cd, description, id, name} = this.props
+        const {children, description, id, name, eleprops} = this.props
+        const {current, save, editing} = eleprops
+        const descriptionVal = description.length==0 ? "<none>" : description
         const selected = currentid(current) == id
+        const isEdit = editing && selected
         return (
-            <List.Item>
-                <List.Icon className="folder-elem" onClick = {this.toggle} name={expand ? 'folder open outline' : 'folder outline'}/>
-                <List.Content onClick = {this.toggle} className={"folder-elem" + (selected? "-selected" : "")}>
-                    <List.Header >{name}</List.Header>
-                    <List.Description>{description}</List.Description>
+            <List.Item
+                draggable={!this.isfolder}
+                onDragStart={this.isfolder? null : this.dragStart}
+            >
+                <List.Icon 
+                    onClick = {this.toggle}
+                    name={this.isfolder? (expand ? 'folder open outline' : 'folder outline') : 'code'}
+                />
+                <List.Content 
+                    onClick = {this.toggle} 
+                    className={this.isfolder? ("folder-elem" + ((selected && !editing)? "-selected" : "")) : "file-elem"}
+                >
+                    {isEdit? 
+                        <List.Header>
+                            <Form size="tiny">
+                                <Form.Input type="text" name="name" onChange={this.handleEditChange} defaultValue={name}/>
+                                <Form.Field><TextArea name="description" onChange={e => this.handleEditChange(e as any)} defaultValue={description} /></Form.Field>
+                                <Button basic color="blue" onClick={() => save(this.state.name, this.state.description)}>Save</Button>
+                            </Form>
+                        </List.Header>
+                    :
+                        <React.Fragment>
+                            <List.Header>{name}</List.Header>
+                            <List.Description>{descriptionVal}</List.Description>
+                        </React.Fragment>
+                    }
                 </List.Content>
-                <List.List className={"ui relaxed divided"} style = {{display: (expand? "block" : "none")}}>
-                    {...renderTaskElementList(children, current, cd, this.path)}
-                </List.List>
+                {children?
+                    <List.List className={"ui relaxed divided"} style = {{display: (expand? "block" : "none")}}>
+                        {...renderTaskElementList(children, this.path, eleprops)}
+                    </List.List>
+                :
+                    ""
+                }
             </List.Item>
         )
     }
