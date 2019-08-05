@@ -4,6 +4,26 @@ import * as T from "./Types"
 import * as _ from "lodash"
 import { delay } from "q";
 
+function jsonRequest<T, R>(url: string): ((info: T) => Promise<R>){
+    return(
+        info => {
+            let req = fetch(url, 
+                {
+                  headers: {"Content-Type":'application/json'}
+                , credentials: 'same-origin'
+                , method: 'POST'
+                ,  body: JSON.stringify(info)
+                }).then((res) => {
+                    if (!res.ok){
+                        return Promise.reject(res);
+                    }
+                    return res.json()
+                })
+            return req        
+        }
+    )
+}
+
 export const loginReq: LoginRequest = (username, password) => {
     let req = fetch('/login', 
         {
@@ -178,18 +198,6 @@ export const parseReq: T.ParseRquest = (program: string) => (
     })
 )
 
-export const newToolReq: T.NewToolReq = (task: T.NewTool) => (
-    fetch('tool/create',
-        {
-          headers: {"Content-Type":'application/json'}
-        , credentials: 'same-origin'
-        , method: 'POST'
-        ,  body: JSON.stringify(task)
-        }
-    ).then ((res) => {
-        if (!res.ok){
-            return Promise.reject(res)
-        }
-        return (res.json())
-    })
-)
+export const newToolReq: T.NewToolReq = jsonRequest('tool/create')
+
+export const updateToolReq: T.UpdateToolReq = jsonRequest('tool/update')

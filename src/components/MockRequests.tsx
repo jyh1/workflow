@@ -19,6 +19,14 @@ import * as Data from './TestData'
 let latency = 3000
 let reqtime = () => latency * Math.random()
 
+function mockRequest<R>(info: R): Promise<R>{
+    return (new Promise((executor, resolve) => {
+        setTimeout(
+            () => executor(info)
+        , reqtime())
+    }))
+}
+
 export const loginReq: LoginRequest = (username, password) => (
     new Promise((executor, resolve) => {
         setTimeout(
@@ -58,8 +66,6 @@ export const taskListReq: TaskListRequest = () => (
             , reqtime())
     })
 )
-
-export const newToolReq: T.NewToolReq = (t) => taskListReq()
 
 let defTask = (i:TaskId):Task => (
     {
@@ -210,3 +216,6 @@ export const parseReq: T.ParseRquest = (program: string) => (
         , reqtime())
     })
 ) 
+
+export const updateToolReq: T.UpdateToolReq = (d) => mockRequest(d.id)
+export const newToolReq: T.NewToolReq = (t) => mockRequest("1")

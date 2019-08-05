@@ -76,7 +76,8 @@ export type WorksheetItemsRequest = (worksheet: string) => Promise<WorksheetCont
 export type WorksheetsRequest = () => Promise<Worksheet[]>
 export type BundleInfoRequest = (uuid: string) => Promise<BundleInfo>
 export type ParseRquest = (program: string) => Promise<ParseResult>
-export type NewToolReq = (task: NewTool) => Promise<TaskListElement[]>
+export type NewToolReq = (task: NewTool) => Promise<string>
+export type UpdateToolReq = (task: UpdateTool) => Promise<string>
 
 // graph representation
 export type ToolPort = {nodeid: string, nodename: string, label: string}
@@ -112,7 +113,9 @@ export type WorksheetContent = {items: WorksheetItem[]} & Worksheet
 
 export type Worksheet = {uuid: string, name: string, title?: string}
 
-export type NewTool = {parent?: string, name?: string, description?: string}
+export type NewTool = {parent?: string, name: string, description: string}
+
+export type UpdateTool = {id: string, name: string, description: string}
 
 export const endPointPath = {
       login: "/login"

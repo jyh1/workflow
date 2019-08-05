@@ -3,7 +3,7 @@ import * as React from "react"
 import * as _ from "lodash"
 import {Header, Button, Segment, Icon, Sticky, Ref, Popup} from 'semantic-ui-react'
 // import {taskListReq, newToolReq} from "../MockRequests"
-import {taskListReq, newToolReq} from "../Requests"
+import {taskListReq, newToolReq, updateToolReq} from "../Requests"
 
 import {ToolList, currentid} from './ToolList'
 import {ToolPath} from './ToolHeader'
@@ -23,8 +23,10 @@ export class ToolPanel extends React.Component<{}, ToolPanelState>{
         this.setState(p => Object.assign(p, {current: dir}))
     }
 
-    save = (name: string, desc: string) => {
-        this.setState(p => Object.assign(p, {editing: false}))
+    save = (id: string, name: string, description: string) => {
+        updateToolReq({id, name, description})
+        .then(this.stopEdit)
+        .then( () => this.updateList(taskListReq()))
     }
 
     updateList = (tlis: Promise<TaskListElement[]>) => {
@@ -34,6 +36,22 @@ export class ToolPanel extends React.Component<{}, ToolPanelState>{
         })
     }
 
+    newFolder = (parent?: string) => {
+        const name = "New Folder"
+        newToolReq({name, description: "", parent})
+        .then((newid) => this.setState(p => Object.assign(p, {current: p.current.concat([{name, id: newid}])})))
+        .then( () => this.updateList(taskListReq()))
+        .then(this.startEdit)
+    }
+
+    startEdit = () => {
+        this.setState(p => Object.assign(p, {editing: true}))
+    }
+
+    stopEdit = () => {
+        this.setState(p => Object.assign(p, {editing: false}))
+    }
+
     componentDidMount(){
         this.updateList(taskListReq())
     }
@@ -41,7 +59,7 @@ export class ToolPanel extends React.Component<{}, ToolPanelState>{
     render(){
         const {current} = this.state
         const pid = currentid(current)
-        const eleprops = {editing: this.state.editing, current, cd: this.cd, save: this.save}
+        const eleprops = {editing: this.state.editing, current, cd: this.cd, save: this.save, cancelEdit: this.stopEdit}
         return(
             <React.Fragment>
                 <Header color='blue' as="h2" attached='top'>Tools</Header> 
@@ -51,10 +69,10 @@ export class ToolPanel extends React.Component<{}, ToolPanelState>{
                             <div className="panelsticky">
                                 <Button.Group floated="right" size="small" basic color='blue'>
                                     <Popup content='New Folder' trigger = 
-                                        {<Button icon onClick={() => this.updateList(newToolReq({name: "test", parent: pid}))}><Icon name='add' /></Button>}
+                                        {<Button icon onClick={() => this.newFolder(pid)}><Icon name='add' /></Button>}
                                     />
                                     <Popup content='Edit' trigger = 
-                                        {<Button icon onClick={() => this.setState(p => Object.assign(p, {editing: true}))}><Icon name='edit' /></Button>}
+                                        {<Button icon onClick={this.startEdit}><Icon name='edit' /></Button>}
                                     />
                                     <Popup position='bottom right' content='Delete' trigger = {<Button icon><Icon name='trash alternate outline' /></Button>}
                                     />

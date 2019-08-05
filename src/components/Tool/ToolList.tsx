@@ -143,7 +143,7 @@ class ToolElementWidget extends React.Component<Props, {expand: boolean, name: s
     render(){
         const {expand} = this.state
         const {children, description, id, name, eleprops} = this.props
-        const {current, save, editing} = eleprops
+        const {current, save, editing, cancelEdit} = eleprops
         const descriptionVal = description.length==0 ? "<none>" : description
         const selected = currentid(current) == id
         const isEdit = editing && selected
@@ -158,14 +158,15 @@ class ToolElementWidget extends React.Component<Props, {expand: boolean, name: s
                 />
                 <List.Content 
                     onClick = {this.toggle} 
-                    className={this.isfolder? ("folder-elem" + ((selected && !editing)? "-selected" : "")) : "file-elem"}
+                    className={(this.isfolder? "folder-elem" : "file-elem") + ((selected && !editing)? "-selected" : "")}
                 >
                     {isEdit? 
                         <List.Header>
-                            <Form size="tiny">
+                            <Form>
                                 <Form.Input type="text" name="name" onChange={this.handleEditChange} defaultValue={name}/>
                                 <Form.Field><TextArea name="description" onChange={e => this.handleEditChange(e as any)} defaultValue={description} /></Form.Field>
-                                <Button basic color="blue" onClick={() => save(this.state.name, this.state.description)}>Save</Button>
+                                <Button basic color="blue" onClick={() => save(id, this.state.name, this.state.description)}>Save</Button>
+                                <Button basic color="red" onClick={cancelEdit}>Cancel</Button>
                             </Form>
                         </List.Header>
                     :

@@ -200,7 +200,6 @@ div.form-row-input label {
     @extend .unselectable;
     cursor: pointer;
 }
-
 .folder-elem-selected {
     @extend .folder-elem;
     background-color: #dfeefd;
@@ -209,6 +208,10 @@ div.form-row-input label {
 .file-elem{
     @extend .unselectable;
     cursor: grab;
+}
+.file-elem-selected{
+    @extend .file-elem;
+    background-color: #dfeefd;
 }
 
 .ws-item {
