@@ -59,6 +59,8 @@ export const taskListReq: TaskListRequest = () => (
     })
 )
 
+export const newToolReq: T.NewToolReq = (t) => taskListReq()
+
 let defTask = (i:TaskId):Task => (
     {
         taskbody: i

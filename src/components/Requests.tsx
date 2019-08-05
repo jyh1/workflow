@@ -177,3 +177,19 @@ export const parseReq: T.ParseRquest = (program: string) => (
         return (res.json())
     })
 )
+
+export const newToolReq: T.NewToolReq = (task: T.NewTool) => (
+    fetch('tool/create',
+        {
+          headers: {"Content-Type":'application/json'}
+        , credentials: 'same-origin'
+        , method: 'POST'
+        ,  body: JSON.stringify(task)
+        }
+    ).then ((res) => {
+        if (!res.ok){
+            return Promise.reject(res)
+        }
+        return (res.json())
+    })
+)

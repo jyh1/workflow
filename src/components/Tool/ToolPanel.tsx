@@ -1,11 +1,11 @@
-import {TaskListElement} from "../Types"
+import {TaskListElement, TaskElement} from "../Types"
 import * as React from "react"
 import * as _ from "lodash"
 import {Header, Button, Segment, Icon, Sticky, Ref, Popup} from 'semantic-ui-react'
-import {taskListReq} from "../MockRequests"
-// import {taskListReq} from "../Requests"
+// import {taskListReq, newToolReq} from "../MockRequests"
+import {taskListReq, newToolReq} from "../Requests"
 
-import {ToolList} from './ToolList'
+import {ToolList, currentid} from './ToolList'
 import {ToolPath} from './ToolHeader'
 import {Path} from './Types'
 
@@ -23,14 +23,20 @@ export class ToolPanel extends React.Component<{}, ToolPanelState>{
         this.setState(p => Object.assign(p, {current: dir}))
     }
 
-    componentDidMount(){
-        taskListReq().then((e) => {
+    updateList = (tlis: Promise<TaskListElement[]>) => {
+        this.setState(p => Object.assign(p, {loading: true}))
+        tlis.then((e) => {
             this.setState((prev)=> Object.assign(prev, {tasks: e, loading: false}))
         })
     }
 
+    componentDidMount(){
+        this.updateList(taskListReq())
+    }
+
     render(){
         const {current} = this.state
+        const pid = currentid(current)
         return(
             <React.Fragment>
                 <Header color='blue' as="h2" attached='top'>Tools</Header> 
@@ -39,9 +45,11 @@ export class ToolPanel extends React.Component<{}, ToolPanelState>{
                         <Sticky context={this.contextRef}>
                             <div className="panelsticky">
                                 <Button.Group floated="right" size="small" basic color='blue'>
-                                    <Popup content='New Folder' trigger = {<Button icon><Icon name='add' /></Button>}
+                                    <Popup content='New Folder' trigger = 
+                                        {<Button icon onClick={() => this.updateList(newToolReq({name: "test", parent: pid}))}><Icon name='add' /></Button>}
                                     />
-                                    <Popup content='New Tool' trigger = {<Button icon><Icon name='add square' /></Button>}
+                                    <Popup content='New Tool' trigger = 
+                                        {<Button icon><Icon name='add square' /></Button>}
                                     />
                                     <Popup position='bottom right' content='Delete' trigger = {<Button icon><Icon name='trash alternate outline' /></Button>}
                                     />

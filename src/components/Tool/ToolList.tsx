@@ -3,7 +3,6 @@ import * as React from "react"
 import * as _ from "lodash"
 import {List, Segment, Header} from 'semantic-ui-react'
 import {Path, CD} from './Types'
-import { timingSafeEqual } from "crypto";
 
 type TaskListProps = {current?: Path, cd: CD, tasks: TaskListElement[]}
 type State = {}
@@ -100,7 +99,7 @@ class TaskWidget extends React.Component<TaskProps, {}>{
 }
 
 // tool folder
-function currentid(path: Path){
+export function currentid(path: Path){
     if (path.length == 0){
         return null
     }
