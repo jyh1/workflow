@@ -14,6 +14,7 @@ import * as T from '../Types'
 type Props = {
       nodes: NodeInfo[]
     , refreshBundle: () => void
+    , doSave: () => void
 };
 
 type State = {
@@ -181,6 +182,12 @@ export class Canvas extends React.Component<Props, State>{
                     <S.Menu.Menu position='right'>
                         <S.Button color='blue' icon='cogs' labelPosition='left' content="Build" loading={this.state.loading} onClick={this.compile.bind(this)}/>
                         <S.Button color='blue' icon='play' labelPosition='left' content="Run" loading={this.state.running} disabled={this.state.compiled === undefined? true : false} onClick={this.run.bind(this)}/>
+                        <S.Button color='blue' 
+                            icon='play'
+                            labelPosition='left' 
+                            content="Save" 
+                            onClick={this.props.doSave}
+                        />
                         {dropDown}
                     </S.Menu.Menu>
 

@@ -19,18 +19,22 @@ export class ToolPath extends React.Component<Props, {}>{
                 length == 0?
                     (<Breadcrumb.Divider>/</Breadcrumb.Divider>)
                     :
-                    (_.map(current, (p, index) => 
-                        <React.Fragment key={p.id}>
-                            <Breadcrumb.Divider>/</Breadcrumb.Divider>
-                            <Breadcrumb.Section 
-                                onClick=
-                                    {() => cd(current.slice(0, index + 1))} 
-                                    link={index != length - 1} 
-                                    active={index == length - 1}
-                            >
-                                {p.name}
-                            </Breadcrumb.Section>
-                        </React.Fragment>))
+                    (_.map(current, (p, index) => {
+                        const islast = index == length - 1
+                        return(
+                            <React.Fragment key={p.id}>
+                                <Breadcrumb.Divider>/</Breadcrumb.Divider>
+                                <Breadcrumb.Section 
+                                    onClick=
+                                        {islast ? null : (() => cd(current.slice(0, index + 1), !islast))}
+                                        link={!islast} 
+                                        active={islast}
+                                >
+                                    {p.name}
+                                </Breadcrumb.Section>
+                            </React.Fragment>
+                        )
+                    }))
                 }
             </Breadcrumb>
         )

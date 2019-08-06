@@ -11,12 +11,22 @@ import {Path} from './Types'
 
 
 type ToolPanelState = {tasks: TaskListElement[], loading: boolean, current?: Path, editing: boolean, isfolder: boolean}
-export class ToolPanel extends React.Component<{}, ToolPanelState>{
+type ToolPanelProps = {saveTask: boolean, doneSave: () => void}
+export class ToolPanel extends React.Component<ToolPanelProps, ToolPanelState>{
     contextRef: React.Ref<any>
-    constructor(props: {}){
+    constructor(props: ToolPanelProps){
         super(props)
         this.state = {tasks: [], loading: true, current: [], editing: false, isfolder: true}
         this.contextRef = React.createRef()
+    }
+
+    shouldComponentUpdate(nextProps: ToolPanelProps, nextState: ToolPanelState){
+        if (nextProps.saveTask){
+            console.log('save')
+            this.props.doneSave()
+            return false
+        }
+        return true
     }
 
     cd = (dir: Path, isfolder: boolean) => {

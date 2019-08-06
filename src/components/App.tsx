@@ -16,12 +16,12 @@ import '../theme/layout.scss'
 import * as localforage from 'localforage'
 
 type Props = {}
-type State = {currentWorksheet: T.WorksheetContent, loadingWorksheet: boolean}
+type State = {currentWorksheet: T.WorksheetContent, loadingWorksheet: boolean, saveTask: boolean}
 
 export class HomeApp extends React.Component<Props, State>{
     constructor(props: Props){
         super(props)
-        this.state = {currentWorksheet: {items: [], uuid: "", name: ""}, loadingWorksheet: false}
+        this.state = {currentWorksheet: {items: [], uuid: "", name: ""}, loadingWorksheet: false, saveTask: false}
     }
     componentDidMount(){
         this.changeWorksheet()
@@ -36,14 +36,15 @@ export class HomeApp extends React.Component<Props, State>{
         this.refreshBundle().then(() => this.setState(prev => Object.assign(prev, {loadingWorksheet: false})))
     }
 
+
     render(){
         const refreshBundle = this.refreshBundle.bind(this)
         const changeWorksheet = this.changeWorksheet.bind(this)
         return (
             <SplitPane split="vertical" defaultSize="16%" pane1Style={{overflowY: "auto"}}>
-                <ToolPanel/>
+                <ToolPanel saveTask={this.state.saveTask} doneSave={() => this.setState(p => Object.assign(p, {saveTask: false}))}/>
                 <SplitPane split="vertical" defaultSize={385} primary="second" minSize={385} pane2Style={{overflowY: "auto"}}>
-                    <Canvas nodes = {[]} refreshBundle={refreshBundle} />
+                    <Canvas nodes = {[]} refreshBundle={refreshBundle} doSave={() => this.setState(p => Object.assign(p, {saveTask: true}))} />
                     <WorksheetPanel content={this.state.currentWorksheet} changeWorksheet={changeWorksheet} loading={this.state.loadingWorksheet} />
                 </SplitPane>
             </SplitPane>
