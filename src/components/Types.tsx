@@ -43,6 +43,7 @@ export interface NodeInfo {
     name: string
     pos: {x: number; y: number}
     taskinfo: TaskInfo
+    nodetype?: NodeType
 }
 
 export type TaskId = string
@@ -58,7 +59,7 @@ export type ParseResult = {
 export type Task = ParseResult & {taskcode: string}
 
 export const taskTag = "task"
-export type TaskDragType = {name: string, taskinfo: TaskInfo}
+export type TaskDragType = {name: string, taskinfo: TaskInfo, nodetype?: NodeType}
 
 export type TaskElement = {name: string, id: string, description: string} & ({children: TaskElement[]} | {taskid: TaskId})
 
@@ -116,6 +117,9 @@ export type Worksheet = {uuid: string, name: string, title?: string}
 export type NewTool = {parent?: string, name: string, description: string}
 
 export type UpdateTool = {id: string, name: string, description: string}
+
+
+export type NodeType = "tool" | "argument"
 
 export const endPointPath = {
       login: "/login"

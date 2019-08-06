@@ -36,6 +36,9 @@ div.toolForm {
         @extend .px-2;
         cursor: move;
         background: $brand-secondary;
+        &_argument{
+            background: #fe7f02
+        }
     }
     .toolFormBody {
         @extend .card-body;

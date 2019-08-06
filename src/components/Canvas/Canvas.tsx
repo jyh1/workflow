@@ -147,6 +147,12 @@ export class Canvas extends React.Component<Props, State>{
         event.dataTransfer.setData(taskTag, JSON.stringify(dragData)); 
     }
 
+    dragArgumentStart: React.DragEventHandler = (event) => {
+        let dragData : TaskDragType = {taskinfo: {type: "codaval", content: "0x1223"}, name: "Argument", nodetype: "argument"}
+        event.dataTransfer.setData(taskTag, JSON.stringify(dragData)); 
+    }
+
+
     processDrop: React.DragEventHandler = (event) => {
         event.preventDefault()
         let data = event.dataTransfer.getData(taskTag);
@@ -156,7 +162,7 @@ export class Canvas extends React.Component<Props, State>{
                 dragged = JSON.parse(data);
             } catch (e) {return}
         const pos = this.engine.getRelativeMousePoint(event)
-        let node : NodeInfo = {pos, name: dragged.name, taskinfo: dragged.taskinfo}
+        let node : NodeInfo = {pos, name: dragged.name, taskinfo: dragged.taskinfo, nodetype: dragged.nodetype}
         this.newNode(node)
         // console.log(node)
     }
@@ -167,11 +173,23 @@ export class Canvas extends React.Component<Props, State>{
     }
 
     render(){
+        const nodes = this.engine.getDiagramModel().nodes as {[s: string]: TaskNodeModel}
+        let hasarg: boolean = false
+        for(const n in nodes){
+            if (nodes[n].nodeType == "argument"){
+                hasarg = true
+                break
+            }
+        }
+
         const dropDown = (
             <S.Dropdown item icon='plus' simple>
                 <S.Dropdown.Menu>
                     <S.Dropdown.Item draggable onDragStart={this.dragStart}>
                         <S.Icon name="code"/>Empty Tool
+                    </S.Dropdown.Item>
+                    <S.Dropdown.Item disabled={hasarg} draggable onDragStart={this.dragArgumentStart}>
+                        <S.Icon name="ellipsis vertical"/>Argument Node
                     </S.Dropdown.Item>
                 </S.Dropdown.Menu>
             </S.Dropdown>

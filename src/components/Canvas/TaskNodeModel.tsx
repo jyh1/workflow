@@ -15,7 +15,7 @@ import * as React from "react";
 import * as _ from "lodash";
 import {NodeInfo, TaskBody, Task} from "../Types"
 import * as T from "../Types"
-import {Button, Icon, Divider, Dimmer, Loader} from 'semantic-ui-react'
+import {Button, Input, Divider, Dimmer, Loader} from 'semantic-ui-react'
 // import {taskReq} from "../MockRequests"
 import {taskReq, parseReq} from "../Requests"
 import {CodaEditor} from './Editor'
@@ -30,6 +30,7 @@ export class TaskNodeModel extends DefaultNodeModel {
 	lockModel: () => void
 	unlockModel: () => void
 	newNode: (node: NodeInfo) => void
+	nodeType: T.NodeType
     constructor(node: NodeInfo, refresh: () => void, lock: () => void, unlock: () => void, newNode: (node: NodeInfo) => void){
         super(node.name);
 		[this.x, this.y] = [node.pos.x, node.pos.y];
@@ -43,6 +44,7 @@ export class TaskNodeModel extends DefaultNodeModel {
 		this.unlockModel = unlock;
 		this.newNode = newNode;
 		this.toggleEditor = false
+		this.nodeType = node.nodetype ? node.nodetype : "tool"
 		if(node.taskinfo.type == "taskid"){
 			taskreq = taskReq(node.taskinfo.content)
 		}
@@ -130,20 +132,21 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 		const inports = this.props.node.getInPorts()
 		const outports = this.props.node.getOutPorts()
 		const node = this.props.node
+		const isargument = node.nodeType == "argument"
 		return (
 			<React.Fragment>
 				{/* task node */}
-				<div className={"toolForm toolFormInCanvas " + (this.props.node.selected ? "toolForm-active" : "")}>
+				<div className={"toolForm toolFormInCanvas " + (node.selected ? "toolForm-active" : "")}>
 					{/* title */}
 					<Dimmer active={node.loading} inverted>
 						<Loader inverted content='Loading' />
 					</Dimmer>
-					<div className={"toolFormTitle"}>
+					<div className={"toolFormTitle" + (isargument? "_argument" : "")}>
 						<Button.Group size="medium" floated="right">
 							<Button icon='edit outline'  style={{padding: "3px"}} onClick={this.toggleEditor.bind(this)}/>
-							<Button icon='times' style={{padding: "3px"}}  onClick={()=>this.props.node.removeAndRefresh()}/>
+							<Button icon='times' style={{padding: "3px"}}  onClick={()=>node.removeAndRefresh()}/>
 						</Button.Group>
-						<i className={"code icon"}/>
+						<i className={isargument? "ellipsis vertical icon" : "code icon"}/>
 						<span>{node.name}</span>
 					</div>
 					{/* inputs */}
