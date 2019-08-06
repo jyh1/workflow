@@ -122,16 +122,16 @@ class ToolElementWidget extends React.Component<Props, {expand: boolean, name: s
         const selected = currentid(current) == id
         const expand = this.state.expand
         if (expand && !selected){
-            cd(this.path)
+            cd(this.path, this.isfolder)
             return
         }
         if (expand && selected){
             this.setState((prevState) => ({...prevState, expand: false}))
-            cd([])
+            cd([], true)
             return
         }
         this.setState((prevState) => ({...prevState, expand: !prevState.expand}))
-        cd(this.path)
+        cd(this.path, this.isfolder)
     }
 
     handleEditChangeF(event: React.ChangeEvent<HTMLInputElement>){

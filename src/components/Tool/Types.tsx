@@ -1,5 +1,5 @@
 export type Path = {name: string, id: string}[]
-export type CD = (dir: Path) => void
+export type CD = (dir: Path, isfolder: boolean) => void
 export type EleProps = {
       cd: CD
     , current: Path

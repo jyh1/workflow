@@ -10,17 +10,17 @@ import {ToolPath} from './ToolHeader'
 import {Path} from './Types'
 
 
-type ToolPanelState = {tasks: TaskListElement[], loading: boolean, current?: Path, editing: boolean}
+type ToolPanelState = {tasks: TaskListElement[], loading: boolean, current?: Path, editing: boolean, isfolder: boolean}
 export class ToolPanel extends React.Component<{}, ToolPanelState>{
     contextRef: React.Ref<any>
     constructor(props: {}){
         super(props)
-        this.state = {tasks: [], loading: true, current: [], editing: false}
+        this.state = {tasks: [], loading: true, current: [], editing: false, isfolder: true}
         this.contextRef = React.createRef()
     }
 
-    cd = (dir: Path) => {
-        this.setState(p => Object.assign(p, {current: dir}))
+    cd = (dir: Path, isfolder: boolean) => {
+        this.setState(p => Object.assign(p, {current: dir, isfolder}))
     }
 
     save = (id: string, name: string, description: string) => {
@@ -57,7 +57,7 @@ export class ToolPanel extends React.Component<{}, ToolPanelState>{
     }
 
     render(){
-        const {current} = this.state
+        const {current, isfolder} = this.state
         const pid = currentid(current)
         const eleprops = {editing: this.state.editing, current, cd: this.cd, save: this.save, cancelEdit: this.stopEdit}
         return(
@@ -69,7 +69,7 @@ export class ToolPanel extends React.Component<{}, ToolPanelState>{
                             <div className="panelsticky">
                                 <Button.Group floated="right" size="small" basic color='blue'>
                                     <Popup content='New Folder' trigger = 
-                                        {<Button icon onClick={() => this.newFolder(pid)}><Icon name='add' /></Button>}
+                                        {<Button disabled={!isfolder} icon onClick={() => this.newFolder(pid)}><Icon name='add' /></Button>}
                                     />
                                     <Popup content='Edit' trigger = 
                                         {<Button icon onClick={this.startEdit}><Icon name='edit' /></Button>}
