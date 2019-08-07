@@ -4,15 +4,17 @@ import * as T from "./Types"
 import * as _ from "lodash"
 import { delay } from "q";
 
-function jsonRequest<T, R>(url: string): ((info: T) => Promise<R>){
+type ContentType = 'application/json' | 'text/plain;charset=utf-8'
+
+function jsonRequest<T, R>(url: string, ctype : ContentType = 'application/json'): ((info: T) => Promise<R>){
     return(
         info => {
             let req = fetch(url, 
                 {
-                  headers: {"Content-Type":'application/json'}
+                  headers: {"Content-Type":ctype}
                 , credentials: 'same-origin'
                 , method: 'POST'
-                ,  body: JSON.stringify(info)
+                ,  body: ((ctype == 'application/json')? JSON.stringify(info) : (info as any as string))
                 }).then((res) => {
                     if (!res.ok){
                         return Promise.reject(res);
@@ -182,21 +184,9 @@ export const bundleInfoReq: T.BundleInfoRequest = (uuid: string) => (
     .then(res => res.data.attributes)
 ) 
 
-export const parseReq: T.ParseRquest = (program: string) => (
-    fetch('tool/parse',
-        {
-          headers: {"Content-Type":'text/plain;charset=utf-8'}
-        , credentials: 'same-origin'
-        , method: 'POST'
-        , body: program
-        }
-    ).then((res) => {
-        if (!res.ok){
-            return Promise.reject(res);
-        }
-        return (res.json())
-    })
-)
+export const parseReq: T.ParseRquest = jsonRequest('tool/parse', 'text/plain;charset=utf-8')
+
+export const parseArgReq: T.ParseArgRequest = jsonRequest('tool/parse/argument', 'text/plain;charset=utf-8')
 
 export const newToolReq: T.NewToolReq = jsonRequest('tool/create')
 

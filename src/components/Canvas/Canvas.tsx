@@ -162,7 +162,7 @@ export class Canvas extends React.Component<Props, State>{
                 dragged = JSON.parse(data);
             } catch (e) {return}
         const pos = this.engine.getRelativeMousePoint(event)
-        let node : NodeInfo = {pos, name: dragged.name, taskinfo: dragged.taskinfo, nodetype: dragged.nodetype}
+        let node : NodeInfo = {pos, name: dragged.name, taskinfo: dragged.taskinfo, nodeType: dragged.nodetype}
         this.newNode(node)
         // console.log(node)
     }

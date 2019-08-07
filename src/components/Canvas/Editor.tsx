@@ -3,18 +3,26 @@ import * as Brace from "brace";
 import AceEditor from "react-ace";
 import {Modal, Button, Icon, Input } from 'semantic-ui-react'
 import * as T from '../Types'
-import {parseReq, compileReq} from "../Requests"
+import {parseReq, parseArgReq} from "../Requests"
 
 import "brace/mode/haskell";
 import "brace/theme/github";
 
-type Props = {name: string, close: () => void, save: (task: T.Task) => void, body: T.Task}
+type Props = {
+      name: string
+    , close: () => void
+    , save: (task: T.Task) => void
+    , body: T.Task
+    , nodeType: T.NodeType
+}
 type State = {value: string, codaval?: T.Task}
 
 export class CodaEditor extends React.Component<Props, State>{
+    parseValue: (s: string) => Promise<T.ParseResult>
     constructor(props: Props){
         super(props)
         this.state = {value: props.body.taskcode, codaval: props.body}
+        this.parseValue = (props.nodeType == "tool")? parseReq : parseArgReq
     }
     handleInput = (val: string) => {
         this.setState(p => Object.assign(p, {value: val, codaval: null}))
@@ -27,7 +35,7 @@ export class CodaEditor extends React.Component<Props, State>{
     }
     compile = () => {
         let {value} = this.state
-        parseReq(value)
+        this.parseValue(value)
         .then(task => this.setState(p => Object.assign(p, {codaval: Object.assign(task, {taskcode: value}) })))
     }
     render(){

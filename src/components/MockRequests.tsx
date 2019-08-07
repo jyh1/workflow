@@ -217,5 +217,13 @@ export const parseReq: T.ParseRquest = (program: string) => (
     })
 ) 
 
+export const parseArgReq: T.ParseArgRequest = (str: string) => (
+    new Promise((executor, resolve) => {
+        setTimeout(
+            () => executor({"outports":["arg1","arg2"],"inports":[],"taskbody":{"arg1":{"tag":"TypeBundle"},"arg2":{"tag":"TypeBundle"}}})
+        , reqtime())
+    })
+) 
+
 export const updateToolReq: T.UpdateToolReq = (d) => mockRequest(d.id)
 export const newToolReq: T.NewToolReq = (t) => mockRequest("1")

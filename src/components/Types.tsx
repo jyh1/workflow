@@ -43,7 +43,7 @@ export interface NodeInfo {
     name: string
     pos: {x: number; y: number}
     taskinfo: TaskInfo
-    nodetype?: NodeType
+    nodeType?: NodeType
 }
 
 export type TaskId = string
@@ -77,6 +77,7 @@ export type WorksheetItemsRequest = (worksheet: string) => Promise<WorksheetCont
 export type WorksheetsRequest = () => Promise<Worksheet[]>
 export type BundleInfoRequest = (uuid: string) => Promise<BundleInfo>
 export type ParseRquest = (program: string) => Promise<ParseResult>
+export type ParseArgRequest = (arg: string) => Promise<ParseResult>
 export type NewToolReq = (task: NewTool) => Promise<string>
 export type UpdateToolReq = (task: UpdateTool) => Promise<string>
 

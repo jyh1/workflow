@@ -44,7 +44,7 @@ export class TaskNodeModel extends DefaultNodeModel {
 		this.unlockModel = unlock;
 		this.newNode = newNode;
 		this.toggleEditor = false
-		this.nodeType = node.nodetype ? node.nodetype : "tool"
+		this.nodeType = node.nodeType ? node.nodeType : "tool"
 		if(node.taskinfo.type == "taskid"){
 			taskreq = taskReq(node.taskinfo.content)
 		}
@@ -77,7 +77,7 @@ export class TaskNodeModel extends DefaultNodeModel {
 		})
 	}
 	updateTask(task: Task){
-		const node: NodeInfo = {name: this.name, pos: {x: this.x, y: this.y}, taskinfo: {type: "task", content: task}}
+		const node: NodeInfo = {name: this.name, pos: {x: this.x, y: this.y}, taskinfo: {type: "task", content: task}, nodeType: this.nodeType}
 		this.newNode(node)
 		this.removeAndRefresh()
 	}
@@ -171,6 +171,7 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 						  close={this.closeEditor.bind(this)}
 						  save={(task) => node.updateTask(task)}
 						  body={node.extras}
+						  nodeType={node.nodeType}
 					  /> 
 					: <React.Fragment/>
 				}
