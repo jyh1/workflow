@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Brace from "brace";
 import AceEditor from "react-ace";
-import {Modal, Button, Icon, Input } from 'semantic-ui-react'
+import {Modal, Button, Icon, Popup, Input } from 'semantic-ui-react'
 import * as T from '../Types'
 import {parseReq, parseArgReq} from "../Requests"
 
@@ -11,25 +11,25 @@ import "brace/theme/github";
 type Props = {
       name: string
     , close: () => void
-    , save: (task: T.Task) => void
+    , save: (task: T.Task, name: string) => void
     , body: T.Task
     , nodeType: T.NodeType
 }
-type State = {value: string, codaval?: T.Task}
+type State = {value: string, codaval?: T.Task, editName: boolean, name: string}
 
 export class CodaEditor extends React.Component<Props, State>{
     parseValue: (s: string) => Promise<T.ParseResult>
     constructor(props: Props){
         super(props)
-        this.state = {value: props.body.taskcode, codaval: props.body}
+        this.state = {value: props.body.taskcode, codaval: props.body, editName: false, name: props.name}
         this.parseValue = (props.nodeType == "tool")? parseReq : parseArgReq
     }
     handleInput = (val: string) => {
         this.setState(p => Object.assign(p, {value: val, codaval: null}))
     }
     handleClose = () => {
-        const {codaval} = this.state
-        this.props.save(codaval)
+        const {codaval, name} = this.state
+        this.props.save(codaval, name)
         // console.log(codaval)
         this.props.close()
     }
@@ -38,12 +38,31 @@ export class CodaEditor extends React.Component<Props, State>{
         this.parseValue(value)
         .then(task => this.setState(p => Object.assign(p, {codaval: Object.assign(task, {taskcode: value}) })))
     }
+    startEditingName = () => {
+        this.setState(p => Object.assign(p, {editName: true}))
+    }
+    stopEditingName = () => {
+        this.setState(p => Object.assign(p, {editName: false}))
+    }
+
+    editName = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const name = e.target.value
+        this.setState(p => Object.assign(p, {name}));
+    }
+
     render(){
-        const {codaval, value} = this.state
+        const {codaval, value, editName, name} = this.state
         const compiled = codaval? true : false
+        const header = (
+            <Modal.Header>
+                Edit: {editName? 
+                        <input onChange={this.editName} onBlur={this.stopEditingName} defaultValue={name}/> 
+                        : <Popup content='Click to edit' trigger = {<div onClick={this.startEditingName} className="editorToolname">{name}</div>}/>
+                      }
+            </Modal.Header>)
         return(
             <Modal open={true} id="editormodal" onDrag={(e:any) => {console.log(232); e.stopPropagation}}>
-                <Modal.Header>Edit: {this.props.name}</Modal.Header>
+                {header}
                 <Modal.Content>
                     <AceEditor
                         mode="haskell"
@@ -54,6 +73,7 @@ export class CodaEditor extends React.Component<Props, State>{
                         showGutter={true}
                         highlightActiveLine={true}
                         value={value}
+                        placeholder={(this.props.nodeType == "tool")? "Input Codalang": "Input argument dictionary (e.g. [arg1: bundle, arg2: string ...])"}
                         setOptions={{
                             showLineNumbers: true,
                             tabSize: 2

@@ -76,9 +76,9 @@ export class TaskNodeModel extends DefaultNodeModel {
 			this.refresh()
 		})
 	}
-	updateTask(task: Task){
-		const node: NodeInfo = {name: this.name, pos: {x: this.x, y: this.y}, taskinfo: {type: "task", content: task}, nodeType: this.nodeType}
-		this.newNode(node)
+	updateTask(task: Task, name: string){
+		const node: NodeInfo = {name, pos: {x: this.x, y: this.y}, taskinfo: {type: "task", content: task}, nodeType: this.nodeType}
+		this.newNode(node)	
 		this.removeAndRefresh()
 	}
 }
@@ -125,7 +125,6 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 	closeEditor(){
 		this.props.node.toggleEditor = false		
 		this.props.node.unlockModel()
-		this.forceUpdate()
 	}
 
 	render() {
@@ -169,7 +168,7 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 					  <CodaEditor 
 						  name={node.name}
 						  close={this.closeEditor.bind(this)}
-						  save={(task) => node.updateTask(task)}
+						  save={(task, name) => node.updateTask(task, name)}
 						  body={node.extras}
 						  nodeType={node.nodeType}
 					  /> 

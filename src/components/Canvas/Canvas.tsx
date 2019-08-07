@@ -143,12 +143,12 @@ export class Canvas extends React.Component<Props, State>{
     }
 
     dragStart: React.DragEventHandler = (event) => {
-        let dragData : TaskDragType = {taskinfo: {type: "empty", content: {}}, name: "New Task"}
+        let dragData : TaskDragType = {taskinfo: {type: "empty", content: {}}, name: "New Tool"}
         event.dataTransfer.setData(taskTag, JSON.stringify(dragData)); 
     }
 
     dragArgumentStart: React.DragEventHandler = (event) => {
-        let dragData : TaskDragType = {taskinfo: {type: "codaval", content: "0x1223"}, name: "Argument", nodetype: "argument"}
+        let dragData : TaskDragType = {taskinfo: {type: "empty", content: {}}, name: "Arguments", nodetype: "argument"}
         event.dataTransfer.setData(taskTag, JSON.stringify(dragData)); 
     }
 
