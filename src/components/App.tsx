@@ -16,12 +16,16 @@ import '../theme/layout.scss'
 import * as localforage from 'localforage'
 
 type Props = {}
-type State = {currentWorksheet: T.WorksheetContent, loadingWorksheet: boolean, saveTask: boolean}
+type State = {
+      currentWorksheet: T.WorksheetContent
+    , loadingWorksheet: boolean
+    , codalang?: T.CodaLang
+    }
 
 export class HomeApp extends React.Component<Props, State>{
     constructor(props: Props){
         super(props)
-        this.state = {currentWorksheet: {items: [], uuid: "", name: ""}, loadingWorksheet: false, saveTask: false}
+        this.state = {currentWorksheet: {items: [], uuid: "", name: ""}, loadingWorksheet: false}
     }
     componentDidMount(){
         this.changeWorksheet()
@@ -36,15 +40,23 @@ export class HomeApp extends React.Component<Props, State>{
         this.refreshBundle().then(() => this.setState(prev => Object.assign(prev, {loadingWorksheet: false})))
     }
 
+    doSave = (codalang: T.CodaLang) => {
+        this.setState(p => Object.assign(p, {codalang}))
+    }
+
+    doneSave = () => {
+        this.setState(p => Object.assign(p, {codalang: null}))
+    }
+
 
     render(){
         const refreshBundle = this.refreshBundle.bind(this)
         const changeWorksheet = this.changeWorksheet.bind(this)
         return (
             <SplitPane split="vertical" defaultSize="16%" pane1Style={{overflowY: "auto"}}>
-                <ToolPanel saveTask={this.state.saveTask} doneSave={() => this.setState(p => Object.assign(p, {saveTask: false}))}/>
+                <ToolPanel codalang={this.state.codalang} doneSave={this.doneSave}/>
                 <SplitPane split="vertical" defaultSize={385} primary="second" minSize={385} pane2Style={{overflowY: "auto"}}>
-                    <Canvas nodes = {[]} refreshBundle={refreshBundle} doSave={() => this.setState(p => Object.assign(p, {saveTask: true}))} />
+                    <Canvas nodes = {[]} refreshBundle={refreshBundle} doSave={this.doSave} />
                     <WorksheetPanel content={this.state.currentWorksheet} changeWorksheet={changeWorksheet} loading={this.state.loadingWorksheet} />
                 </SplitPane>
             </SplitPane>

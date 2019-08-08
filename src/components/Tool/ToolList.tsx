@@ -146,6 +146,7 @@ class ToolElementWidget extends React.Component<Props, {expand: boolean, name: s
         const {current, save, editing, cancelEdit} = eleprops
         const descriptionVal = description.length==0 ? "<none>" : description
         const selected = currentid(current) == id
+        const open = expand || selected
         const isEdit = editing && selected
         return (
             <List.Item
@@ -154,7 +155,7 @@ class ToolElementWidget extends React.Component<Props, {expand: boolean, name: s
             >
                 <List.Icon 
                     onClick = {this.toggle}
-                    name={this.isfolder? (expand ? 'folder open outline' : 'folder outline') : 'code'}
+                    name={this.isfolder? (open ? 'folder open outline' : 'folder outline') : 'code'}
                 />
                 <List.Content 
                     onClick = {this.toggle} 
@@ -177,7 +178,7 @@ class ToolElementWidget extends React.Component<Props, {expand: boolean, name: s
                     }
                 </List.Content>
                 {children?
-                    <List.List className={"ui relaxed divided"} style = {{display: (expand? "block" : "none")}}>
+                    <List.List className={"ui relaxed divided"} style = {{display: (open? "block" : "none")}}>
                         {...renderTaskElementList(children, this.path, eleprops)}
                     </List.List>
                 :

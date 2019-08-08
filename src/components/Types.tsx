@@ -1,11 +1,11 @@
 import { string } from "prop-types";
 
 export interface Tool {
-    codaExpr: CodaVal;
+    codaExpr: CodaLang;
     node: Node;
 }
 
-export type CodaVal = Object;
+export type CodaLang = Object;
 
 export type Arguments = string[]
 
@@ -37,7 +37,7 @@ export type JBlock = {variable: string, options: ClOption[], command: JCmd}
 
 export type JLang = {result: JRes, blocks: JBlock[]}
 
-export type CompileResult = {codalang: CodaVal, jlang: JLang}
+export type CompileResult = {codalang: CodaLang, jlang: JLang}
 
 export type TaskInfo = JObject<"taskid", TaskId> | JObject<"codaval", string> | JObject<"task", Task> | JObject<"empty", {}>
 
@@ -122,7 +122,7 @@ export type WorksheetContent = {items: WorksheetItem[]} & Worksheet
 
 export type Worksheet = {uuid: string, name: string, title?: string}
 
-export type NewTool = {parent?: string, name: string, description: string}
+export type NewTool = {parent?: string, name: string, description: string, codalang?: CodaLang}
 
 export type UpdateTool = {id: string, name: string, description: string}
 

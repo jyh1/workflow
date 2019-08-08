@@ -7,14 +7,13 @@ import * as _ from "lodash"
 import * as S from 'semantic-ui-react'
 import {compileReq} from "../Requests"
 import {evalJLang} from "../Interpreter"
-import { object } from "prop-types";
 import {clReq} from '../Requests'
 import * as T from '../Types'
 
 type Props = {
       nodes: NodeInfo[]
     , refreshBundle: () => void
-    , doSave: () => void
+    , doSave: (codalang: T.CodaLang) => void
 };
 
 type State = {
@@ -38,12 +37,6 @@ export class Canvas extends React.Component<Props, State>{
         this.engine.registerLinkFactory(new TaskLinkFactory());
         let model = new SRD.DiagramModel();
         this.model = model
-        // let nodes = _.map(
-        //     this.props.nodes,
-        //     (val) => {
-        //         return (new TaskNodeModel(val, this.refresh, this.lockModel, this.unlockModel))
-        //     })
-        // model.addAll(... nodes);
         this.engine.setDiagramModel(model);
 
         // refresh bundlelist after submitting request
@@ -209,25 +202,33 @@ export class Canvas extends React.Component<Props, State>{
             </S.Dropdown>
         )
 
+        const {running, compiled} = this.state
+        const {jlang, codalang} = compiled
+
         return(
             <div style={{height: "100%"}}>
                 <S.Menu style={{marginBottom: 0}}>
                     <S.Menu.Menu position='right'>
-                        <S.Button color='blue' icon='cogs' labelPosition='left' content="Build" loading={this.state.loading} onClick={this.compile.bind(this)}/>
+                        <S.Button basic color='blue' icon='cogs' labelPosition='left' content="Build" loading={this.state.loading} onClick={this.compile.bind(this)}/>
                         <S.Button 
-                            color='blue' 
+                            color='blue'
+                            basic
                             icon='play' 
                             labelPosition='left' 
                             content="Run" 
-                            loading={this.state.running} 
-                            disabled={this.state.compiled.jlang? false : true} 
+                            loading={running} 
+                            disabled={jlang? false : true} 
                             onClick={this.run.bind(this)}
                         />
-                        <S.Button color='blue' 
+                        <S.Button 
+                            basic
+                            color='blue' 
                             icon='play'
                             labelPosition='left' 
                             content="Save" 
-                            onClick={this.props.doSave}
+                            loading={running} 
+                            disabled={codalang? false : true} 
+                            onClick={() => this.props.doSave(codalang)}
                         />
                         {dropDown}
                     </S.Menu.Menu>
