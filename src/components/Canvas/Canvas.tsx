@@ -18,7 +18,7 @@ type Props = {
 };
 
 type State = {
-    compiled?: JLang
+    compiled?: T.CompileResult
     loading: boolean
     running: boolean
     locked: boolean
@@ -119,7 +119,7 @@ export class Canvas extends React.Component<Props, State>{
         let nodes = this.serializeTaskGraph()
         this.lockModel()
         this.setState(obj => Object.assign(obj, {loading: true, compiled: undefined}))
-        compileReq(nodes)
+        compileReq({body: nodes})
         .then((res) => {
             this.setState(obj => Object.assign(obj, {compiled: res, loading: false}))
             this.unlockModel()
@@ -134,7 +134,7 @@ export class Canvas extends React.Component<Props, State>{
     }
 
     run(){
-        let jlang =  this.state.compiled
+        const {jlang} =  this.state.compiled
         this.setState(prev => Object.assign(prev, {running: true}))
         if (jlang){
             evalJLang(jlang, this.reqAndRefresh.bind(this))

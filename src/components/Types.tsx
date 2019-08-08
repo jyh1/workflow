@@ -37,6 +37,8 @@ export type JBlock = {variable: string, options: ClOption[], command: JCmd}
 
 export type JLang = {result: JRes, blocks: JBlock[]}
 
+export type CompileResult = {codalang: CodaVal, jlang: JLang}
+
 export type TaskInfo = JObject<"taskid", TaskId> | JObject<"codaval", string> | JObject<"task", Task> | JObject<"empty", {}>
 
 export interface NodeInfo {
@@ -70,7 +72,7 @@ export type TaskListElement = {name: string; taskid?: string; parent?: TaskListE
 export type LoginRequest = (username: string, password: string) => Promise<void>
 export type TaskListRequest = () => Promise<TaskListElement[]>
 export type TaskInfoRequest = (taskid: TaskId) => Promise<Task>
-export type CompileRequest = (nodes: ToolNode[]) => Promise<JLang>
+export type CompileRequest = (nodes: CodaGraph) => Promise<CompileResult>
 export type ClRequest = (worsheet: string, command: string) => Promise<string>
 export type ClWaitRequest = (path: string) => Promise<string>
 export type WorksheetItemsRequest = (worksheet: string) => Promise<WorksheetContent>
@@ -90,6 +92,9 @@ export interface ToolNodeInterface<PortType> {
     arguments: {[arg: string]: PortType}
 }
 export type ToolNode = ToolNodeInterface<ToolPort>
+
+// optional type dict for arguments
+export type CodaGraph = {args?: TaskBody, body: ToolNode[]}
 
 export type ToolModelExtra = Task
 
