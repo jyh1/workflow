@@ -76,21 +76,20 @@ export class Canvas extends React.Component<Props, State>{
             const taskbody = extras.task.taskbody
             graphModel.addNode(id)
 
+            name = (n as any).name
+            
+            // argument node
             if (extras.nodeType == "argument"){
                 argNodeDict = extras.task.taskbody
-                // argument node's name is null
-                name = null
-            } else {
-                // uniq name
-                name = (n as any).name
-                if (uniqName.has(name)){
-                    const count = uniqName.get(name)
-                    uniqName.set(name, count + 1)
-                    name = name + '-' + count
-                } else {
-                    uniqName.set(name, 0)
-                }
+            }
 
+            // uniq name
+            if (uniqName.has(name)){
+                const count = uniqName.get(name)
+                uniqName.set(name, count + 1)
+                name = name + '-' + count
+            } else {
+                uniqName.set(name, 0)
             }
             let argDic: ArgDic = {} // portname to linkid
             for (let p of ports){
@@ -103,16 +102,18 @@ export class Canvas extends React.Component<Props, State>{
                 }
             }
 
-            processedNodes[id]= {id, taskbody, arguments: argDic, name}
+            processedNodes[id]= {id, taskbody, arguments: argDic, name, nodeType: extras.nodeType}
         }
 
-        // filter out argument node
-        let sortedOrder = _.filter(graphModel.topoSort(), n => processedNodes[n].name? true: false)
+        // only keep tool node
+        let sortedOrder = _.filter(graphModel.topoSort(), n => processedNodes[n].nodeType == "tool" ? true: false)
         // console.log(processedNodes)
         let tools = _.mapValues(processedNodes, (n) => {
                 let toToolPort: (linkid: string) => ToolPort = (linkid) => {
-                    let nodeid = linkDic[linkid].nodeid
-                    return {nodeid, nodename: processedNodes[nodeid].name, label: portIdToName[linkDic[linkid].portid]}
+                    const {nodeid} = linkDic[linkid]
+                    const sourcenode = processedNodes[nodeid]
+                    const nodeobj = {nodeid, nodename: sourcenode.name, label: portIdToName[linkDic[linkid].portid]}
+                    return {type: sourcenode.nodeType, content: nodeobj}
                 }
                 return ({...n, arguments: _.mapValues(n.arguments, toToolPort)})
             })

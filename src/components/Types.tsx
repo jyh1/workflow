@@ -85,12 +85,13 @@ export type NewToolReq = (task: NewTool) => Promise<string>
 export type UpdateToolReq = (task: UpdateTool) => Promise<string>
 
 // graph representation
-export type ToolPort = {nodeid: string, label: string, nodename?: string}
+export type ToolPort = JObject <NodeType, {nodeid: string, label: string, nodename: string}>
 export interface ToolNodeInterface<PortType> {
     name: string; 
     id: string; 
     taskbody: TaskBody; 
     arguments: {[arg: string]: PortType}
+    nodeType: NodeType
 }
 export type ToolNode = ToolNodeInterface<ToolPort>
 
