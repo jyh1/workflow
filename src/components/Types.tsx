@@ -50,9 +50,10 @@ export interface NodeInfo {
 
 export type TaskId = string
 export type TaskBody = Object
+export type TypeDict = Object
 
 export type ParseResult = {
-      taskbody: TaskBody
+      taskbody: TaskBody | TypeDict
     , inports: Arguments
     , outports: Arguments
     , taskid?: string
@@ -84,7 +85,7 @@ export type NewToolReq = (task: NewTool) => Promise<string>
 export type UpdateToolReq = (task: UpdateTool) => Promise<string>
 
 // graph representation
-export type ToolPort = {nodeid: string, nodename: string, label: string}
+export type ToolPort = {nodeid: string, label: string, nodename?: string}
 export interface ToolNodeInterface<PortType> {
     name: string; 
     id: string; 
@@ -94,9 +95,9 @@ export interface ToolNodeInterface<PortType> {
 export type ToolNode = ToolNodeInterface<ToolPort>
 
 // optional type dict for arguments
-export type CodaGraph = {args?: TaskBody, body: ToolNode[]}
+export type CodaGraph = {args?: TypeDict, body: ToolNode[]}
 
-export type ToolModelExtra = Task
+export type ToolModelExtra = {task: Task, nodeType: NodeType}
 
 // bundle list in worksheet
 export type BundleState = "created" | "ready" | "preparing" | "running" | "failed"

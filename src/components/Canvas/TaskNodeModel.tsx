@@ -72,7 +72,7 @@ export class TaskNodeModel extends DefaultNodeModel {
 			this.inports = _.map(task.inports, (val) => this.addPort(new TaskPortModel(true, Toolkit.UID(), val)));
 			this.outports = _.map(task.outports, (val) => this.addPort(new TaskPortModel(false, Toolkit.UID(), val)));
 			this.loading = false;
-			this.extras = task
+			this.extras = {task: task, nodeType: this.nodeType}
 			this.refresh()
 		})
 	}
@@ -164,13 +164,13 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 					</div>
 				</div>
 				{/* modal */}
-				{node.toggleEditor? 
+				{node.toggleEditor && node.extras.task? 
 					  <CodaEditor 
 						  name={node.name}
 						  close={this.closeEditor.bind(this)}
 						  save={(task, name) => node.updateTask(task, name)}
-						  body={node.extras}
-						  nodeType={node.nodeType}
+						  body={node.extras.task}
+						  nodeType={node.extras.nodeType}
 					  /> 
 					: <React.Fragment/>
 				}

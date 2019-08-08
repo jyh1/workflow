@@ -18,7 +18,7 @@ type Props = {
 };
 
 type State = {
-    compiled?: T.CompileResult
+    compiled: T.CompileResult
     loading: boolean
     running: boolean
     locked: boolean
@@ -31,7 +31,7 @@ export class Canvas extends React.Component<Props, State>{
     // refresh: () => void;
     constructor(props: Props){
         super(props);
-        this.state = {loading: false, running: false, locked: false};
+        this.state = {loading: false, running: false, locked: false, compiled: {codalang: null, jlang: null}};
         this.engine = new SRD.DiagramEngine();
         this.engine.installDefaultFactories();
         this.engine.registerNodeFactory(new TaskNodeFactory());
@@ -52,10 +52,10 @@ export class Canvas extends React.Component<Props, State>{
 
     refresh = () => {
         this.forceUpdate()
-        this.setState((prev) => Object.assign(prev, {compiled: undefined}))
+        this.setState((prev) => Object.assign(prev, {compiled: {codalang: null, jlang: null}}))
     }
 
-    serializeTaskGraph(): ToolNode[]{
+    serializeTaskGraph(): T.CodaGraph{
         let g = this.model.serializeDiagram()
         let graphModel = new Graph()
         let {links, nodes} = g
@@ -68,33 +68,46 @@ export class Canvas extends React.Component<Props, State>{
         type ArgDic = {[arg: string]: string} //argumentname to linkid
         let processedNodes: {[nodeid: string]: ToolNodeInterface<string>} = {}
         let uniqName: Map<string, number> = new Map()
+        let argNodeDict: T.TypeDict = null
         for(let n of nodes){
             let {id, ports} = n
             let extras = n.extras as T.ToolModelExtra
+            let name: string
+            const taskbody = extras.task.taskbody
             graphModel.addNode(id)
-            let name: string = (n as any).name
-            if (uniqName.has(name)){
-                const count = uniqName.get(name)
-                uniqName.set(name, count + 1)
-                name = name + '-' + count
+
+            if (extras.nodeType == "argument"){
+                argNodeDict = extras.task.taskbody
+                // argument node's name is null
+                name = null
             } else {
-                uniqName.set(name, 0)
+                // uniq name
+                name = (n as any).name
+                if (uniqName.has(name)){
+                    const count = uniqName.get(name)
+                    uniqName.set(name, count + 1)
+                    name = name + '-' + count
+                } else {
+                    uniqName.set(name, 0)
+                }
+
             }
-            let taskbody = extras.taskbody
             let argDic: ArgDic = {} // portname to linkid
             for (let p of ports){
                 let portname = (p as any).label
                 portIdToName[p.id] = portname
                 if((p as any).in){
                     if (p.links.length !== 1){ throw "unfilled argument"} //TODO: use a error class
-                    if (p.links.length !== 1){ continue} //TODO: use a error class
                     let link = p.links[0]
                     argDic[portname] = link
                 }
             }
-            processedNodes[id]= {id, taskbody, arguments: argDic, name: name}
+
+            processedNodes[id]= {id, taskbody, arguments: argDic, name}
         }
-        let sortedOrder = graphModel.topoSort()
+
+        // filter out argument node
+        let sortedOrder = _.filter(graphModel.topoSort(), n => processedNodes[n].name? true: false)
         // console.log(processedNodes)
         let tools = _.mapValues(processedNodes, (n) => {
                 let toToolPort: (linkid: string) => ToolPort = (linkid) => {
@@ -103,7 +116,7 @@ export class Canvas extends React.Component<Props, State>{
                 }
                 return ({...n, arguments: _.mapValues(n.arguments, toToolPort)})
             })
-        return (_.map(sortedOrder, k => tools[k]))
+        return ({args: argNodeDict, body: _.map(sortedOrder, k => tools[k])})
     }
 
     lockModel = () => {
@@ -118,12 +131,12 @@ export class Canvas extends React.Component<Props, State>{
     compile(){
         let nodes = this.serializeTaskGraph()
         this.lockModel()
-        this.setState(obj => Object.assign(obj, {loading: true, compiled: undefined}))
-        compileReq({body: nodes})
+        this.setState(obj => Object.assign(obj, {loading: true, compiled: {codalang: null, jlang: null}}))
+        compileReq(nodes)
         .then((res) => {
             this.setState(obj => Object.assign(obj, {compiled: res, loading: false}))
             this.unlockModel()
-            console.log(res)
+            // console.log(res)
         } )
     }
 
@@ -194,12 +207,21 @@ export class Canvas extends React.Component<Props, State>{
                 </S.Dropdown.Menu>
             </S.Dropdown>
         )
+
         return(
             <div style={{height: "100%"}}>
                 <S.Menu style={{marginBottom: 0}}>
                     <S.Menu.Menu position='right'>
                         <S.Button color='blue' icon='cogs' labelPosition='left' content="Build" loading={this.state.loading} onClick={this.compile.bind(this)}/>
-                        <S.Button color='blue' icon='play' labelPosition='left' content="Run" loading={this.state.running} disabled={this.state.compiled === undefined? true : false} onClick={this.run.bind(this)}/>
+                        <S.Button 
+                            color='blue' 
+                            icon='play' 
+                            labelPosition='left' 
+                            content="Run" 
+                            loading={this.state.running} 
+                            disabled={this.state.compiled.jlang? false : true} 
+                            onClick={this.run.bind(this)}
+                        />
                         <S.Button color='blue' 
                             icon='play'
                             labelPosition='left' 
