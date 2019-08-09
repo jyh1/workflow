@@ -180,7 +180,8 @@ export class Canvas extends React.Component<Props, State>{
     }
 
     render(){
-        const nodes = this.engine.getDiagramModel().nodes as {[s: string]: TaskNodeModel}
+        const model = this.engine.getDiagramModel()
+        const nodes = model.nodes as {[s: string]: TaskNodeModel}
         let hasarg: boolean = false
         for(const n in nodes){
             if (nodes[n].nodeType == "argument"){
@@ -192,44 +193,62 @@ export class Canvas extends React.Component<Props, State>{
         const dropDown = (
             <S.Dropdown item icon='plus' simple>
                 <S.Dropdown.Menu>
-                    <S.Dropdown.Item draggable onDragStart={this.dragStart}>
+                    <S.Dropdown.Item style={{cursor: "grab"}} draggable onDragStart={this.dragStart}>
                         <S.Icon name="code"/>Empty Tool
                     </S.Dropdown.Item>
-                    <S.Dropdown.Item disabled={hasarg} draggable onDragStart={this.dragArgumentStart}>
+                    <S.Dropdown.Item style={{cursor: "grab"}} disabled={hasarg} draggable onDragStart={this.dragArgumentStart}>
                         <S.Icon name="ellipsis vertical"/>Argument Node
                     </S.Dropdown.Item>
                 </S.Dropdown.Menu>
             </S.Dropdown>
         )
 
-        const {running, compiled} = this.state
+        const {running, compiled, locked} = this.state
+        model.setLocked(locked)
         const {jlang, codalang} = compiled
 
         return(
             <div style={{height: "100%"}}>
                 <S.Menu style={{marginBottom: 0}}>
                     <S.Menu.Menu position='right'>
-                        <S.Button basic color='blue' icon='cogs' labelPosition='left' content="Build" loading={this.state.loading} onClick={this.compile.bind(this)}/>
-                        <S.Button 
-                            color='blue'
-                            basic
-                            icon='play' 
-                            labelPosition='left' 
-                            content="Run" 
-                            loading={running} 
-                            disabled={jlang? false : true} 
-                            onClick={this.run.bind(this)}
-                        />
-                        <S.Button 
-                            basic
-                            color='blue' 
-                            icon='play'
-                            labelPosition='left' 
-                            content="Save" 
-                            loading={running} 
-                            disabled={codalang? false : true} 
-                            onClick={() => this.props.doSave(codalang)}
-                        />
+                        <S.ButtonGroup>
+                            <S.Popup content='Build' trigger = 
+                                {<S.Button 
+                                    basic 
+                                    color='blue' 
+                                    icon='cogs' 
+                                    loading={this.state.loading} 
+                                    onClick={this.compile.bind(this)}/>}
+                            />
+                            <S.Popup content='Run' trigger = 
+                                {<S.Button 
+                                    color='blue'
+                                    basic
+                                    icon='play' 
+                                    loading={running} 
+                                    disabled={jlang? false : true} 
+                                    onClick={this.run.bind(this)}
+                                />}
+                            />
+                            <S.Popup content='Build' trigger = 
+                                {<S.Button 
+                                    basic
+                                    color='blue' 
+                                    icon='save'
+                                    loading={running} 
+                                    disabled={codalang? false : true} 
+                                    onClick={() => this.props.doSave(codalang)}
+                                />}
+                            />
+                            <S.Popup content={locked? "Unlock Canvas": "Lock Canvas"} trigger = 
+                                {<S.Button 
+                                    basic
+                                    color={locked? 'blue' : 'red'}
+                                    icon={locked? "lock open" : "lock"}
+                                    onClick={() => this.setState(p => ({...p, locked: !p.locked}))}
+                                />}
+                            />
+                        </S.ButtonGroup>
                         {dropDown}
                     </S.Menu.Menu>
 
