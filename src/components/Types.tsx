@@ -83,6 +83,7 @@ export type ParseRquest = (program: string) => Promise<ParseResult>
 export type ParseArgRequest = (arg: string) => Promise<ParseResult>
 export type NewToolReq = (task: NewTool) => Promise<string>
 export type UpdateToolReq = (task: UpdateTool) => Promise<string>
+export type RemoveElementReq = (eid: string) => Promise<{}>
 
 // graph representation
 export type ToolPort = JObject <NodeType, {nodeid: string, label: string, nodename: string}>

@@ -191,3 +191,18 @@ export const parseArgReq: T.ParseArgRequest = jsonRequest('tool/parse/argument',
 export const newToolReq: T.NewToolReq = jsonRequest('tool/create')
 
 export const updateToolReq: T.UpdateToolReq = jsonRequest('tool/update')
+
+export const removeEleReq: T.RemoveElementReq = (eid) => (
+    fetch('/tool/' + eid, 
+    {
+      headers: {"Content-Type":'application/json'}
+    , credentials: 'same-origin'
+    , method: "DELETE"
+    })
+    .then((res) => {
+        if (!res.ok){
+            return Promise.reject(res);
+        }
+        return res.json()
+    })
+)

@@ -227,3 +227,4 @@ export const parseArgReq: T.ParseArgRequest = (str: string) => (
 
 export const updateToolReq: T.UpdateToolReq = (d) => mockRequest(d.id)
 export const newToolReq: T.NewToolReq = (t) => mockRequest("1")
+export const removeEleReq: T.RemoveElementReq = (t) => mockRequest({})

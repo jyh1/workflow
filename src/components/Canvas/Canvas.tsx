@@ -211,11 +211,10 @@ export class Canvas extends React.Component<Props, State>{
             <div style={{height: "100%"}}>
                 <S.Menu style={{marginBottom: 0}}>
                     <S.Menu.Menu position='right'>
-                        <S.ButtonGroup>
+                        <S.ButtonGroup basic>
                             <S.Popup content='Build' trigger = 
                                 {<S.Button 
-                                    basic 
-                                    color='blue' 
+                                    color='blue'
                                     icon='cogs' 
                                     loading={this.state.loading} 
                                     onClick={this.compile.bind(this)}/>}
@@ -223,7 +222,6 @@ export class Canvas extends React.Component<Props, State>{
                             <S.Popup content='Run' trigger = 
                                 {<S.Button 
                                     color='blue'
-                                    basic
                                     icon='play' 
                                     loading={running} 
                                     disabled={jlang? false : true} 
@@ -232,8 +230,7 @@ export class Canvas extends React.Component<Props, State>{
                             />
                             <S.Popup content='Build' trigger = 
                                 {<S.Button 
-                                    basic
-                                    color='blue' 
+                                    color='blue'
                                     icon='save'
                                     loading={running} 
                                     disabled={codalang? false : true} 
@@ -242,7 +239,6 @@ export class Canvas extends React.Component<Props, State>{
                             />
                             <S.Popup content={locked? "Unlock Canvas": "Lock Canvas"} trigger = 
                                 {<S.Button 
-                                    basic
                                     color={locked? 'blue' : 'red'}
                                     icon={locked? "lock open" : "lock"}
                                     onClick={() => this.setState(p => ({...p, locked: !p.locked}))}

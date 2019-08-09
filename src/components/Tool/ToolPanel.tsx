@@ -4,7 +4,7 @@ import * as React from "react"
 import * as _ from "lodash"
 import {Header, Button, Segment, Icon, Sticky, Ref, Popup} from 'semantic-ui-react'
 // import {taskListReq, newToolReq} from "../MockRequests"
-import {taskListReq, newToolReq, updateToolReq} from "../Requests"
+import {taskListReq, newToolReq, updateToolReq, removeEleReq} from "../Requests"
 
 import {ToolList} from './ToolList'
 import {ToolPath} from './ToolHeader'
@@ -43,25 +43,25 @@ export class ToolPanel extends React.Component<ToolPanelProps, ToolPanelState>{
     save = (id: string, name: string, description: string) => {
         updateToolReq({id, name, description})
         .then(this.stopEdit)
-        .then( () => this.updateList(taskListReq()))
+        .then( () => this.updateList(false))
     }
 
-    updateList = (tlis: Promise<TaskListElement[]>) => {
+    updateList = (setroot: boolean) => {
         this.setState(p => ({...p, loading: true}))
-        tlis.then((e) => {
-            this.setState((prev)=> ({...prev, ...this.toTaskElement(e), loading: false}))
+        let tlis = taskListReq().then((e) => {
+            this.setState((prev)=> ({...prev, ...this.toTaskElement(e), loading: false, current: setroot? null : prev.current}))
         })
         return tlis
     }
 
     newTool = (codalang: T.CodaLang) => {
-        const parent = this.currentPid()
+        const parent = this.currentFolderPid()
         const name = "New Tool"
         this.newElement(newToolReq({name, description: "", parent, codalang}))
     }
 
     newFolder = () => {
-        const parent = this.currentPid()
+        const parent = this.currentFolderPid()
         const name = "New Folder"
         this.newElement(newToolReq({name, description: "", parent}))
         
@@ -69,7 +69,7 @@ export class ToolPanel extends React.Component<ToolPanelProps, ToolPanelState>{
 
     newElement(newEle: Promise<string>){
         newEle.then(newid => (
-            this.updateList(taskListReq())
+            this.updateList(false)
             .then(() => this.setState(p => ({...p, current: newid, editing: true})))
             )
         )
@@ -84,10 +84,10 @@ export class ToolPanel extends React.Component<ToolPanelProps, ToolPanelState>{
     }
 
     componentDidMount(){
-        this.updateList(taskListReq())
+        this.updateList(false)
     }
 
-    currentPid = () => {
+    currentFolderPid = () => {
         let current = this.state.current
         const elementInfo = this.state.elementInfo
         if (current){
@@ -97,6 +97,13 @@ export class ToolPanel extends React.Component<ToolPanelProps, ToolPanelState>{
             return elementInfo[current].parent
         }
         return current
+    }
+
+    removeEle = () => {
+        const current = this.state.current
+        if (current){
+            removeEleReq(current).then(() => this.updateList(true))
+        }
     }
 
     // converting to a tree structure
@@ -165,7 +172,11 @@ export class ToolPanel extends React.Component<ToolPanelProps, ToolPanelState>{
                                     <Popup content='Edit' trigger = 
                                         {<Button icon onClick={this.startEdit}><Icon name='edit' /></Button>}
                                     />
-                                    <Popup position='bottom right' content='Delete' trigger = {<Button icon><Icon name='trash alternate outline' /></Button>}
+                                    <Popup position='bottom right' content='Delete' trigger = {
+                                        <Button 
+                                            icon="trash alternate outline"
+                                            onClick={this.removeEle}
+                                        />}
                                     />
                                 </Button.Group>
                                 <br style={{clear: "both"}} />
