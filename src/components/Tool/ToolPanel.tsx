@@ -6,18 +6,24 @@ import {Header, Button, Segment, Icon, Sticky, Ref, Popup} from 'semantic-ui-rea
 // import {taskListReq, newToolReq} from "../MockRequests"
 import {taskListReq, newToolReq, updateToolReq} from "../Requests"
 
-import {ToolList, currentid} from './ToolList'
+import {ToolList} from './ToolList'
 import {ToolPath} from './ToolHeader'
-import {Path} from './Types'
+import {ElementId, ElementInfo, CD} from './Types'
 
 
-type ToolPanelState = {tasks: TaskListElement[], loading: boolean, current?: Path, editing: boolean, isfolder: boolean}
+type ToolPanelState = {
+      tasks: TaskElement[]
+    , loading: boolean
+    , current?: ElementId
+    , editing: boolean
+    , elementInfo: {[elementid: string]: ElementInfo}
+}
 type ToolPanelProps = {codalang?: T.CodaLang, doneSave: () => void}
 export class ToolPanel extends React.Component<ToolPanelProps, ToolPanelState>{
     contextRef: React.Ref<any>
     constructor(props: ToolPanelProps){
         super(props)
-        this.state = {tasks: [], loading: true, current: [], editing: false, isfolder: true}
+        this.state = {tasks: [], loading: true, current: null, editing: false, elementInfo: {}}
         this.contextRef = React.createRef()
     }
 
@@ -30,8 +36,8 @@ export class ToolPanel extends React.Component<ToolPanelProps, ToolPanelState>{
         return true
     }
 
-    cd = (dir: Path, isfolder: boolean) => {
-        this.setState(p => Object.assign(p, {current: dir, isfolder}))
+    cd: CD = (current) => {
+        this.setState(p => ({...p, current}))
     }
 
     save = (id: string, name: string, description: string) => {
@@ -41,29 +47,32 @@ export class ToolPanel extends React.Component<ToolPanelProps, ToolPanelState>{
     }
 
     updateList = (tlis: Promise<TaskListElement[]>) => {
-        this.setState(p => Object.assign(p, {loading: true}))
+        this.setState(p => ({...p, loading: true}))
         tlis.then((e) => {
-            this.setState((prev)=> Object.assign(prev, {tasks: e, loading: false}))
+            this.setState((prev)=> ({...prev, ...this.toTaskElement(e), loading: false}))
         })
+        return tlis
     }
 
     newTool = (codalang: T.CodaLang) => {
         const parent = this.currentPid()
         const name = "New Tool"
-        this.newElement(newToolReq({name, description: "", parent, codalang}), name)
+        this.newElement(newToolReq({name, description: "", parent, codalang}))
     }
 
     newFolder = () => {
         const parent = this.currentPid()
         const name = "New Folder"
-        this.newElement(newToolReq({name, description: "", parent}), name)
+        this.newElement(newToolReq({name, description: "", parent}))
         
     }
 
-    newElement(newEle: Promise<string>, name: string){
-        newEle.then((newid) => this.setState(p => Object.assign(p, {current: p.current.concat([{name, id: newid}])})))
-        .then( () => this.updateList(taskListReq()))
-        .then(this.startEdit)
+    newElement(newEle: Promise<string>){
+        newEle.then(newid => (
+            this.updateList(taskListReq())
+            .then(() => this.setState(p => ({...p, current: newid, editing: true})))
+            )
+        )
     }
 
     startEdit = () => {
@@ -79,13 +88,69 @@ export class ToolPanel extends React.Component<ToolPanelProps, ToolPanelState>{
     }
 
     currentPid = () => {
-        const {current} = this.state
-        return currentid(current)
+        let current = this.state.current
+        const elementInfo = this.state.elementInfo
+        if (current){
+            if(elementInfo[current].isfolder){
+                return current
+            }
+            return elementInfo[current].parent
+        }
+        return current
+    }
+
+    // converting to a tree structure
+    toTaskElement(eles: TaskListElement[]){
+        type FolderRep = {name?: string, id?: ElementId, children: TaskRep[], description: string}
+        type TaskRep = TaskElement | FolderRep
+        let dic : {[eleid: string]: FolderRep} = {}
+        let infodic : {[eleid: string]: ElementInfo} = {}
+        let taskArray : TaskElement[] = []
+        for(let e of eles){
+            let isfolder: boolean
+            let rep : TaskRep
+            if('taskid' in e){
+                isfolder = false
+                let task: TaskElement = {name: e.name, id: e.id, taskid: e.taskid, description: e.description}
+                rep = task
+            } else {
+                isfolder = true
+                // file object
+                if(dic[e.id]){
+                    // dic[e.id] = Object.assign(dic[e.id], {name: e.name, id: e.id, description: e.description})
+                    dic[e.id] = {...dic[e.id], name: e.name, id: e.id, description: e.description}
+                } else {
+                    let newEle : TaskElement = {name: e.name, id: e.id, children: [], description: e.description}  
+                    dic[e.id] = newEle
+                }
+                rep = dic[e.id]
+            }
+            if(e.parent){
+                if (dic[e.parent]){dic[e.parent].children.push(rep)} 
+                    else {dic[e.parent] = {children: [rep], description: ""}}
+            } else {
+                // top level
+                taskArray.push(rep as TaskElement)
+            }
+
+            infodic[e.id] = {name: e.name, id: e.id, parent: e.parent, isfolder}
+        }
+        return {tasks: taskArray, elementInfo: infodic}
     }
 
     render(){
-        const {current, isfolder} = this.state
-        const eleprops = {editing: this.state.editing, current, cd: this.cd, save: this.save, cancelEdit: this.stopEdit}
+        const {current, elementInfo} = this.state        
+        // constructing path
+        let path: ElementInfo[] = []
+        let currentElement = current
+        while(currentElement){
+            const ele = elementInfo[currentElement]
+            path.unshift(ele)
+            currentElement = ele.parent
+        }
+
+        const eleprops = {editing: this.state.editing, path, cd: this.cd, save: this.save, cancelEdit: this.stopEdit}
+
         return(
             <React.Fragment>
                 <Header color='blue' as="h2" attached='top'>Tools</Header> 
@@ -95,7 +160,7 @@ export class ToolPanel extends React.Component<ToolPanelProps, ToolPanelState>{
                             <div className="panelsticky">
                                 <Button.Group floated="right" size="small" basic color='blue'>
                                     <Popup content='New Folder' trigger = 
-                                        {<Button disabled={!isfolder} icon onClick={this.newFolder}><Icon name='add' /></Button>}
+                                        {<Button icon onClick={this.newFolder}><Icon name='add' /></Button>}
                                     />
                                     <Popup content='Edit' trigger = 
                                         {<Button icon onClick={this.startEdit}><Icon name='edit' /></Button>}
@@ -105,8 +170,8 @@ export class ToolPanel extends React.Component<ToolPanelProps, ToolPanelState>{
                                 </Button.Group>
                                 <br style={{clear: "both"}} />
                                 <ToolPath 
-                                current={current}
-                                cd={this.cd}
+                                    path={path}
+                                    cd={this.cd}
                                 />
                             </div>
                         </Sticky>                                       

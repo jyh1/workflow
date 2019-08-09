@@ -1,9 +1,9 @@
 import * as React from "react"
 import {Breadcrumb} from 'semantic-ui-react'
 import * as _ from "lodash"
-import {Path, CD} from './Types'
+import {CD, ElementInfo} from './Types'
 
-type Props = {cd: CD, current: Path}
+type Props = {cd: CD, path: ElementInfo[]}
 export class ToolPath extends React.Component<Props, {}>{
     constructor(props: Props){
         super(props)
@@ -11,22 +11,22 @@ export class ToolPath extends React.Component<Props, {}>{
     }
 
     render(){
-        const {current, cd} = this.props
-        const length = current.length
+        const {path, cd} = this.props
+        const length = path.length
         return (
             <Breadcrumb className="panel">
                 {
                 length == 0?
                     (<Breadcrumb.Divider>/</Breadcrumb.Divider>)
                     :
-                    (_.map(current, (p, index) => {
+                    (_.map(path, (p, index) => {
                         const islast = index == length - 1
                         return(
                             <React.Fragment key={p.id}>
                                 <Breadcrumb.Divider>/</Breadcrumb.Divider>
                                 <Breadcrumb.Section 
                                     onClick=
-                                        {islast ? null : (() => cd(current.slice(0, index + 1), !islast))}
+                                        {islast ? null : (() => cd(p.id))}
                                         link={!islast} 
                                         active={islast}
                                 >

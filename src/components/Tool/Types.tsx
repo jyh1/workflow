@@ -1,9 +1,10 @@
-export type Path = {name: string, id: string}[]
-export type CD = (dir: Path, isfolder: boolean) => void
+export type ElementId = string
+export type CD = (current: ElementId) => void
 export type EleProps = {
       cd: CD
-    , current: Path
+    , path: ElementInfo[]
     , editing: boolean
-    , save: (id: string, name: string, desc: string) => void
+    , save: (id: ElementId, name: string, desc: string) => void
     , cancelEdit: () => void
     }
+export type ElementInfo = {id: ElementId, name: string, isfolder: boolean, parent: ElementId}
