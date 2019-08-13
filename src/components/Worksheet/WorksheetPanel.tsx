@@ -6,7 +6,7 @@ import {PanelHeader} from './Header'
 import * as _ from "lodash"
 import {Worksheet} from './Worksheet'
 
-type Props = {changeWorksheet: () => void, content: T.WorksheetContent, loading: boolean}
+type Props = {changeWorksheet: () => void, content: T.WorksheetContent, loading: boolean, refreshBundle: () => void}
 type State = {}
 
 export class WorksheetPanel extends React.Component<Props, State>{
@@ -20,13 +20,13 @@ export class WorksheetPanel extends React.Component<Props, State>{
 
     render(){
         // console.log(this.props.items)
-        const {content, loading} = this.props
+        const {content, loading, refreshBundle} = this.props
         return(
             <div>
                 <SegmentGroup className="newsegment">
                     <PanelHeader selectWorksheet={this.changeWorksheet.bind(this)} uuid={content.uuid} />
                     <SegmentGroup>
-                        <Worksheet {...content} loading={loading} />
+                        <Worksheet {...content} loading={loading} refreshBundle={refreshBundle}/>
                     </SegmentGroup>
                 </SegmentGroup>
             </div>

@@ -2,7 +2,8 @@ import {LoginRequest, TaskInfoRequest, Task, TaskListRequest, TaskElement, TaskI
 import Cookies from 'universal-cookie';
 import * as T from "./Types"
 import * as _ from "lodash"
-import { delay } from "q";
+import {getDefaultBundleMetadata, createDefaultBundleName, pathIsArchive, getArchiveExt} from './codalab-worksheets/util/worksheet_utils'
+import {delay} from "q"
 
 type ContentType = 'application/json' | 'text/plain;charset=utf-8'
 
@@ -206,3 +207,41 @@ export const removeEleReq: T.RemoveElementReq = (eid) => (
         return res.json()
     })
 )
+
+export const uploadFileReq: T.UploadFileReq = (worksheet, file) => {
+    const createBundleData = getDefaultBundleMetadata(file.name);
+    const create = jsonRequest(T.endPointPath.rest + "bundles?worksheet=" + worksheet)(createBundleData)
+    const upload = create.then(
+        (data: any) => {
+            const bundleUuid = data.data[0].id;
+            const reader = new FileReader();
+            reader.onload = function(){
+                const arrayBuffer = this.result as ArrayBuffer;
+                const bytesArray = new Uint8Array(arrayBuffer);
+                const url = T.endPointPath.rest + "bundles/" + bundleUuid + '/contents/blob/?' + getQueryParams(file.name)
+                fetch(url, {
+                      headers: {"Content-Type":'application/octet-stream'}
+                    , credentials: 'same-origin'
+                    , method: 'PUT'
+                    , body: new Blob([bytesArray])
+                })
+                return fetch
+            }
+            reader.readAsArrayBuffer(file);
+            return data
+        }
+    )
+    return upload
+}
+
+function getQueryParams(filename: string) {
+    const formattedFilename = createDefaultBundleName(filename);
+    const queryParams: {[name: string]: string} = {
+        finalize: "1",
+        filename: pathIsArchive(filename)
+            ? formattedFilename + getArchiveExt(filename)
+            : formattedFilename,
+        unpack: pathIsArchive(filename) ? "1" : "0",
+    };
+    return _.map(queryParams, k => k + '=' + queryParams[k]).join('&')
+}

@@ -1,11 +1,12 @@
 import * as React from 'react'
 import * as _ from 'lodash'
-import {Header, Segment, SegmentGroup, Dimmer, Loader} from 'semantic-ui-react'
+import {Header, Segment, Button, Dimmer, Loader} from 'semantic-ui-react'
 import * as T from '../Types'
 import {BundleTable} from './BundleTable'
+import {UploadButton} from './UploadButton'
 import {MarkupText} from './Markup'
 
-type Props = T.WorksheetContent & {loading: boolean}
+type Props = T.WorksheetContent & {loading: boolean, refreshBundle: () => void}
 type State = {}
 
 export class Worksheet extends React.Component<Props, State>{
@@ -13,7 +14,7 @@ export class Worksheet extends React.Component<Props, State>{
         super(props)
     }
     render(){
-        const {items, uuid, name, title} = this.props
+        const {items, uuid, name, title, refreshBundle} = this.props
         const headername = title? title: name
         return(
             <React.Fragment>
@@ -22,7 +23,8 @@ export class Worksheet extends React.Component<Props, State>{
                         {headername}
                     </a>
                 </Header>
-                <Segment attached>
+                <Segment attached style={{paddingTop: "5px"}}>
+                    <UploadButton worksheet={uuid} refreshBundle={refreshBundle}/>
                     {... _.map(items, (item, ind) => <WorksheetItem key={uuid + ind} item={item} />)}
                 </Segment>
                 <Dimmer active={this.props.loading} inverted>

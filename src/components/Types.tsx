@@ -84,6 +84,7 @@ export type ParseArgRequest = (arg: string) => Promise<ParseResult>
 export type NewToolReq = (task: NewTool) => Promise<string>
 export type UpdateToolReq = (task: UpdateTool) => Promise<string>
 export type RemoveElementReq = (eid: string) => Promise<{}>
+export type UploadFileReq = (worksheet: string, file: File) => Promise<{}>
 
 // graph representation
 export type ToolPort = JObject <NodeType, {nodeid: string, label: string, nodename: string}>
@@ -102,7 +103,7 @@ export type CodaGraph = {args?: TypeDict, body: ToolNode[]}
 export type ToolModelExtra = {task: Task, nodeType: NodeType}
 
 // bundle list in worksheet
-export type BundleState = "created" | "ready" | "preparing" | "running" | "failed"
+export type BundleState = "created" | "ready" | "preparing" | "running" | "failed" | "uploading"
 export type BundleInfo = {
       uuid: string
     , args?: string

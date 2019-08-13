@@ -294,3 +294,16 @@ div.form-row-input label {
 .editorToolinput{
     padding: 0
 }
+
+.upload-btn-wrapper {
+    position: relative;
+    overflow: hidden;
+    float: right;
+    input[type=file]{
+        font-size: 100px;
+        position: absolute;
+        left: 0;
+        top: 0;
+        opacity: 0;
+    }
+}
