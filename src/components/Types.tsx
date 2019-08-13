@@ -131,9 +131,10 @@ export type UpdateTool = {id: string, name: string, description: string}
 export type NodeType = "tool" | "argument"
 
 export const endPointPath = {
-      login: "/login"
-    , mainapp: "/"
-    , codalab: "rest/"
+      login: "/workflow/login"
+    , mainapp: "/workflow"
+    , rest: "/rest/"
+    , codalab: "/"
 }
 
 export function makeLitTask(uuid: string): Task{

@@ -51,7 +51,7 @@ export const getLoginStatus = () => {
 
 
 export const taskListReq: TaskListRequest = () => (
-    fetch('/tool/list', 
+    fetch('./tool/list', 
         {
           headers: {"Content-Type":'application/json'}
         , credentials: 'same-origin'
@@ -60,7 +60,7 @@ export const taskListReq: TaskListRequest = () => (
 )
 
 export const taskReq: TaskInfoRequest = (taskid) => (
-    fetch('/tool/' + taskid, 
+    fetch('./tool/' + taskid, 
         {
           headers: {"Content-Type":'application/json'}
         , credentials: 'same-origin'
@@ -70,7 +70,7 @@ export const taskReq: TaskInfoRequest = (taskid) => (
 
 
 export const clReq: T.ClRequest = (worksheet, command) => (
-    fetch(T.endPointPath.codalab + 'cli/command',
+    fetch(T.endPointPath.rest + 'cli/command',
         {
           headers: {"Content-Type":'application/json'}
         , credentials: 'same-origin'
@@ -89,7 +89,7 @@ export const clReq: T.ClRequest = (worksheet, command) => (
 // simulate waiting by polling the bundle status
 export const clWait: T.ClWaitRequest = (path) => {
     let uuid = path.split('/')[0]
-    return (fetch(T.endPointPath.codalab + 'bundles/' + uuid,
+    return (fetch(T.endPointPath.rest + 'bundles/' + uuid,
         {
           headers: {"Content-Type":'application/json'}
         , credentials: 'same-origin'
@@ -114,7 +114,7 @@ export const clWait: T.ClWaitRequest = (path) => {
 
 
 export const compileReq: T.CompileRequest = (ts) => {
-    let req = fetch('tool/compile', 
+    let req = fetch('./tool/compile', 
         {
           headers: {"Content-Type":'application/json'}
         , credentials: 'same-origin'
@@ -140,7 +140,7 @@ function parseWorksheetItem(item: any): T.WorksheetItem{
     return null
 }
 export const worksheetItemsReq: T.WorksheetItemsRequest = (worksheet) => {
-    let req = fetch(T.endPointPath.codalab + 'interpret/worksheet/' + worksheet + '?include=items.bundles', 
+    let req = fetch(T.endPointPath.rest + 'interpret/worksheet/' + worksheet + '?include=items.bundles', 
         {credentials: 'same-origin'})
         .then((res) => {
             if (!res.ok){
@@ -162,7 +162,7 @@ export const worksheetItemsReq: T.WorksheetItemsRequest = (worksheet) => {
 }
 
 export const worksheetsReq: T.WorksheetsRequest = () => (
-    fetch(T.endPointPath.codalab + 'worksheets?keywords=.mine', {credentials: 'same-origin'})
+    fetch(T.endPointPath.rest + 'worksheets?keywords=.mine', {credentials: 'same-origin'})
     .then(res => {
         if (!res.ok){
             return Promise.reject(res);
@@ -173,7 +173,7 @@ export const worksheetsReq: T.WorksheetsRequest = () => (
 )
 
 export const bundleInfoReq: T.BundleInfoRequest = (uuid: string) => (
-    fetch(T.endPointPath.codalab + 'bundles/' + uuid,
+    fetch(T.endPointPath.rest + 'bundles/' + uuid,
         {credentials: 'same-origin'})
     .then((res) => {
         if (!res.ok){
@@ -193,7 +193,7 @@ export const newToolReq: T.NewToolReq = jsonRequest('tool/create')
 export const updateToolReq: T.UpdateToolReq = jsonRequest('tool/update')
 
 export const removeEleReq: T.RemoveElementReq = (eid) => (
-    fetch('/tool/' + eid, 
+    fetch('./tool/' + eid, 
     {
       headers: {"Content-Type":'application/json'}
     , credentials: 'same-origin'

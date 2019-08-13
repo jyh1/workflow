@@ -69,7 +69,7 @@ export class Canvas extends React.Component<Props, State>{
             const taskbody = extras.task.taskbody
             graphModel.addNode(id)
 
-            name = (n as any).name
+            name = (n as any).name.replace(/\W/g, '')
             
             // argument node
             if (extras.nodeType == "argument"){
@@ -114,22 +114,18 @@ export class Canvas extends React.Component<Props, State>{
     }
 
     lockModel = () => {
-        this.model.setLocked(true)
         this.setState(p => Object.assign(p, {locked: true}))
     }
     unlockModel = () => {
-        this.model.setLocked(false)
         this.setState(p => Object.assign(p, {locked: false}))
     }
 
     compile(){
         let nodes = this.serializeTaskGraph()
-        this.lockModel()
-        this.setState(obj => Object.assign(obj, {loading: true, compiled: {codalang: null, jlang: null}}))
+        this.setState(p => ({...p, loading: true, compiled: {codalang: null, jlang: null}, locked: true}))
         compileReq(nodes)
         .then((res) => {
-            this.setState(obj => Object.assign(obj, {compiled: res, loading: false}))
-            this.unlockModel()
+            this.setState(p => ({...p, compiled: res, loading: false}))
             // console.log(res)
         } )
     }
@@ -211,9 +207,10 @@ export class Canvas extends React.Component<Props, State>{
             <div style={{height: "100%"}}>
                 <S.Menu style={{marginBottom: 0}}>
                     <S.Menu.Menu position='right'>
-                        <S.ButtonGroup basic>
+                        <S.ButtonGroup>
                             <S.Popup content='Build' trigger = 
                                 {<S.Button 
+                                    basic
                                     color='blue'
                                     icon='cogs' 
                                     loading={this.state.loading} 
@@ -221,6 +218,7 @@ export class Canvas extends React.Component<Props, State>{
                             />
                             <S.Popup content='Run' trigger = 
                                 {<S.Button 
+                                    basic
                                     color='blue'
                                     icon='play' 
                                     loading={running} 
@@ -228,8 +226,9 @@ export class Canvas extends React.Component<Props, State>{
                                     onClick={this.run.bind(this)}
                                 />}
                             />
-                            <S.Popup content='Build' trigger = 
+                            <S.Popup content='Save' trigger = 
                                 {<S.Button 
+                                    basic
                                     color='blue'
                                     icon='save'
                                     loading={running} 
@@ -239,7 +238,8 @@ export class Canvas extends React.Component<Props, State>{
                             />
                             <S.Popup content={locked? "Unlock Canvas": "Lock Canvas"} trigger = 
                                 {<S.Button 
-                                    color={locked? 'blue' : 'red'}
+                                    basic
+                                    color={locked? 'red' : 'blue'}
                                     icon={locked? "lock open" : "lock"}
                                     onClick={() => this.setState(p => ({...p, locked: !p.locked}))}
                                 />}

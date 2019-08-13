@@ -112,7 +112,7 @@ class ToolElementWidget extends React.Component<Props, {expand: boolean, name: s
         const descriptionVal = description.length==0 ? "<none>" : description
         const selected = currentid(path) == id
         for(const e of path){
-            if (expand){continue}
+            if (expand){break}
             expand = expand || (id == e.id)
         }
         const isEdit = editing && selected
