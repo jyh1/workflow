@@ -18,8 +18,9 @@ export class Worksheet extends React.Component<Props, State>{
         return(
             <React.Fragment>
                 <Header as='h2' dividing textAlign='center' attached='top' color="blue">
-                    {headername}
-                    <Header.Subheader>{uuid}</Header.Subheader>
+                    <a href={T.endPointPath.codalab + "worksheets/" + uuid} target="_blank">
+                        {headername}
+                    </a>
                 </Header>
                 <Segment attached>
                     {... _.map(items, (item, ind) => <WorksheetItem key={uuid + ind} item={item} />)}
