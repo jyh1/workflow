@@ -205,7 +205,7 @@ export class Canvas extends React.Component<Props, State>{
 
         return(
             <div style={{height: "100%"}}>
-                <S.Menu style={{marginBottom: 0}}>
+                <S.Menu style={{marginBottom: "0px", paddingBottom: "4px", borderRadius: "0px", paddingTop: "5px"}}>
                     <S.Menu.Menu position='right'>
                         <S.ButtonGroup>
                             <S.Popup content='Build' trigger = 

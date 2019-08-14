@@ -160,12 +160,12 @@ export class ToolPanel extends React.Component<ToolPanelProps, ToolPanelState>{
 
         return(
             <React.Fragment>
-                <Header color='blue' as="h2" attached='top'>Tools</Header> 
+                <Header color='blue' as="h2" attached='top'>Tool Panel</Header> 
                 <Ref innerRef={this.contextRef}>
                     <Segment attached loading={this.state.loading} className="toolpanel">
                         <Sticky context={this.contextRef}>
                             <div className="panelsticky">
-                                <Button.Group floated="right" size="small" basic color='blue'>
+                                <Button.Group floated="right" basic color='blue'>
                                     <Popup content='New Folder' trigger = 
                                         {<Button icon onClick={this.newFolder}><Icon name='add' /></Button>}
                                     />
