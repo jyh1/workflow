@@ -1,5 +1,5 @@
 import * as React from "react"
-import {Breadcrumb} from 'semantic-ui-react'
+import {Breadcrumb, Icon} from 'semantic-ui-react'
 import * as _ from "lodash"
 import {CD, ElementInfo} from './Types'
 
@@ -15,6 +15,7 @@ export class ToolPath extends React.Component<Props, {}>{
         const length = path.length
         return (
             <Breadcrumb className="panel">
+                <Icon style={{cursor: "pointer"}} color="blue" name="folder" onClick={() => cd(null)}></Icon>
                 {
                 length == 0?
                     (<Breadcrumb.Divider>/</Breadcrumb.Divider>)

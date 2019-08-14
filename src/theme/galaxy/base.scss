@@ -287,7 +287,8 @@ div.form-row-input label {
 }
 
 .panelsticky{
-    background-color: white
+    background-color: white;
+    padding-bottom: 14px;
 }
 
 .editorToolname{
@@ -310,4 +311,14 @@ div.form-row-input label {
     padding-top: 5px;
     border-bottom: 1px solid #d4d4d5;
     padding-left: 10px;
+}
+
+.toolbuttons{
+    margin-bottom: 0px; 
+    padding-bottom: 7px; 
+    border-radius: 0px; 
+    padding-top: 5px;
+    border-bottom: 1px solid #d4d4d5;
+    padding-right: 10px;
+    padding-left: 14px;
 }

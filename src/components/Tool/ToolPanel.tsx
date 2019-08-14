@@ -3,7 +3,7 @@ import * as T from "../Types"
 import * as React from "react"
 import * as _ from "lodash"
 import {Header, Button, Segment, Icon, Sticky, Ref, Popup} from 'semantic-ui-react'
-// import {taskListReq, newToolReq} from "../MockRequests"
+// import {taskListReq, newToolReq, updateToolReq, removeEleReq} from "../MockRequests"
 import {taskListReq, newToolReq, updateToolReq, removeEleReq} from "../Requests"
 
 import {ToolList} from './ToolList'
@@ -37,7 +37,9 @@ export class ToolPanel extends React.Component<ToolPanelProps, ToolPanelState>{
     }
 
     cd: CD = (current) => {
-        this.setState(p => ({...p, current}))
+        if(!this.state.editing){
+            this.setState(p => ({...p, current}))
+        }
     }
 
     save = (id: string, name: string, description: string) => {
@@ -160,39 +162,43 @@ export class ToolPanel extends React.Component<ToolPanelProps, ToolPanelState>{
 
         return(
             <React.Fragment>
-                <Header color='blue' as="h2" attached='top'>Tool Panel</Header> 
                 <Ref innerRef={this.contextRef}>
-                    <Segment attached loading={this.state.loading} className="toolpanel">
+                    <div>
                         <Sticky context={this.contextRef}>
                             <div className="panelsticky">
-                                <Button.Group floated="right" basic color='blue'>
-                                    <Popup content='New Folder' trigger = 
-                                        {<Button icon onClick={this.newFolder}><Icon name='add' /></Button>}
+                                <div className="toolbuttons">
+                                    <Button.Group floated="right" basic color='blue'>
+                                        <Popup content='New Folder' trigger = 
+                                            {<Button icon onClick={this.newFolder}><Icon name='add' /></Button>}
+                                        />
+                                        <Popup content='Edit' trigger = 
+                                            {<Button disabled={current? false: true} icon onClick={this.startEdit}><Icon name='edit' /></Button>}
+                                        />
+                                        <Popup position='bottom right' content="Refresh Panel"
+                                            trigger={
+                                                <Button 
+                                                    icon="refresh" 
+                                                    onClick={() => this.updateList(true)}
+                                                />}
+                                        />
+                                    </Button.Group>
+                                    <Popup content='Delete' trigger = {
+                                            <Button basic color='red'
+                                                icon="trash alternate outline"
+                                                onClick={this.removeEle}
+                                            />}
                                     />
-                                    <Popup content='Edit' trigger = 
-                                        {<Button icon onClick={this.startEdit}><Icon name='edit' /></Button>}
-                                    />
-                                    <Popup position='bottom right' content='Delete' trigger = {
-                                        <Button 
-                                            icon="trash alternate outline"
-                                            onClick={this.removeEle}
-                                        />}
-                                    />
-                                </Button.Group>
-                                <br style={{clear: "both"}} />
-                                <ToolPath 
-                                    path={path}
-                                    cd={this.cd}
-                                />
+                                    <br style={{clear: "both"}} />
+                                </div>
+                                <div style={{paddingLeft: "14px"}}><ToolPath path={path} cd={this.cd} /></div>
                             </div>
-                        </Sticky>                                       
-                        <ToolList
-                            eleprops={eleprops}
-                            tasks={this.state.tasks}
-                        />
-                
-                    </Segment> 
-                </Ref>                   
+                        </Sticky>
+                        <Segment style={{border: "none", paddingTop: "0", marginTop: "0"}} loading={this.state.loading} className="toolpanel">
+                            <ToolList eleprops={eleprops} tasks={this.state.tasks}/>                
+                        </Segment> 
+                    </div>
+                </Ref>
+                                
             </React.Fragment>
         )
     }
