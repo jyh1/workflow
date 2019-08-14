@@ -246,5 +246,5 @@ function getQueryParams(filename: string) {
             : formattedFilename,
         unpack: pathIsArchive(filename) ? "1" : "0",
     };
-    return _.map(queryParams, k => k + '=' + queryParams[k]).join('&')
+    return _.map(queryParams, (v, k) => k + '=' + v).join('&')
 }
