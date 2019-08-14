@@ -138,6 +138,9 @@ function parseWorksheetItem(item: any): T.WorksheetItem{
     if (item.mode == "table_block"){
         return {type: "bundles", content: item.bundles_spec.bundle_infos}
     }
+    if (item.mode == "subworksheets_block"){
+        return {type: "subworksheets", content: item.subworksheet_infos}
+    }
     return null
 }
 export const worksheetItemsReq: T.WorksheetItemsRequest = (worksheet) => {

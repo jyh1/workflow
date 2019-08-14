@@ -1,14 +1,16 @@
 import * as React from 'react'
 
-import {Button} from 'semantic-ui-react'
+import {Button, Popup} from 'semantic-ui-react'
 import {uploadFileReq} from '../Requests'
 import * as _ from "lodash"
 
 type Props = {worksheet: string, refreshBundle: () => void}
 type State = {}
 export class UploadButton extends React.Component<Props, State>{
+    inputElement: any
     constructor(props: Props){
         super(props)
+        this.inputElement = React.createRef();
     }
     uploadBundle(e: React.ChangeEvent<HTMLInputElement>){
         e.stopPropagation()
@@ -23,15 +25,16 @@ export class UploadButton extends React.Component<Props, State>{
     render(){
         return(
             <React.Fragment>
-                <div className="upload-btn-wrapper">
-                    <input type='file' onChange={this.uploadBundle.bind(this)} multiple />
+                <input type='file' style={{ display: "none" }} ref={this.inputElement} onChange={this.uploadBundle.bind(this)} multiple />
+                <Popup content='Upload Files' position='bottom right' trigger = {
                     <Button 
-                        primary 
+                        basic
                         color="blue" 
-                        content="Upload"
-                        id='upload-bundle-button'
+                        floated="right"
+                        icon="upload"
+                        onClick={() => this.inputElement.current.click()}
                     />
-                </div>
+                }/>
                 <br style={{clear: "both"}}/>
             </React.Fragment>
         )

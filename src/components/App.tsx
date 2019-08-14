@@ -57,7 +57,12 @@ export class HomeApp extends React.Component<Props, State>{
                 <ToolPanel codalang={this.state.codalang} doneSave={this.doneSave}/>
                 <SplitPane split="vertical" defaultSize={385} primary="second" minSize={385} pane2Style={{overflowY: "auto"}}>
                     <Canvas nodes = {[]} refreshBundle={refreshBundle} doSave={this.doSave} />
-                    <WorksheetPanel refreshBundle={refreshBundle} content={this.state.currentWorksheet} changeWorksheet={changeWorksheet} loading={this.state.loadingWorksheet} />
+                    <WorksheetPanel 
+                        refreshBundle={refreshBundle} 
+                        content={this.state.currentWorksheet} 
+                        changeWorksheet={changeWorksheet} 
+                        loading={this.state.loadingWorksheet} 
+                    />
                 </SplitPane>
             </SplitPane>
         )

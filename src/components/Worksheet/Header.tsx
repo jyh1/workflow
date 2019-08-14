@@ -1,20 +1,27 @@
 import * as React from 'react'
-import {Dropdown, Segment, Button, Icon, Header, Input, Modal } from 'semantic-ui-react'
+import {Dropdown, Segment, Button, Icon, Header, Input, Form, Popup } from 'semantic-ui-react'
 import * as _ from 'lodash'
 import * as T from '../Types'
-import {worksheetsReq} from '../Requests'
+import {worksheetsReq, clReq} from '../Requests'
 
 type Props = {selectWorksheet: (uuid: string) => void, uuid?: string}
-type State = {worksheets: T.Worksheet[], uuid?: string, newworksheet: boolean}
+type State = {worksheets: T.Worksheet[]}
 
 export class PanelHeader extends React.Component <Props, State>{
     constructor(props: Props){
         super(props)
-        this.state = {worksheets: [], newworksheet: false}
+        this.state = {worksheets: []}
+    }
+    refreshPanel(uuid: string){
+        this.refreshWorksheetList()
+        .then(() => this.props.selectWorksheet(uuid))
+    }
+    refreshWorksheetList(){
+        const req = worksheetsReq().then(res => this.setState(p => ({...p, worksheets: res})))
+        return req
     }
     componentDidMount(){
-        worksheetsReq()
-        .then(res => this.setState(prev => Object.assign(prev, {worksheets: res, uuid: this.props.uuid})))
+        this.refreshWorksheetList()
     }
     modalState = (s: boolean) => (() => this.setState(p => Object.assign(p, {newworksheet: s})))
 
@@ -24,13 +31,28 @@ export class PanelHeader extends React.Component <Props, State>{
                     this.state.worksheets
                     , res => ({key: res.uuid, value: res.uuid, text: res.name})
                 )
-        const {newworksheet} = this.state
         return(
             <React.Fragment>
                 <Segment className="worksheetheader">
-                    <NewWorsheetModal close = {this.modalState(false)} isopen={newworksheet}/>
-                    <Button basic color="blue" icon="plus" content="New Worksheet" onClick={this.modalState(true)} />
-                    <Button basic color="blue" icon="barcode" content="Input UUID"/>                    
+                    <Button.Group basic color="blue">
+                        <Popup flowing hoverable
+                            trigger={<Button icon="plus" />}
+                        >
+                            <NewWorsheetForm refreshPanel={this.refreshPanel.bind(this)}/>
+                        </Popup>
+                        <Popup
+                            content="Input UUID"
+                            trigger={<Button icon="barcode"/>}
+                        />
+                        <Popup
+                            content="Refresh Panel"
+                            trigger={
+                                <Button 
+                                    icon="refresh" 
+                                    onClick={() => this.refreshPanel.bind(this)(this.props.uuid)}
+                                />}
+                        />
+                    </Button.Group>
                     <br/>
                     <span>
                         Your worksheet: {' '}
@@ -47,9 +69,9 @@ export class PanelHeader extends React.Component <Props, State>{
     }
 }
 
-type MProps = {close: () => void, isopen: boolean}
+type MProps = {refreshPanel: (uuid: string) => void}
 type MState = {name: string}
-class NewWorsheetModal extends React.Component<MProps, MState>{
+class NewWorsheetForm extends React.Component<MProps, MState>{
     constructor(props: MProps){
         super(props)
         this.state = {name: ""}
@@ -58,29 +80,27 @@ class NewWorsheetModal extends React.Component<MProps, MState>{
     handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
         const target = event.target
         const value = target.value
-        this.setState((prev) => Object.assign(prev, {name: value}));
+        this.setState((prev) => ({...prev, name: value}));
     }
-
-    createWorksheet = () => {
-        console.log(this.state.name)
-        this.props.close()
+    createWorksheet(){
+        clReq("", 'cl new ' + this.state.name)
+        .then(newuuid => this.props.refreshPanel(newuuid))
     }
 
     render(){
-        const {close, isopen} = this.props
         return(
-            <Modal open={isopen} onClose={close} id="newworksheetmodal">
-                <Header as="h2" icon='plus square outline' content='Create New Worksheet' />
-                <Modal.Content>
-                    <Input fluid icon='file' iconPosition='left' placeholder='New worksheet name' onChange={this.handleInput}/>
-                </Modal.Content>
-                <Modal.Actions>
-                    <Button basic onClick={close} >Cancel</Button>
-                    <Button color='blue' onClick={this.createWorksheet}>
-                        <Icon name='checkmark'/> Create
+            <React.Fragment>
+                <Header as="h4" content='New Worksheet' />
+                <Form>
+                    <Form.Field>
+                        <Input placeholder='Worksheet name' onChange={this.handleInput}/>
+                    </Form.Field>
+                    <Button basic color='blue' onClick={this.createWorksheet.bind(this)}>
+                        <Icon name='plus'/> Create
                     </Button>
-                </Modal.Actions>
-            </Modal>
+                </Form>
+                    
+            </React.Fragment>
         )
     }
 

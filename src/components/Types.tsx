@@ -118,7 +118,10 @@ export type BundleMeta = {
     , name: string
 }
 
-export type WorksheetItem = JObject<"bundles", BundleInfo[]> | JObject<"markup", string>
+export type WorksheetItem = 
+    JObject<"bundles", BundleInfo[]> 
+    | JObject<"markup", string> 
+    | JObject <"subworksheets", Worksheet[]>
 
 export type WorksheetContent = {items: WorksheetItem[]} & Worksheet
 
