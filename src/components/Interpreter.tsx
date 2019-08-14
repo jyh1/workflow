@@ -87,7 +87,9 @@ function resolveCMDEle(env: Env, alias: Map<string, string>, e: T.CMDEle): Promi
     if (e.type == "bundle"){
         return Promise.resolve(alias.get(e.content))
     }
-    return Promise.resolve(e.content)
+    if (e.type == "plain"){
+        return Promise.resolve(e.content.replace(/[\t\n]/g, " "))
+    }
 }
 
 function resolveCMDEles(env: Env, alias: Map<string, string>, es: T.CMDEle[]): Promise<string>{
@@ -131,7 +133,7 @@ function resolveJBlock(env: Env, blk: T.JBlock): void{
     // console.log(blk)
     // console.log(blk.command)
     let options = blk.options.slice()
-    options.unshift({type: "plain", content: "--name " + blk.variable})
+    options.unshift({type: "plain", content: " --name " + blk.variable + " "})
     let cmd = blk.command
     if(cmd.type == "run"){
         env.env.set(blk.variable, clrun(env, options, cmd.content.cmd, cmd.content.dependencies))
