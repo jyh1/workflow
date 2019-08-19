@@ -15,13 +15,13 @@ type Props = {
     , body: T.Task
     , nodeType: T.NodeType
 }
-type State = {value: string, codaval?: T.Task, editName: boolean, name: string}
+type State = {value: string, codaval?: T.Task, editName: boolean, name: string, info: string}
 
 export class CodaEditor extends React.Component<Props, State>{
     parseValue: (s: string) => Promise<T.ParseResult>
     constructor(props: Props){
         super(props)
-        this.state = {value: props.body.taskcode, codaval: props.body, editName: false, name: props.name}
+        this.state = {value: props.body.taskcode, codaval: props.body, editName: false, name: props.name, info: ""}
         this.parseValue = (props.nodeType == "tool")? parseReq : parseArgReq
     }
     handleInput = (val: string) => {
@@ -36,8 +36,8 @@ export class CodaEditor extends React.Component<Props, State>{
     compile = () => {
         let {value} = this.state
         this.parseValue(value)
-        .then(task => this.setState(p => Object.assign(p, {codaval: Object.assign(task, {taskcode: value}) })))
-        .catch(e => e.then(console.log))
+        .then(task => this.setState(p => ({...p, codaval: {...task, taskcode: value}})))
+        .catch(e => e.then((e: T.Exception) => this.setState(p => ({...p, info: e.info}))))
     }
     startEditingName = () => {
         this.setState(p => Object.assign(p, {editName: true}))
@@ -52,7 +52,7 @@ export class CodaEditor extends React.Component<Props, State>{
     }
 
     render(){
-        const {codaval, value, editName, name} = this.state
+        const {codaval, value, editName, name, info} = this.state
         const compiled = codaval? true : false
         const header = (
             <Modal.Header>
@@ -72,15 +72,17 @@ export class CodaEditor extends React.Component<Props, State>{
                         editorProps={{ $blockScrolling: true }}
                         showPrintMargin={true}
                         showGutter={true}
+                        focus={true}
+                        wrapEnabled={true}
                         highlightActiveLine={true}
                         value={value}
-                        annotations={[{row: 1, column: 1, type: 'error', text: 'Some error'}]}
                         placeholder={(this.props.nodeType == "tool")? "Input Codalang": "Input argument dictionary (e.g. [arg1: bundle, arg2: string ...])"}
                         setOptions={{
                             showLineNumbers: true,
-                            tabSize: 2
+                            tabSize: 4
                             }}
                     />
+                <div id="editorinfo">{info}</div>
                 </Modal.Content>
                 <Modal.Actions>
                     <Button basic onClick={this.props.close}>Cancel</Button>

@@ -258,11 +258,16 @@ div.form-row-input label {
     left: 50%; 
     top: 50%;
     width: 550px;
-    height: 670px;
-    margin-left: -275px;
-    margin-top: -335px;
+    height: 750px;
+    margin-left: -225px;
+    margin-top: -375px;
     position: fixed;
   }
+
+#editorinfo {
+    height: 80px;
+    overflow-y:auto;
+}
 
 .ui.segment.worksheetdropdown {
     padding-bottom: 5px;
