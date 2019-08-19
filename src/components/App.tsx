@@ -3,7 +3,7 @@ import {Canvas} from "./Canvas/Canvas"
 import {ToolPanel} from "./Tool/ToolPanel"
 import {endPointPath} from "./Types"
 import * as _ from "lodash"
-import { Router, Route, Link, Redirect, withRouter, Switch, RouteProps } from 'react-router-dom';
+import { Router, Route, Redirect, withRouter, Switch, RouteProps } from 'react-router-dom';
 // import {getLoginStatus} from "./MockRequests"
 import {getLoginStatus} from "./Requests"
 import { createBrowserHistory } from 'history';

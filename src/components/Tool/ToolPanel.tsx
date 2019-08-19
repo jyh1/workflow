@@ -167,18 +167,19 @@ export class ToolPanel extends React.Component<ToolPanelProps, ToolPanelState>{
                         <Sticky context={this.contextRef}>
                             <div className="panelsticky">
                                 <div className="toolbuttons">
-                                    <Button.Group floated="right" basic color='blue'>
+                                    <Button.Group floated="right">
                                         <Popup content='New Folder' trigger = 
-                                            {<Button icon onClick={this.newFolder}><Icon name='add' /></Button>}
+                                            {<Button icon='add' onClick={this.newFolder} basic color='blue'/>}
                                         />
                                         <Popup content='Edit' trigger = 
-                                            {<Button disabled={current? false: true} icon onClick={this.startEdit}><Icon name='edit' /></Button>}
+                                            {<Button disabled={current? false: true} icon='edit' onClick={this.startEdit} basic color='blue'/>}
                                         />
                                         <Popup position='bottom right' content="Refresh Panel"
                                             trigger={
                                                 <Button 
                                                     icon="refresh" 
                                                     onClick={() => this.updateList(true)}
+                                                    basic color='blue'
                                                 />}
                                         />
                                     </Button.Group>

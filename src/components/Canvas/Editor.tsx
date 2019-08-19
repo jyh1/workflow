@@ -37,6 +37,7 @@ export class CodaEditor extends React.Component<Props, State>{
         let {value} = this.state
         this.parseValue(value)
         .then(task => this.setState(p => Object.assign(p, {codaval: Object.assign(task, {taskcode: value}) })))
+        .catch(e => e.then(console.log))
     }
     startEditingName = () => {
         this.setState(p => Object.assign(p, {editName: true}))
@@ -61,7 +62,7 @@ export class CodaEditor extends React.Component<Props, State>{
                       }
             </Modal.Header>)
         return(
-            <Modal open={true} id="editormodal" onDrag={(e:any) => {console.log(232); e.stopPropagation}}>
+            <Modal open={true} id="editormodal">
                 {header}
                 <Modal.Content>
                     <AceEditor
@@ -73,6 +74,7 @@ export class CodaEditor extends React.Component<Props, State>{
                         showGutter={true}
                         highlightActiveLine={true}
                         value={value}
+                        annotations={[{row: 1, column: 1, type: 'error', text: 'Some error'}]}
                         placeholder={(this.props.nodeType == "tool")? "Input Codalang": "Input argument dictionary (e.g. [arg1: bundle, arg2: string ...])"}
                         setOptions={{
                             showLineNumbers: true,

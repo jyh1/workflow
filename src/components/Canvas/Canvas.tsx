@@ -155,6 +155,12 @@ export class Canvas extends React.Component<Props, State>{
         event.dataTransfer.setData(taskTag, JSON.stringify(dragData)); 
     }
 
+    zoom = (factor: number) => {
+        const model = this.engine.getDiagramModel()
+        model.setZoomLevel(this.model.getZoomLevel() * factor)
+        this.forceUpdate()
+    }
+
 
     processDrop: React.DragEventHandler = (event) => {
         event.preventDefault()
@@ -207,6 +213,15 @@ export class Canvas extends React.Component<Props, State>{
             <div style={{height: "100%"}}>
                 <S.Menu style={{marginBottom: "0px", paddingBottom: "4px", borderRadius: "0px", paddingTop: "5px"}}>
                     <S.Menu.Menu position='right'>
+                    
+                        <S.ButtonGroup style={{marginRight: "10px"}}>
+                            <S.Button icon="zoom in" basic color="blue" onClick={() => this.zoom(1.25)}/>
+                            <S.Button icon="zoom out" basic color="blue" onClick={() => this.zoom(0.8)}/>
+                            <S.Popup content='Zoom to Fit' trigger = {
+                                <S.Button icon="compress" basic color="blue" onClick={() => this.engine.zoomToFit()}/>
+                            }/>
+                        </S.ButtonGroup>
+
                         <S.ButtonGroup>
                             <S.Popup content='Build' trigger = 
                                 {<S.Button 
@@ -245,6 +260,7 @@ export class Canvas extends React.Component<Props, State>{
                                 />}
                             />
                         </S.ButtonGroup>
+
                         {dropDown}
                     </S.Menu.Menu>
 

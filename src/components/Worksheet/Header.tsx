@@ -7,15 +7,15 @@ import {worksheetsReq, clReq} from '../Requests'
 
 export const WorksheetButtons: React.SFC<{uuid?: string, refreshPanel: (uuid: string) => void}> = (props) => {
     return(
-        <Button.Group basic color="blue">
+        <Button.Group>
             <Popup flowing hoverable
-                trigger={<Button icon="plus" />}
+                trigger={<Button icon="plus" basic color="blue"/>}
             >
                 <NewWorsheetForm refreshPanel={props.refreshPanel}/>
             </Popup>
             <Popup
                 content="Input UUID"
-                trigger={<Button icon="barcode"/>}
+                trigger={<Button icon="barcode" basic color="blue"/>}
             />
             <Popup
                 content="Refresh Panel"
@@ -23,6 +23,7 @@ export const WorksheetButtons: React.SFC<{uuid?: string, refreshPanel: (uuid: st
                     <Button 
                         icon="refresh" 
                         onClick={() => props.refreshPanel(props.uuid)}
+                        basic color="blue"
                     />}
             />
         </Button.Group>
