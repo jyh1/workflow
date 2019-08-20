@@ -31,6 +31,7 @@
     "@types/marked": "^0.6.5",
     "@types/react-router-dom": "^4.3.4",
     "@types/react-split-pane": "^0.1.67",
+    "anser": "^1.4.8",
     "bootstrap-scss": "^4.3.1",
     "css-loader": "^3.0.0",
     "file-loader": "^4.0.0",

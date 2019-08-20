@@ -257,16 +257,18 @@ div.form-row-input label {
 #editormodal {
     left: 50%; 
     top: 50%;
-    width: 550px;
-    height: 750px;
-    margin-left: -225px;
-    margin-top: -375px;
+    width: 900px;
+    height: 625px;
+    margin-left: -455px;
+    margin-top: -310px;
     position: fixed;
   }
 
 #editorinfo {
-    height: 80px;
-    overflow-y:auto;
+    white-space:pre;
+    font-family: monospace;
+    overflow-y: auto;
+    overflow-x: auto;
 }
 
 .ui.segment.worksheetdropdown {
@@ -326,4 +328,13 @@ div.form-row-input label {
     border-bottom: 1px solid #d4d4d5;
     padding-right: 10px;
     padding-left: 14px;
+}
+
+.error-marker{
+    position: absolute;
+    background-color: #fe7f02;
+}
+
+span {
+    white-space:pre;
 }

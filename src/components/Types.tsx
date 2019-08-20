@@ -135,7 +135,7 @@ export type UpdateTool = {id: string, name: string, description: string}
 export type NodeType = "tool" | "argument"
 
 
-export type Exception = {info: string}
+export type Exception = ({type: "parser", line: number, column: number} | {type: "type"}) & {info: string}
 
 export const endPointPath = {
       login: "/workflow/login"
