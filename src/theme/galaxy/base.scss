@@ -344,6 +344,6 @@ span {
     z-index: 1001;
     bottom: 5%;
     right: 5%;
-    width: 30%;
-    opacity: 0.9;
+    min-width: 30%;
+    max-width: 40%;
 }

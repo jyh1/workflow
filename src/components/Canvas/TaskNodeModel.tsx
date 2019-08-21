@@ -27,11 +27,12 @@ export class TaskNodeModel extends DefaultNodeModel {
 	loading: boolean
 	toggleEditor: boolean
 	refresh: () => void
+	error: (e: T.Exception) => void
 	lockModel: () => void
 	unlockModel: () => void
 	newNode: (node: NodeInfo) => void
 	nodeType: T.NodeType
-    constructor(node: NodeInfo, refresh: () => void, lock: () => void, unlock: () => void, newNode: (node: NodeInfo) => void){
+    constructor(node: NodeInfo, refresh: () => void, lock: () => void, unlock: () => void, newNode: (node: NodeInfo) => void, error: (e: T.Exception) => void){
         super(node.name);
 		[this.x, this.y] = [node.pos.x, node.pos.y];
 		this.inports = []
@@ -40,6 +41,7 @@ export class TaskNodeModel extends DefaultNodeModel {
 		let taskreq: Promise<Task>
 
 		this.refresh = refresh;
+		this.error = error;
 		this.lockModel = lock;
 		this.unlockModel = unlock;
 		this.newNode = newNode;
@@ -171,6 +173,7 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 						  save={(task, name) => node.updateTask(task, name)}
 						  body={node.extras.task}
 						  nodeType={node.extras.nodeType}
+						  error={node.error}
 					  /> 
 					: <React.Fragment/>
 				}

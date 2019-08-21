@@ -16,13 +16,15 @@ type Props = {
     , save: (task: T.Task, name: string) => void
     , body: T.Task
     , nodeType: T.NodeType
+    , error: (e: T.Exception) => void
 }
 type State = {
       value: string
     , codaval?: T.Task
     , editName: boolean
     , name: string
-    , exception?: T.Exception
+    , line?: number
+    , col?: number
 }
 
 export class CodaEditor extends React.Component<Props, State>{
@@ -49,9 +51,11 @@ export class CodaEditor extends React.Component<Props, State>{
     compile = () => {
         let {value} = this.state
         this.parseValue(value)
-        .then(task => this.setState(p => ({...p, codaval: {...task, taskcode: value}, exception: undefined})))
-        .catch(e => e.then((e: T.Exception) => 
-            this.setState(p => ({...p, exception: e})))
+        .then(task => this.setState(p => ({...p, codaval: {...task, taskcode: value}, line: undefined})))
+        .catch(e => e.then((e: any) => {
+            this.setState(p => ({...p, line: e.line, col: e.column}))
+            this.props.error({...e, info: <EditorInfo info={e.info}/>})
+            })
         )
     }
     startEditingName = () => {
@@ -66,19 +70,12 @@ export class CodaEditor extends React.Component<Props, State>{
         this.setState(p => Object.assign(p, {name}));
     }
 
-    clearInfo = () => {
-        this.setState(p => ({...p, exception: {...p.exception, info: ""}}))
-    }
-
     render(){
-        const {codaval, value, editName, name, exception} = this.state
-        const info = exception ? exception.info : ""
+        const {codaval, value, editName, name, line, col} = this.state
         let markers: any[] = []
-        if (exception){
-            if (exception.type == 'parser'){
-                markers = 
-                    [{startRow: exception.line, startCol: 0, endRow: exception.line, endCol: exception.column, className: 'error-marker', type: 'background'}]
-            }
+        if (typeof line == "number"){
+            markers = 
+                [{startRow: line, startCol: 0, endRow: line, endCol: col, className: 'error-marker', type: 'background'}]
         }
         const compiled = codaval? true : false
         const header = (
@@ -90,12 +87,7 @@ export class CodaEditor extends React.Component<Props, State>{
             </Modal.Header>)
         return(
             <Modal open={true} id="editormodal">
-                <Popup 
-                    content={<EditorInfo info={info} clearInfo={this.clearInfo}/>}
-                    open={info.length > 0}
-                    position='top center'
-                    trigger={header}
-                />
+                {header}
                 <AceEditor
                     mode="haskell"
                     theme="github"
@@ -125,11 +117,10 @@ export class CodaEditor extends React.Component<Props, State>{
     }
 }
 
-const EditorInfo: React.SFC<{info: string, clearInfo: () => void}> = (props) => {
+const EditorInfo: React.SFC<{info: string}> = (props) => {
     const infoHtml = Anser.ansiToHtml(props.info)
     return(
         <React.Fragment>
-            <Button basic icon='close' style={{padding: "0"}} onClick={props.clearInfo} />
             <div id="editorinfo" dangerouslySetInnerHTML={{__html: infoHtml.replace(/\n/g, "<br>")}}/>
         </React.Fragment>
 

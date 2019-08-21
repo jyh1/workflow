@@ -200,7 +200,7 @@ export class Canvas extends React.Component<Props, State>{
     }
 
     newNode = (node: NodeInfo) => {
-        this.engine.getDiagramModel().addNode(new TaskNodeModel(node, this.refresh, this.lockModel, this.unlockModel, this.newNode))
+        this.engine.getDiagramModel().addNode(new TaskNodeModel(node, this.refresh, this.lockModel, this.unlockModel, this.newNode, this.props.error))
         this.refresh()
     }
 
