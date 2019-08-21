@@ -114,21 +114,7 @@ export const clWait: T.ClWaitRequest = (path) => {
 }
 
 
-export const compileReq: T.CompileRequest = (ts) => {
-    let req = fetch('./tool/compile', 
-        {
-          headers: {"Content-Type":'application/json'}
-        , credentials: 'same-origin'
-        , method: 'POST'
-        ,  body: JSON.stringify(ts)
-        }).then((res) => {
-            if (!res.ok){
-                return Promise.reject(res);
-            }
-            return res.json()
-        })
-    return req
-}
+export const compileReq: T.CompileRequest = jsonRequest('./tool/compile')
 
 
 function parseWorksheetItem(item: any): T.WorksheetItem{

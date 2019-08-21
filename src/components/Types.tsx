@@ -140,6 +140,7 @@ export type Exception =
         | {type: "type"}
         | {type: "Unfilled Input Port", nodeid: string, portid: string}
         | {type: "Circle in Graph", nodeids: string[]}
+        | {type: "Empty Graph"}
     ) 
     & {info: JSX.Element})
 

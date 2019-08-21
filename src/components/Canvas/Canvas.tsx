@@ -142,6 +142,10 @@ export class Canvas extends React.Component<Props, State>{
     compile(){
         try {
             const nodes = this.serializeTaskGraph()
+            if (nodes.body.length == 0){
+                const e: T.Exception = {type: "Empty Graph", info: <React.Fragment/>}
+                throw e
+            }
             this.setState(p => ({...p, loading: true, compiled: {codalang: null, jlang: null}, locked: true}))
             compileReq(nodes)
             .then((res) => {
