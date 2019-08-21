@@ -1,4 +1,4 @@
-import {NodeInfo, taskTag, TaskDragType, ToolPort, ToolNode, ToolNodeInterface, JLang} from "../Types"
+import {NodeInfo, taskTag, TaskDragType, ToolPort, Exception, ToolNodeInterface, JLang} from "../Types"
 import * as React from "react"
 import * as SRD from "storm-react-diagrams"
 import {TaskNodeModel, TaskNodeFactory, TaskLinkFactory} from "./TaskNodeModel"
@@ -14,6 +14,7 @@ type Props = {
       nodes: NodeInfo[]
     , refreshBundle: () => void
     , doSave: (codalang: T.CodaLang) => void
+    , error: (e: T.Exception) => void
 };
 
 type State = {
@@ -89,7 +90,15 @@ export class Canvas extends React.Component<Props, State>{
                 let portname = (p as any).label
                 portIdToName[p.id] = portname
                 if((p as any).in){
-                    if (p.links.length !== 1){ throw "unfilled argument"} //TODO: use a error class
+                    if (p.links.length !== 1){ 
+                        const error: Exception = {
+                              type: "Unfilled Input Port"
+                            , info: <React.Fragment>Port <b>{portname}</b> is empty in node <b>{(n as any).name}</b></React.Fragment>
+                            , nodeid: id
+                            , portid: p.id
+                        }
+                        throw (error)
+                    } 
                     let link = p.links[0]
                     argDic[portname] = link
                 }
@@ -99,7 +108,17 @@ export class Canvas extends React.Component<Props, State>{
         }
 
         // only keep tool node
-        let sortedOrder = _.filter(graphModel.topoSort(), n => processedNodes[n].nodeType == "tool" ? true: false)
+        let sortedOrder
+        try {
+            sortedOrder = _.filter(graphModel.topoSort(), n => processedNodes[n].nodeType == "tool" ? true: false)
+        } catch (nodes) {
+            const e: Exception = {
+                  type: "Circle in Graph"
+                , nodeids: nodes
+                , info: <React.Fragment>Circle encountered in the computation graph</React.Fragment>
+            }
+            throw e
+        }
         // console.log(processedNodes)
         let tools = _.mapValues(processedNodes, (n) => {
                 let toToolPort: (linkid: string) => ToolPort = (linkid) => {
@@ -121,13 +140,17 @@ export class Canvas extends React.Component<Props, State>{
     }
 
     compile(){
-        let nodes = this.serializeTaskGraph()
-        this.setState(p => ({...p, loading: true, compiled: {codalang: null, jlang: null}, locked: true}))
-        compileReq(nodes)
-        .then((res) => {
-            this.setState(p => ({...p, compiled: res, loading: false}))
-            // console.log(res)
-        } )
+        try {
+            const nodes = this.serializeTaskGraph()
+            this.setState(p => ({...p, loading: true, compiled: {codalang: null, jlang: null}, locked: true}))
+            compileReq(nodes)
+            .then((res) => {
+                this.setState(p => ({...p, compiled: res, loading: false}))
+            })
+            .catch(e => this.props.error(e))    
+        } catch (error) {
+            this.props.error(error)
+        }
     }
 
     reqAndRefresh(worksheet: string, command: string): Promise<string>{

@@ -338,3 +338,12 @@ div.form-row-input label {
 span {
     white-space:pre;
 }
+
+#error-list{
+    position: absolute;
+    z-index: 1001;
+    bottom: 5%;
+    right: 5%;
+    width: 30%;
+    opacity: 0.9;
+}

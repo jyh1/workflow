@@ -3,7 +3,7 @@ import {Canvas} from "./Canvas/Canvas"
 import {ToolPanel} from "./Tool/ToolPanel"
 import {endPointPath} from "./Types"
 import * as _ from "lodash"
-import { Router, Route, Redirect, withRouter, Switch, RouteProps } from 'react-router-dom';
+import { Router, Route, Redirect, Switch, RouteProps } from 'react-router-dom';
 // import {getLoginStatus} from "./MockRequests"
 import {getLoginStatus} from "./Requests"
 import { createBrowserHistory } from 'history';
@@ -14,18 +14,25 @@ import {worksheetItemsReq} from './Requests'
 import SplitPane from 'react-split-pane'
 import '../theme/layout.scss'
 import * as localforage from 'localforage'
+import * as S from 'semantic-ui-react'
+import { ErrorList } from "./Errors/ErrorList";
 
 type Props = {}
 type State = {
       currentWorksheet: T.WorksheetContent
     , loadingWorksheet: boolean
     , codalang?: T.CodaLang
+    , errors: T.Exception[]
     }
 
 export class HomeApp extends React.Component<Props, State>{
     constructor(props: Props){
         super(props)
-        this.state = {currentWorksheet: {items: [], uuid: "", name: ""}, loadingWorksheet: false}
+        this.state = {
+              currentWorksheet: {items: [], uuid: "", name: ""}
+            , loadingWorksheet: false
+            , errors: []
+        }
     }
     componentDidMount(){
         this.changeWorksheet()
@@ -48,23 +55,34 @@ export class HomeApp extends React.Component<Props, State>{
         this.setState(p => Object.assign(p, {codalang: null}))
     }
 
+    addException = (e: T.Exception) => {
+        this.setState(p => ({...p, errors: p.errors.concat(e)}))
+    }
+    removeException = (ind: number) => {
+        this.setState(p => ({...p, errors: [].concat(p.errors.slice(0, ind), p.errors.slice(ind + 1))}))
+    }
+
 
     render(){
         const refreshBundle = this.refreshBundle.bind(this)
         const changeWorksheet = this.changeWorksheet.bind(this)
+        const {errors} = this.state
         return (
-            <SplitPane split="vertical" defaultSize="16%" pane1Style={{overflowY: "auto"}}>
-                <ToolPanel codalang={this.state.codalang} doneSave={this.doneSave}/>
-                <SplitPane split="vertical" defaultSize={385} primary="second" minSize={385} pane2Style={{overflowY: "auto"}}>
-                    <Canvas nodes = {[]} refreshBundle={refreshBundle} doSave={this.doSave} />
-                    <WorksheetPanel 
-                        refreshBundle={refreshBundle} 
-                        content={this.state.currentWorksheet} 
-                        changeWorksheet={changeWorksheet} 
-                        loading={this.state.loadingWorksheet} 
-                    />
+            <React.Fragment>
+                <ErrorList errors={errors} removeException={this.removeException}/>
+                <SplitPane split="vertical" defaultSize="16%" pane1Style={{overflowY: "auto"}}>
+                    <ToolPanel codalang={this.state.codalang} doneSave={this.doneSave}/>
+                    <SplitPane split="vertical" defaultSize={385} primary="second" minSize={385} pane2Style={{overflowY: "auto"}}>
+                        <Canvas error={this.addException} nodes = {[]} refreshBundle={refreshBundle} doSave={this.doSave} />
+                        <WorksheetPanel 
+                            refreshBundle={refreshBundle} 
+                            content={this.state.currentWorksheet} 
+                            changeWorksheet={changeWorksheet} 
+                            loading={this.state.loadingWorksheet} 
+                        />
+                    </SplitPane>
                 </SplitPane>
-            </SplitPane>
+            </React.Fragment>
         )
     }
 }
