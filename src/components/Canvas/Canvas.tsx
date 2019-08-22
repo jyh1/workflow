@@ -213,7 +213,7 @@ export class Canvas extends React.Component<Props, State>{
             this.setState(prev => Object.assign(prev, {running: true}))
             evalJLang(jlang, this.reqAndRefresh.bind(this))
             .then(res => {
-                this.runningInfo.currentInfo = {type: "positive", header: "Executing Complete", body: <p/>}
+                this.runningInfo.currentInfo = {type: "positive", header: "Execution Complete", body: <p/>}
                 this.reportRunning()
                 })
             .then(()=>{this.setState(prev => Object.assign(prev, {running: false}))})

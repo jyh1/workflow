@@ -83,6 +83,15 @@ export class TaskNodeModel extends DefaultNodeModel {
 		this.newNode(node)	
 		this.removeAndRefresh()
 	}
+	copyTask(){
+		const node: NodeInfo = {
+			  name: this.name
+			, pos: {x: this.x + 100, y: this.y + 100}
+			, taskinfo: {type: "task", content: this.extras.task}
+			, nodeType: this.nodeType
+		}
+		this.newNode(node)
+	}
 }
 
 
@@ -144,6 +153,7 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 					</Dimmer>
 					<div className={"toolFormTitle" + (isargument? "_argument" : "")}>
 						<Button.Group size="medium" floated="right">
+							<Button icon='copy outline' style={{padding: "3px"}}  onClick={() => node.copyTask()}/>
 							<Button icon='edit outline'  style={{padding: "3px"}} onClick={this.toggleEditor.bind(this)}/>
 							<Button icon='times' style={{padding: "3px"}}  onClick={()=>node.removeAndRefresh()}/>
 						</Button.Group>
