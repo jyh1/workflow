@@ -14,7 +14,7 @@ type Props = {
       nodes: NodeInfo[]
     , refreshBundle: () => void
     , doSave: (codalang: T.CodaLang) => void
-    , report: (e: T.Info) => void
+    , report: (e: T.Info, id?: number) => number
 };
 
 type State = {
@@ -194,10 +194,12 @@ export class Canvas extends React.Component<Props, State>{
 
     run(){
         const {jlang} =  this.state.compiled
-        this.setState(prev => Object.assign(prev, {running: true}))
         if (jlang){
+            const infoid = this.props.report({type: "loading", header: "Executing Graph", body: <p/>})
+            this.setState(prev => Object.assign(prev, {running: true}))
             evalJLang(jlang, this.reqAndRefresh.bind(this))
-            .then(console.log).then(()=>{this.setState(prev => Object.assign(prev, {running: false}))})
+            .then(res => this.props.report({type: "positive", header: "Executing Complete", body: <p>{res}</p> }, infoid))
+            .then(()=>{this.setState(prev => Object.assign(prev, {running: false}))})
         }
     }
 
@@ -220,6 +222,10 @@ export class Canvas extends React.Component<Props, State>{
 
     processDrop: React.DragEventHandler = (event) => {
         event.preventDefault()
+        if (this.state.locked){
+            this.props.report({type: "warning", header: "Locked Canvas", body: <p>Unlock canvas to add new node.</p>})
+            return
+        }
         let data = event.dataTransfer.getData(taskTag);
         // console.log(data)
         let dragged: TaskDragType;

@@ -22,7 +22,7 @@ type State = {
       currentWorksheet: T.WorksheetContent
     , loadingWorksheet: boolean
     , codalang?: T.CodaLang
-    , infos: T.Info[]
+    , infos: Map<number, T.Info>
     }
 
 export class HomeApp extends React.Component<Props, State>{
@@ -31,7 +31,7 @@ export class HomeApp extends React.Component<Props, State>{
         this.state = {
               currentWorksheet: {items: [], uuid: "", name: ""}
             , loadingWorksheet: false
-            , infos: []
+            , infos: new Map()
         }
     }
     componentDidMount(){
@@ -55,18 +55,32 @@ export class HomeApp extends React.Component<Props, State>{
         this.setState(p => Object.assign(p, {codalang: null}))
     }
 
-    addException = (e: T.Info) => {
-        this.setState(p => ({...p, infos: p.infos.concat(e)}))
+    addException = (e: T.Info, id?: number):number => {
+        let timestamp
+        if (id){
+            timestamp = id
+            if (!this.state.infos.has(id)) {return id}
+        } else {
+            timestamp = new Date().getTime()
+        }
+        let newinfos = new Map(this.state.infos)
+        newinfos.set(timestamp, e)
+        this.setState(p => ({...p, infos: newinfos}))
+        return timestamp
     }
-    removeException = (ind: number) => {
-        this.setState(p => ({...p, infos: [].concat(p.infos.slice(0, ind), p.infos.slice(ind + 1))}))
+    removeException = (id: number) => {
+        let newinfos = new Map(this.state.infos)
+        newinfos.delete(id)
+        this.setState(p => ({...p, infos: newinfos}))
     }
 
 
     render(){
         const refreshBundle = this.refreshBundle.bind(this)
         const changeWorksheet = this.changeWorksheet.bind(this)
-        const {infos: errors} = this.state
+        const {infos} = this.state
+        let errors = Array.from(infos.entries())
+        errors.sort((a, b) => a[0] < b[0]? -1 : 1)
         return (
             <React.Fragment>
                 <ErrorList errors={errors} removeException={this.removeException}/>
