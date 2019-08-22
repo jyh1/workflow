@@ -55,11 +55,11 @@ export class HomeApp extends React.Component<Props, State>{
         this.setState(p => Object.assign(p, {codalang: null}))
     }
 
-    addException = (e: T.Info, id?: number):number => {
+    addException = (e: T.Info):number => {
         let timestamp
-        if (id){
-            timestamp = id
-            if (!this.state.infos.has(id)) {return id}
+        if (e.update){
+            timestamp = e.update.id
+            if (!this.state.infos.has(timestamp)) {return timestamp}
         } else {
             timestamp = new Date().getTime()
         }

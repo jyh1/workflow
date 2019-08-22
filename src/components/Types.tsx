@@ -141,7 +141,14 @@ export type Exception =
     ) 
     & {info: string})
 
-export type Info = {type: "positive" | "warning" | "error"  | "loading", header: string, body: JSX.Element}
+export type Info = 
+    {
+      type: "positive" | "warning" | "error"  | "loading"
+    , header: string
+    , body: JSX.Element
+    , update?: {id: number}
+    , timeout?: number
+    }
 
 export const endPointPath = {
       login: "/workflow/login"

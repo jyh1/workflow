@@ -14,7 +14,7 @@ type Props = {
       nodes: NodeInfo[]
     , refreshBundle: () => void
     , doSave: (codalang: T.CodaLang) => void
-    , report: (e: T.Info, id?: number) => number
+    , report: (e: T.Info) => number
 };
 
 type State = {
@@ -32,6 +32,7 @@ export class Canvas extends React.Component<Props, State>{
     engine: SRD.DiagramEngine;
     model: SRD.DiagramModel
     refreshBundle: () => void
+    runningInfo: {commands: JSX.Element[], infoid: number, currentInfo: T.Info}
     // refresh: () => void;
     constructor(props: Props){
         super(props);
@@ -152,7 +153,7 @@ export class Canvas extends React.Component<Props, State>{
             .then((res) => {
                 this.setState(p => ({...p, compiled: res, loading: false}))
             })
-            .then(() => this.props.report({type: "positive", header: "Build Sucess", body: <p/>}))
+            .then(() => this.props.report({type: "positive", header: "Build Sucess", body: <p/>, timeout: 3000}))
             .catch(e => this.props.report(e))    
         } catch (error) {
             const einfo: UnfilledPort | CircleErr | EmptyGraph = error
@@ -189,16 +190,32 @@ export class Canvas extends React.Component<Props, State>{
     reqAndRefresh(worksheet: string, command: string): Promise<string>{
         let req = clReq(worksheet, command)
         req.then(this.refreshBundle)
+        .then( () => {
+            this.runningInfo.commands.push(<S.MessageItem key={this.runningInfo.commands.length}><code>{command}</code></S.MessageItem>)
+            this.reportRunning()
+        })
         return req
+    }
+
+    reportRunning(){
+        const {infoid, commands, currentInfo: info} = this.runningInfo
+        this.props.report(
+            {...info, body: <S.MessageList style={{maxHeight: "150px", overflowY: "auto"}}>{commands}</S.MessageList>
+            , update: {id: infoid}})
     }
 
     run(){
         const {jlang} =  this.state.compiled
         if (jlang){
-            const infoid = this.props.report({type: "loading", header: "Executing Graph", body: <p/>})
+            const loadingInfo: T.Info = {type: "loading", header: "Executing Graph", body: <p/>}
+            const infoid = this.props.report(loadingInfo)
+            this.runningInfo = {commands: [], infoid, currentInfo: loadingInfo}
             this.setState(prev => Object.assign(prev, {running: true}))
             evalJLang(jlang, this.reqAndRefresh.bind(this))
-            .then(res => this.props.report({type: "positive", header: "Executing Complete", body: <p>{res}</p> }, infoid))
+            .then(res => {
+                this.runningInfo.currentInfo = {type: "positive", header: "Executing Complete", body: <p/>}
+                this.reportRunning()
+                })
             .then(()=>{this.setState(prev => Object.assign(prev, {running: false}))})
         }
     }

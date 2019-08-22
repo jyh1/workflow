@@ -27,13 +27,8 @@ export class ErrorList extends React.Component<Props, State>{
 }
 
 const ErrorMsg: React.SFC<{info: T.Info, close: () => void}> = (props) => {
-    switch(props.info.type){
-        case "warning":
-            setTimeout(props.close, 5000)
-            break
-        case "positive":
-            setTimeout(props.close, 3000)
-            break
+    if (props.info.timeout){
+        setTimeout(props.close, props.info.timeout)
     }
     const isloading = props.info.type == "loading"
     return(
