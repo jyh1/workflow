@@ -1,4 +1,4 @@
-import {NodeInfo, taskTag, TaskDragType, ToolPort, Exception, ToolNodeInterface, JLang} from "../Types"
+import {NodeInfo, taskTag, TaskDragType, ToolPort, Info, ToolNodeInterface, JLang} from "../Types"
 import * as React from "react"
 import * as SRD from "storm-react-diagrams"
 import {TaskNodeModel, TaskNodeFactory, TaskLinkFactory} from "./TaskNodeModel"
@@ -14,7 +14,7 @@ type Props = {
       nodes: NodeInfo[]
     , refreshBundle: () => void
     , doSave: (codalang: T.CodaLang) => void
-    , error: (e: T.Exception) => void
+    , report: (e: T.Info) => void
 };
 
 type State = {
@@ -23,6 +23,10 @@ type State = {
     running: boolean
     locked: boolean
 }
+
+type UnfilledPort = T.JObject<"unfilled", {portname: string, nodename: string}>
+type CircleErr = T.JObject<"circle", {nodeids: string[]}>
+type EmptyGraph = T.JObject<"empty", {}>
 
 export class Canvas extends React.Component<Props, State>{
     engine: SRD.DiagramEngine;
@@ -91,11 +95,9 @@ export class Canvas extends React.Component<Props, State>{
                 portIdToName[p.id] = portname
                 if((p as any).in){
                     if (p.links.length !== 1){ 
-                        const error: Exception = {
-                              type: "Unfilled Input Port"
-                            , info: <React.Fragment>Port <b>{portname}</b> is empty in node <b>{(n as any).name}</b></React.Fragment>
-                            , nodeid: id
-                            , portid: p.id
+                        const error: UnfilledPort = {
+                            type: "unfilled",
+                            content: {nodename: (n as any).name, portname: portname}
                         }
                         throw (error)
                     } 
@@ -112,10 +114,9 @@ export class Canvas extends React.Component<Props, State>{
         try {
             sortedOrder = _.filter(graphModel.topoSort(), n => processedNodes[n].nodeType == "tool" ? true: false)
         } catch (nodes) {
-            const e: Exception = {
-                  type: "Circle in Graph"
-                , nodeids: nodes
-                , info: <React.Fragment>Circle encountered in the computation graph</React.Fragment>
+            const e: CircleErr = {
+                  type: "circle",
+                  content: {nodeids: nodes}
             }
             throw e
         }
@@ -143,7 +144,7 @@ export class Canvas extends React.Component<Props, State>{
         try {
             const nodes = this.serializeTaskGraph()
             if (nodes.body.length == 0){
-                const e: T.Exception = {type: "Empty Graph", info: <React.Fragment/>}
+                const e: EmptyGraph = {type: "empty", content: {}}
                 throw e
             }
             this.setState(p => ({...p, loading: true, compiled: {codalang: null, jlang: null}, locked: true}))
@@ -151,9 +152,37 @@ export class Canvas extends React.Component<Props, State>{
             .then((res) => {
                 this.setState(p => ({...p, compiled: res, loading: false}))
             })
-            .catch(e => this.props.error(e))    
+            .then(() => this.props.report({type: "positive", header: "Build Sucess", body: <p/>}))
+            .catch(e => this.props.report(e))    
         } catch (error) {
-            this.props.error(error)
+            const einfo: UnfilledPort | CircleErr | EmptyGraph = error
+            let info: T.Info
+            switch (einfo.type){
+                case "unfilled":
+                    info = {
+                          type: "error"
+                        , header: "Unfilled Input Port"
+                        , body: <p>Port <b>{einfo.content.portname}</b> is empty in node <b>{einfo.content.nodename}</b></p>
+                    }
+                    break
+                case "circle":
+                    info = {
+                        type: "error"
+                      , header: "Circle in Graph"
+                      , body: <p>Circle encountered in computation graph</p>
+                    }
+                    break
+                case "empty":
+                    info = {
+                        type: "error"
+                      , header: "Empty Graph"
+                      , body: <p/>
+                    }
+                    break
+                default:
+                    info = {type: "error",  header: "Error", body: <p>{JSON.stringify(einfo)}</p>}
+            }
+            this.props.report(info)
         }
     }
 
@@ -204,7 +233,7 @@ export class Canvas extends React.Component<Props, State>{
     }
 
     newNode = (node: NodeInfo) => {
-        this.engine.getDiagramModel().addNode(new TaskNodeModel(node, this.refresh, this.lockModel, this.unlockModel, this.newNode, this.props.error))
+        this.engine.getDiagramModel().addNode(new TaskNodeModel(node, this.refresh, this.lockModel, this.unlockModel, this.newNode, this.props.report))
         this.refresh()
     }
 

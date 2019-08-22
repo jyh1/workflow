@@ -22,7 +22,7 @@ type State = {
       currentWorksheet: T.WorksheetContent
     , loadingWorksheet: boolean
     , codalang?: T.CodaLang
-    , errors: T.Exception[]
+    , infos: T.Info[]
     }
 
 export class HomeApp extends React.Component<Props, State>{
@@ -31,7 +31,7 @@ export class HomeApp extends React.Component<Props, State>{
         this.state = {
               currentWorksheet: {items: [], uuid: "", name: ""}
             , loadingWorksheet: false
-            , errors: []
+            , infos: []
         }
     }
     componentDidMount(){
@@ -55,25 +55,25 @@ export class HomeApp extends React.Component<Props, State>{
         this.setState(p => Object.assign(p, {codalang: null}))
     }
 
-    addException = (e: T.Exception) => {
-        this.setState(p => ({...p, errors: p.errors.concat(e)}))
+    addException = (e: T.Info) => {
+        this.setState(p => ({...p, infos: p.infos.concat(e)}))
     }
     removeException = (ind: number) => {
-        this.setState(p => ({...p, errors: [].concat(p.errors.slice(0, ind), p.errors.slice(ind + 1))}))
+        this.setState(p => ({...p, infos: [].concat(p.infos.slice(0, ind), p.infos.slice(ind + 1))}))
     }
 
 
     render(){
         const refreshBundle = this.refreshBundle.bind(this)
         const changeWorksheet = this.changeWorksheet.bind(this)
-        const {errors} = this.state
+        const {infos: errors} = this.state
         return (
             <React.Fragment>
                 <ErrorList errors={errors} removeException={this.removeException}/>
                 <SplitPane split="vertical" defaultSize="16%" pane1Style={{overflowY: "auto"}}>
                     <ToolPanel codalang={this.state.codalang} doneSave={this.doneSave}/>
                     <SplitPane split="vertical" defaultSize={385} primary="second" minSize={385} pane2Style={{overflowY: "auto"}}>
-                        <Canvas error={this.addException} nodes = {[]} refreshBundle={refreshBundle} doSave={this.doSave} />
+                        <Canvas report={this.addException} nodes = {[]} refreshBundle={refreshBundle} doSave={this.doSave} />
                         <WorksheetPanel 
                             refreshBundle={refreshBundle} 
                             content={this.state.currentWorksheet} 

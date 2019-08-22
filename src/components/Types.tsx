@@ -138,11 +138,10 @@ export type NodeType = "tool" | "argument"
 export type Exception = 
     (({type: "parser", line: number, column: number} 
         | {type: "type"}
-        | {type: "Unfilled Input Port", nodeid: string, portid: string}
-        | {type: "Circle in Graph", nodeids: string[]}
-        | {type: "Empty Graph"}
     ) 
-    & {info: JSX.Element})
+    & {info: string})
+
+export type Info = {type: "positive" | "warning" | "error", header: string, body: JSX.Element}
 
 export const endPointPath = {
       login: "/workflow/login"

@@ -16,7 +16,7 @@ type Props = {
     , save: (task: T.Task, name: string) => void
     , body: T.Task
     , nodeType: T.NodeType
-    , error: (e: T.Exception) => void
+    , error: (e: T.Info) => void
 }
 type State = {
       value: string
@@ -45,16 +45,25 @@ export class CodaEditor extends React.Component<Props, State>{
     handleClose = () => {
         const {codaval, name} = this.state
         this.props.save(codaval, name)
-        // console.log(codaval)
         this.props.close()
     }
     compile = () => {
         let {value} = this.state
         this.parseValue(value)
         .then(task => this.setState(p => ({...p, codaval: {...task, taskcode: value}, line: undefined})))
-        .catch(e => e.then((e: any) => {
-            this.setState(p => ({...p, line: e.line, col: e.column}))
-            this.props.error({...e, info: <EditorInfo info={e.info}/>})
+        .catch(e => e.then((e: T.Exception) => {
+            let header: string
+            switch (e.type){
+                case "parser":
+                    this.setState(p => ({...p, line: e.line, col: e.column}))
+                    header = "Parse Error"
+                    break
+                case "type":
+                    this.setState(p => ({...p, line: undefined, col: undefined}))
+                    header = "Type Error"
+                    break
+            }
+            this.props.error({type: "error", header: header ,body: <EditorInfo info={e.info}/>})
             })
         )
     }

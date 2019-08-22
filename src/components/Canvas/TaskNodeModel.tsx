@@ -27,12 +27,12 @@ export class TaskNodeModel extends DefaultNodeModel {
 	loading: boolean
 	toggleEditor: boolean
 	refresh: () => void
-	error: (e: T.Exception) => void
+	error: (e: T.Info) => void
 	lockModel: () => void
 	unlockModel: () => void
 	newNode: (node: NodeInfo) => void
 	nodeType: T.NodeType
-    constructor(node: NodeInfo, refresh: () => void, lock: () => void, unlock: () => void, newNode: (node: NodeInfo) => void, error: (e: T.Exception) => void){
+    constructor(node: NodeInfo, refresh: () => void, lock: () => void, unlock: () => void, newNode: (node: NodeInfo) => void, error: (e: T.Info) => void){
         super(node.name);
 		[this.x, this.y] = [node.pos.x, node.pos.y];
 		this.inports = []
