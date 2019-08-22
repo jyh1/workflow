@@ -28,7 +28,7 @@ function jsonRequest<T, R>(url: string, ctype : ContentType = 'application/json'
 }
 
 export const loginReq: LoginRequest = (username, password) => {
-    let req = fetch('/login', 
+    let req = fetch(T.endPointPath.login, 
         {
           headers: {"Content-Type":'application/json'}
         , credentials: 'same-origin'
