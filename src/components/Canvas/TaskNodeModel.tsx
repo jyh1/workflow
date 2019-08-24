@@ -92,6 +92,15 @@ export class TaskNodeModel extends DefaultNodeModel {
 		}
 		this.newNode(node)
 	}
+	lockNode(lock: boolean = true){
+		this.setLocked(lock)
+		_.mapValues(this.getPorts(), 
+			p => {
+				_.mapValues(p.getLinks(), v => {v.setLocked(lock)})
+				p.setLocked(lock)
+			}
+		)
+	}
 }
 
 
@@ -140,12 +149,12 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 
 	openEditor(){
 		this.props.node.toggleEditor = true
-		this.props.node.locked = true
+		this.props.node.lockNode()
 		this.forceUpdate()
 	}
 	closeEditor(){
 		this.props.node.toggleEditor = false		
-		this.props.node.locked = false
+		this.props.node.lockNode(false)
 		this.forceUpdate()
 	}
 
