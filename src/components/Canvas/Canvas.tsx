@@ -10,6 +10,7 @@ import {evalJLang} from "../Interpreter"
 import {clReq} from '../Requests'
 import * as T from '../Types'
 import {buildCommand, Execution} from './ExePlan'
+import { fromException } from "../Errors/FromException";
 
 type Props = {
       nodes: NodeInfo[]
@@ -158,7 +159,10 @@ export class Canvas extends React.Component<Props, State>{
                 this.setState(p => ({...p, compiled: res, loading: false, command: buildCommand(res.jlang)}))
             })
             .then(() => this.props.report({type: "positive", header: "Build Sucess", body: <p/>, timeout: 3000}))
-            .catch(e => this.props.report(e))    
+            .catch(e => {
+                this.setState(p => ({...p, loading: false}))
+                this.props.report(fromException(e))
+            }) 
         } catch (error) {
             this.setState(p => ({...p, command: null, compiled: {jlang: null, codalang: null}}))
             const einfo: UnfilledPort | CircleErr | EmptyGraph = error
@@ -205,7 +209,7 @@ export class Canvas extends React.Component<Props, State>{
     reportRunning(){
         const {infoid, commands, currentInfo: info} = this.runningInfo
         this.props.report(
-            {...info, body: <S.MessageList style={{maxHeight: "150px", overflowY: "auto"}}>{commands}</S.MessageList>
+            {...info, body: <S.MessageList className="infobody">{commands}</S.MessageList>
             , update: {id: infoid}})
     }
 

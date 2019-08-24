@@ -18,7 +18,7 @@ function jsonRequest<T, R>(url: string, ctype : ContentType = 'application/json'
                 ,  body: ((ctype == 'application/json')? JSON.stringify(info) : (info as any as string))
                 }).then((res) => {
                     if (!res.ok){
-                        return Promise.reject(res.json());
+                        return res.json().then(e => Promise.reject(e));
                     }
                     return res.json()
                 })

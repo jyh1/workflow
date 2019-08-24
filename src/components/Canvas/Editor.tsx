@@ -4,11 +4,9 @@ import AceEditor from "react-ace";
 import {Segment, Button, Icon, Popup, Header } from 'semantic-ui-react'
 import * as T from '../Types'
 import {parseReq, parseArgReq} from "../Requests"
-import * as Anser from 'anser';
-
+import {fromException} from "../Errors/FromException"
 import "brace/mode/haskell";
 import "brace/theme/github";
-import { instanceOf } from "prop-types";
 
 type Props = {
       name: string
@@ -47,20 +45,17 @@ export class CodaEditor extends React.Component<Props, State>{
         let {value} = this.state
         this.parseValue(value)
         .then(task => this.setState(p => ({...p, codaval: {...task, taskcode: value}, line: undefined})))
-        .catch(e => e.then((e: T.Exception) => {
-            let header: string
+        .catch(e => {
             switch (e.type){
                 case "parser":
                     this.setState(p => ({...p, line: e.line, col: e.column}))
-                    header = "Parse Error"
                     break
-                case "type":
+                default:
                     this.setState(p => ({...p, line: undefined, col: undefined}))
-                    header = "Type Error"
                     break
             }
-            this.props.error({type: "error", header: header ,body: <EditorInfo info={e.info}/>})
-            })
+            this.props.error(fromException(e))
+            }
         )
     }
 
@@ -102,14 +97,4 @@ export class CodaEditor extends React.Component<Props, State>{
             </Segment>
         )
     }
-}
-
-const EditorInfo: React.SFC<{info: string}> = (props) => {
-    const infoHtml = Anser.ansiToHtml(props.info)
-    return(
-        <React.Fragment>
-            <div id="editorinfo" dangerouslySetInnerHTML={{__html: infoHtml.replace(/\n/g, "<br>")}}/>
-        </React.Fragment>
-
-    )
 }
