@@ -28,6 +28,8 @@ type UnfilledPort = T.JObject<"unfilled", {portname: string, nodename: string}>
 type CircleErr = T.JObject<"circle", {nodeids: string[]}>
 type EmptyGraph = T.JObject<"empty", {}>
 
+type Tab = "Canvas" | "Editor"
+
 export class Canvas extends React.Component<Props, State>{
     engine: SRD.DiagramEngine;
     model: SRD.DiagramModel
@@ -290,7 +292,14 @@ export class Canvas extends React.Component<Props, State>{
 
         return(
             <div style={{height: "100%"}}>
-                <S.Menu style={{marginBottom: "0px", paddingBottom: "4px", borderRadius: "0px", paddingTop: "5px"}}>
+                <S.Menu color="blue" pointing secondary style={{paddingTop: "12px"}}>
+                    <S.Menu.Item name='canvas' active onClick={console.log}>
+                        Canvas
+                    </S.Menu.Item>
+                    <S.Menu.Item name='editor' onClick={console.log}>
+                        Editor
+                    </S.Menu.Item>
+
                     <S.Menu.Menu position='right'>
                     
                         <S.ButtonGroup style={{marginRight: "10px"}}>

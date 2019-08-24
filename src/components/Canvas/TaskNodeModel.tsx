@@ -15,7 +15,7 @@ import * as React from "react";
 import * as _ from "lodash";
 import {NodeInfo, TaskBody, Task} from "../Types"
 import * as T from "../Types"
-import {Button, Input, Divider, Dimmer, Loader} from 'semantic-ui-react'
+import {Button, Input, Divider, Dimmer, Loader, Popup} from 'semantic-ui-react'
 // import {taskReq} from "../MockRequests"
 import {taskReq, parseReq} from "../Requests"
 import {CodaEditor} from './Editor'
@@ -78,15 +78,15 @@ export class TaskNodeModel extends DefaultNodeModel {
 			this.refresh()
 		})
 	}
-	updateTask(task: Task, name: string){
-		const node: NodeInfo = {name, pos: {x: this.x, y: this.y}, taskinfo: {type: "task", content: task}, nodeType: this.nodeType}
+	updateTask(task: Task){
+		const node: NodeInfo = {name: this.name, pos: {x: this.x, y: this.y}, taskinfo: {type: "task", content: task}, nodeType: this.nodeType}
 		this.newNode(node)	
 		this.removeAndRefresh()
 	}
 	copyTask(){
 		const node: NodeInfo = {
 			  name: this.name
-			, pos: {x: this.x + 100, y: this.y + 100}
+			, pos: {x: this.x - 100, y: this.y - 100}
 			, taskinfo: {type: "task", content: this.extras.task}
 			, nodeType: this.nodeType
 		}
@@ -118,10 +118,13 @@ export interface TaskNodeProps extends BaseWidgetProps {
 	diagramEngine: DiagramEngine;
 }
 
-type TaskNodeState = {}
+type TaskNodeState = {
+	  editName: boolean
+}
 export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 	constructor(props: TaskNodeProps) {
 		super("srd-default-node", props);
+		this.state = {editName: false}
 	}
 
 	generatePort(port: TaskPortModel) {
@@ -129,20 +132,43 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 	}
 
 	toggleEditor(){
+		if (this.props.node.toggleEditor){
+			return this.closeEditor()
+		}
+		return this.openEditor()
+	}
+
+	openEditor(){
 		this.props.node.toggleEditor = true
-		this.props.node.lockModel()
+		this.props.node.locked = true
 		this.forceUpdate()
 	}
 	closeEditor(){
 		this.props.node.toggleEditor = false		
-		this.props.node.unlockModel()
+		this.props.node.locked = false
+		this.forceUpdate()
 	}
+
+	startEditingName = () => {
+        this.setState(p => Object.assign(p, {editName: true}))
+    }
+    stopEditingName = () => {
+        this.setState(p => Object.assign(p, {editName: false}))
+	}
+	editName = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const name = e.target.value
+        this.props.node.name = name
+    }
 
 	render() {
 		const inports = this.props.node.getInPorts()
 		const outports = this.props.node.getOutPorts()
 		const node = this.props.node
 		const isargument = node.nodeType == "argument"
+		const nodename = node.name
+		const header = (this.state.editName? 
+			<input onChange={this.editName} onBlur={this.stopEditingName} defaultValue={nodename}/> 
+			: <div title="Double click to edit name" className="editorToolname" onDoubleClick={this.startEditingName}>{nodename}</div>)
 		return (
 			<React.Fragment>
 				{/* task node */}
@@ -153,40 +179,40 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 					</Dimmer>
 					<div className={"toolFormTitle" + (isargument? "_argument" : "")}>
 						<Button.Group size="medium" floated="right">
-							<Button icon='copy outline' style={{padding: "3px"}}  onClick={() => node.copyTask()}/>
 							<Button icon='edit outline'  style={{padding: "3px"}} onClick={this.toggleEditor.bind(this)}/>
+							<Button icon='copy outline' style={{padding: "3px"}}  onClick={() => node.copyTask()}/>
 							<Button icon='times' style={{padding: "3px"}}  onClick={()=>node.removeAndRefresh()}/>
 						</Button.Group>
 						<i className={isargument? "ellipsis vertical icon" : "code icon"}/>
-						<span>{node.name}</span>
+						{header}
 					</div>
+									{/* modal */}
+					{node.toggleEditor && node.extras.task? 
+						<CodaEditor 
+							name={node.name}
+							close={this.closeEditor.bind(this)}
+							save={(task) => node.updateTask(task)}
+							body={node.extras.task}
+							nodeType={node.extras.nodeType}
+							error={node.error}
+						/> : <React.Fragment/>}
 					{/* inputs */}
-					<div>
-						<div className={"toolFormBody"}>
-							{_.map(inports, this.generatePort.bind(this))}
+					<div style={{display: node.toggleEditor? "none" : "inline"}}>
+						<div>
+							<div className={"toolFormBody"}>
+								{_.map(inports, this.generatePort.bind(this))}
+							</div>
 						</div>
-					</div>
-					{/* divider */}
-					{inports.length > 0 ? <Divider /> : <React.Fragment/>}
-					{/* outputs */}
-					<div>
-						<div className={"toolFormBody"}>
-							{_.map(outports, this.generatePort.bind(this))}
+						{/* divider */}
+						{inports.length > 0 ? <Divider /> : <React.Fragment/>}
+						{/* outputs */}
+						<div>
+							<div className={"toolFormBody"}>
+								{_.map(outports, this.generatePort.bind(this))}
+							</div>
 						</div>
 					</div>
 				</div>
-				{/* modal */}
-				{node.toggleEditor && node.extras.task? 
-					  <CodaEditor 
-						  name={node.name}
-						  close={this.closeEditor.bind(this)}
-						  save={(task, name) => node.updateTask(task, name)}
-						  body={node.extras.task}
-						  nodeType={node.extras.nodeType}
-						  error={node.error}
-					  /> 
-					: <React.Fragment/>
-				}
 			</React.Fragment>
 		);
 	}

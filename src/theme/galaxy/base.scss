@@ -22,7 +22,7 @@ div.toolForm {
     z-index: 100;
     font-weight: 700;
     font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif;
-    min-width: 13em;
+    min-width: 16em;
     position: absolute;
     border-width: medium;
     border-color: $brand-primary;
@@ -257,11 +257,12 @@ div.form-row-input label {
 #editormodal {
     left: 50%; 
     top: 50%;
-    width: 900px;
+    width: 750px;
     height: 625px;
-    margin-left: -455px;
+    margin-left: -375px;
     margin-top: -310px;
     position: fixed;
+    z-index: 1002;
   }
 
 #editorinfo {
@@ -345,4 +346,24 @@ span {
     bottom: 5%;
     right: 5%;
     width: 30%;
+}
+
+
+[title]:before {            
+    position : absolute;
+    content : attr(title);
+    opacity : 0;
+    color: #333;
+}
+
+[title]:hover:before {        
+    opacity : 1;
+    background-color: white;
+    margin-top: -30px;
+    margin-left: -15px;
+    padding: 5px;
+}
+
+[title]:before {
+    pointer-events: none;
 }
