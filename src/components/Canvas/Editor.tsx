@@ -83,6 +83,7 @@ export class CodaEditor extends React.Component<Props, State>{
                     showGutter={true}
                     focus={true}
                     width="500px"
+                    height="400px"
                     highlightActiveLine={true}
                     value={value}
                     markers={markers}

@@ -9,6 +9,7 @@ import {compileReq} from "../Requests"
 import {evalJLang} from "../Interpreter"
 import {clReq} from '../Requests'
 import * as T from '../Types'
+import {buildCommand, Execution} from './ExePlan'
 
 type Props = {
       nodes: NodeInfo[]
@@ -22,13 +23,15 @@ type State = {
     loading: boolean
     running: boolean
     locked: boolean
+    command?: string
+    tab: Tab
 }
 
 type UnfilledPort = T.JObject<"unfilled", {portname: string, nodename: string}>
 type CircleErr = T.JObject<"circle", {nodeids: string[]}>
 type EmptyGraph = T.JObject<"empty", {}>
 
-type Tab = "Canvas" | "Editor"
+type Tab = "Canvas" | "Execution Plan"
 
 export class Canvas extends React.Component<Props, State>{
     engine: SRD.DiagramEngine;
@@ -38,7 +41,7 @@ export class Canvas extends React.Component<Props, State>{
     // refresh: () => void;
     constructor(props: Props){
         super(props);
-        this.state = {loading: false, running: false, locked: false, compiled: {codalang: null, jlang: null}};
+        this.state = {loading: false, running: false, locked: false, compiled: {codalang: null, jlang: null}, tab: "Canvas"};
         this.engine = new SRD.DiagramEngine();
         this.engine.installDefaultFactories();
         this.engine.registerNodeFactory(new TaskNodeFactory());
@@ -53,7 +56,6 @@ export class Canvas extends React.Component<Props, State>{
 
     refresh = () => {
         this.forceUpdate()
-        this.setState((prev) => Object.assign(prev, {compiled: {codalang: null, jlang: null}}))
     }
 
     serializeTaskGraph(): T.CodaGraph{
@@ -150,14 +152,15 @@ export class Canvas extends React.Component<Props, State>{
                 const e: EmptyGraph = {type: "empty", content: {}}
                 throw e
             }
-            this.setState(p => ({...p, loading: true, compiled: {codalang: null, jlang: null}, locked: true}))
+            this.setState(p => ({...p, loading: true, command: null, compiled: {jlang: null, codalang: null}}))
             compileReq(nodes)
             .then((res) => {
-                this.setState(p => ({...p, compiled: res, loading: false}))
+                this.setState(p => ({...p, compiled: res, loading: false, command: buildCommand(res.jlang)}))
             })
             .then(() => this.props.report({type: "positive", header: "Build Sucess", body: <p/>, timeout: 3000}))
             .catch(e => this.props.report(e))    
         } catch (error) {
+            this.setState(p => ({...p, command: null, compiled: {jlang: null, codalang: null}}))
             const einfo: UnfilledPort | CircleErr | EmptyGraph = error
             let info: T.Info
             switch (einfo.type){
@@ -262,6 +265,10 @@ export class Canvas extends React.Component<Props, State>{
         this.refresh()
     }
 
+    setTab(tab: Tab){
+        this.setState(p => ({...p, tab}))
+    }
+
     render(){
         const model = this.engine.getDiagramModel()
         const nodes = model.nodes as {[s: string]: TaskNodeModel}
@@ -286,18 +293,18 @@ export class Canvas extends React.Component<Props, State>{
             </S.Dropdown>
         )
 
-        const {running, compiled, locked} = this.state
+        const {running, compiled, locked, tab, command} = this.state
         model.setLocked(locked)
         const {jlang, codalang} = compiled
 
         return(
             <div style={{height: "100%"}}>
                 <S.Menu color="blue" pointing secondary style={{paddingTop: "12px"}}>
-                    <S.Menu.Item name='canvas' active onClick={console.log}>
+                    <S.Menu.Item active={tab == "Canvas"} onClick={() => this.setTab("Canvas")}>
                         Canvas
                     </S.Menu.Item>
-                    <S.Menu.Item name='editor' onClick={console.log}>
-                        Editor
+                    <S.Menu.Item style={{display: command? "block" : "none"}} active={tab == "Execution Plan"} onClick={() => this.setTab("Execution Plan")}>
+                        Execution Plan
                     </S.Menu.Item>
 
                     <S.Menu.Menu position='right'>
@@ -353,9 +360,16 @@ export class Canvas extends React.Component<Props, State>{
                     </S.Menu.Menu>
 
                 </S.Menu>
+
                 <S.Segment attached='bottom' className="canvas-segment">
+                    <div 
+                        style={{height: "100%", display: tab == "Execution Plan"? "block" : "none"}}
+                    >
+                        <Execution codalang="codalang" command={command} />
+                    </div>
+
                     <div
-                        style={{height: "100%"}}
+                        style={{height: "100%", display: tab == "Canvas"? "block" : "none"}}
                         onDragOver={(e) => e.preventDefault()}
                         onDrop={this.processDrop}
                     >
