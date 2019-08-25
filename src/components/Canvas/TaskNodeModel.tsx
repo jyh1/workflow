@@ -58,6 +58,7 @@ export class TaskNodeModel extends DefaultNodeModel {
 			taskreq = Promise.resolve(node.taskinfo.content)
 		}
 		if(node.taskinfo.type == "empty"){
+			this.lockNode()
 			this.toggleEditor = true
 			taskreq = Promise.resolve({taskbody: {}, inports: [], outports: [], taskcode: ""})
 		}
