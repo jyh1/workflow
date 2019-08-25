@@ -37,7 +37,7 @@ export type JBlock = {variable: string, options: ClOption[], command: JCmd}
 
 export type JLang = {result: JRes, blocks: JBlock[]}
 
-export type CompileResult = {codalang: CodaLang, jlang: JLang}
+export type CompileResult = {codalang: CodaLang, jlang: JLang, codalangstr: string}
 
 export type TaskInfo = JObject<"taskid", TaskId> | JObject<"codaval", string> | JObject<"task", Task> | JObject<"empty", {}>
 

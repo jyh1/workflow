@@ -20,13 +20,14 @@ type Props = {
 };
 
 type State = {
-    compiled: T.CompileResult
+    compiled: T.CompileResult & {command: string}
     loading: boolean
     running: boolean
     locked: boolean
-    command?: string
     tab: Tab
 }
+
+const nullRes: State["compiled"] = {command: null, codalang: null, jlang: null, codalangstr: null}
 
 type UnfilledPort = T.JObject<"unfilled", {portname: string, nodename: string}>
 type CircleErr = T.JObject<"circle", {nodeids: string[]}>
@@ -42,7 +43,7 @@ export class Canvas extends React.Component<Props, State>{
     // refresh: () => void;
     constructor(props: Props){
         super(props);
-        this.state = {loading: false, running: false, locked: false, compiled: {codalang: null, jlang: null}, tab: "Canvas"};
+        this.state = {loading: false, running: false, locked: false, compiled: nullRes, tab: "Canvas"};
         this.engine = new SRD.DiagramEngine();
         this.engine.installDefaultFactories();
         this.engine.registerNodeFactory(new TaskNodeFactory());
@@ -153,10 +154,13 @@ export class Canvas extends React.Component<Props, State>{
                 const e: EmptyGraph = {type: "empty", content: {}}
                 throw e
             }
-            this.setState(p => ({...p, loading: true, command: null, compiled: {jlang: null, codalang: null}}))
+            this.setState(p => ({...p, loading: true, compiled: nullRes}))
             compileReq(nodes)
             .then((res) => {
-                this.setState(p => ({...p, compiled: res, loading: false, command: buildCommand(res.jlang)}))
+                buildCommand(res.jlang)
+                .then( command => 
+                    {this.setState(p => ({...p, compiled: {...res, command}, loading: false}))}
+                )
             })
             .then(() => this.props.report({type: "positive", header: "Build Sucess", body: <p/>, timeout: 3000}))
             .catch(e => {
@@ -164,7 +168,7 @@ export class Canvas extends React.Component<Props, State>{
                 this.props.report(fromException(e))
             }) 
         } catch (error) {
-            this.setState(p => ({...p, command: null, compiled: {jlang: null, codalang: null}}))
+            this.setState(p => ({...p, compiled: nullRes}))
             const einfo: UnfilledPort | CircleErr | EmptyGraph = error
             let info: T.Info
             switch (einfo.type){
@@ -297,9 +301,9 @@ export class Canvas extends React.Component<Props, State>{
             </S.Dropdown>
         )
 
-        const {running, compiled, locked, tab, command} = this.state
+        const {running, compiled, locked, tab} = this.state
         model.setLocked(locked)
-        const {jlang, codalang} = compiled
+        const {jlang, codalang, codalangstr, command} = compiled
 
         return(
             <div style={{height: "100%"}}>
@@ -307,7 +311,7 @@ export class Canvas extends React.Component<Props, State>{
                     <S.Menu.Item active={tab == "Canvas"} onClick={() => this.setTab("Canvas")}>
                         Canvas
                     </S.Menu.Item>
-                    <S.Menu.Item style={{display: command? "block" : "none"}} active={tab == "Execution Plan"} onClick={() => this.setTab("Execution Plan")}>
+                    <S.Menu.Item style={{display: codalang? "block" : "none"}} active={tab == "Execution Plan"} onClick={() => this.setTab("Execution Plan")}>
                         Execution Plan
                     </S.Menu.Item>
 
@@ -366,11 +370,13 @@ export class Canvas extends React.Component<Props, State>{
                 </S.Menu>
 
                 <S.Segment attached='bottom' className="canvas-segment">
-                    <div 
-                        style={{height: "100%", display: tab == "Execution Plan"? "block" : "none"}}
-                    >
-                        <Execution codalang="codalang" command={command} />
-                    </div>
+                    {tab == "Execution Plan"? 
+                        (<div style={{height: "100%"}}>
+                            <Execution codalang={codalangstr} command={command} />
+                        </div>
+                        ):
+                        <React.Fragment/>
+                    }
 
                     <div
                         style={{height: "100%", display: tab == "Canvas"? "block" : "none"}}

@@ -2,7 +2,6 @@ import * as T from './Types'
 import * as _ from 'lodash'
 import {quote} from './algorithms'
 import {clReq, clWait} from './Requests'
-import { string } from 'prop-types';
 import * as localforage from 'localforage'
 
 
@@ -60,7 +59,7 @@ function uniqDeps(deps: [string, string][]): DepResult {
             newdeps.push(buildDep(name, bundle))
         }
     }
-    return {alias, deps: quote(newdeps)}
+    return {alias, deps: newdeps.join(' ')}
 }
 
 function resolveDeps(env: Env, deps: T.Deps): Promise<[string, string][]>{
@@ -150,11 +149,15 @@ function resolveJBlock(env: Env, blk: T.JBlock): void{
 }
 
 function resolveJRes(env: Env, res: T.JRes):Promise<string>{
-    if (res.type == "record"){
-        return Promise.resolve('record result')
-    } else {
-        return (resolveJNormalRes(env, res))
-    }
+    return Promise.all(env.env.values()).then(
+        e => {
+            if (res.type == "record"){
+                return Promise.resolve('record result')
+            } else {
+                return (resolveJNormalRes(env, res))
+            }        
+        }
+    )
 }
 
 export function evalJLang(code: T.JLang, req: T.ClRequest = clReq): Promise<string>{

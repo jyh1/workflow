@@ -108,7 +108,7 @@ function toListEle(e: TaskElement, parent?: string): TaskListElement[] {
 export const compileReq: CompileRequest = (ts) => new Promise((executor, resolve) => {
         setTimeout(
             () => {
-                executor({codalang: tc("lit", "0x0cf40bf4b76246bc9d0545e13524a174"), jlang: {result: testRes, blocks: testBlocks}})
+                executor({codalang: tc("lit", "0x0cf40bf4b76246bc9d0545e13524a174"), codalangstr: "0x0cf24434ffs", jlang: {result: testRes, blocks: testBlocks}})
             }
         , reqtime())
     }
