@@ -17,34 +17,45 @@ type State = {}
 export class Execution extends React.Component<Props, State>{
     render(){
         const {codalang, command} = this.props
+        const leftwidth = command ? 8 : 16
+        const codalangpanel = (
+            <S.Grid.Column width={leftwidth}>
+                <S.Header>Out.cl</S.Header>
+                <AceEditor
+                mode="haskell"
+                theme="github"
+                value={codalang}
+                readOnly
+                name="codalangres"
+                width="100%"
+                height="100%"
+                editorProps={{ $blockScrolling: true }}
+                />
+            </S.Grid.Column>
+        )
+        const cmdpanel = (command ?
+            (
+            <S.Grid.Column width={8}>
+                    <S.Header>Out.sh</S.Header>
+                    <AceEditor
+                        mode="sh"
+                        wrapEnabled
+                        theme="github"
+                        width="100%"
+                        height="100%"
+                        value={command}
+                        readOnly
+                        name="commandres"
+                        editorProps={{ $blockScrolling: true }}
+                    />
+                </S.Grid.Column>)
+            :
+            <React.Fragment/>)
         return (
-            <S.Grid style={{height: "100%", paddingBottom: "50px"}}>
+            <S.Grid id="executionplan">
                 <S.Grid.Row>
-                    <S.Grid.Column width={8}>
-                        <AceEditor
-                            mode="haskell"
-                            theme="github"
-                            value={codalang}
-                            readOnly
-                            name="codalangres"
-                            width="100%"
-                            height="100%"
-                            editorProps={{ $blockScrolling: true }}
-                        />
-                    </S.Grid.Column>
-                    <S.Grid.Column width={8}>
-                        <AceEditor
-                            mode="sh"
-                            wrapEnabled
-                            theme="github"
-                            width="100%"
-                            height="100%"
-                            value={command}
-                            readOnly
-                            name="commandres"
-                            editorProps={{ $blockScrolling: true }}
-                        />
-                    </S.Grid.Column>
+                    {codalangpanel}
+                    {cmdpanel}
                 </S.Grid.Row>
             </S.Grid>
         )
