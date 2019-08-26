@@ -70,8 +70,8 @@ export const taskListReq: TaskListRequest = () => (
 let defTask = (i:TaskId):Task => (
     {
         taskbody: i
-      , inports: ["dataset1", "dataset2"]
-      , outports: ["result"]
+      , inports: {dataset1: "bundle", dataset2: "bundle"}
+      , outports: {result: "bundle"}
       , taskcode: "test  code"
   }
 )
@@ -212,7 +212,7 @@ export const bundleInfoReq: T.BundleInfoRequest = (uuid: string) => (
 export const parseReq: T.ParseRquest = (program: string) => (
     new Promise((executor, resolve) => {
         setTimeout(
-            () => executor({"outports":["data"],"inports":[],"taskbody":{"tag":"Dict","contents":{"data":{"tag":"Lit","contents":{"tag":"UUID","contents":"234"}}}}})
+            () => executor({"outports":{data: "bundle"},"inports":{},"taskbody":{"tag":"Dict","contents":{"data":{"tag":"Lit","contents":{"tag":"UUID","contents":"234"}}}}})
         , reqtime())
     })
 ) 
@@ -220,7 +220,7 @@ export const parseReq: T.ParseRquest = (program: string) => (
 export const parseArgReq: T.ParseArgRequest = (str: string) => (
     new Promise((executor, resolve) => {
         setTimeout(
-            () => executor({"outports":["arg1","arg2"],"inports":[],"taskbody":{"arg1":{"tag":"TypeBundle"},"arg2":{"tag":"TypeBundle"}}})
+            () => executor({"outports":{arg1: "bundle",arg2: "bundle"},"inports":{},"taskbody":{"arg1":{"tag":"TypeBundle"},"arg2":{"tag":"TypeBundle"}}})
         , reqtime())
     })
 ) 

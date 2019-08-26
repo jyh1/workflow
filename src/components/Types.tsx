@@ -7,9 +7,13 @@ export interface Tool {
 
 export type CodaLang = Object;
 
-export type Arguments = string[]
+export type Arguments = {[arg: string]: CodaType}
 
-export interface CodaType {};
+export type CodaType = 
+      "bundle" 
+    | "string" 
+    | {type: "record", content: Arguments} 
+    | {type: "lambda", arg: Arguments, body: CodaType} 
 
 export interface JObject<T, C> {
     "type": T
@@ -159,6 +163,6 @@ export const endPointPath = {
 
 export function makeLitTask(uuid: string): Task{
     return ({
-        "outports":["data"],"inports":[],
+        "outports":{data: "bundle"},"inports":{},
         "taskbody":{"tag":"Dict","contents":{"data":{"tag":"Lit","contents":{"tag":"UUID","contents":uuid}}}}, "taskcode": ("0x"+uuid)})
 }

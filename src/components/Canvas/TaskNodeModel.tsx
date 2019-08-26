@@ -60,7 +60,7 @@ export class TaskNodeModel extends DefaultNodeModel {
 		if(node.taskinfo.type == "empty"){
 			this.lockNode()
 			this.toggleEditor = true
-			taskreq = Promise.resolve({taskbody: {}, inports: [], outports: [], taskcode: ""})
+			taskreq = Promise.resolve({taskbody: {}, inports: {}, outports: {}, taskcode: ""})
 		}
 
 		this.loadTask(taskreq)
@@ -72,8 +72,8 @@ export class TaskNodeModel extends DefaultNodeModel {
 
 	loadTask(taskreq: Promise<Task>){
 		taskreq.then((task) => {
-			this.inports = _.map(task.inports, (val) => this.addPort(new TaskPortModel(true, Toolkit.UID(), val)));
-			this.outports = _.map(task.outports, (val) => this.addPort(new TaskPortModel(false, Toolkit.UID(), val)));
+			this.inports = _.map(task.inports, (ty, pname) => this.addPort(new TaskPortModel(true, Toolkit.UID(), pname, ty)));
+			this.outports = _.map(task.outports, (ty, pname) => this.addPort(new TaskPortModel(false, Toolkit.UID(), pname, ty)));
 			this.loading = false;
 			this.extras = {task: task, nodeType: this.nodeType}
 			this.refresh()
@@ -327,6 +327,11 @@ export class TaskLinkModel extends DefaultLinkModel {
 }
 
 export class TaskPortModel extends DefaultPortModel {
+	codatype: T.CodaType
+	constructor(isin: boolean, id: string, name: string, codatype: T.CodaType){
+		super(isin, id, name)
+		this.codatype = codatype
+	}
 	createLinkModel(): TaskLinkModel | null {
 		return new TaskLinkModel();
 	}
