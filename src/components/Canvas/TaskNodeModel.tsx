@@ -342,6 +342,12 @@ export class TaskPortModel extends DefaultPortModel {
 		(this.getParent() as TaskNodeModel).refresh()
 		return true;
 	}
+	serialize(){
+		const portnode = super.serialize()
+		type TaskPort = typeof portnode & {codatype: T.CodaType}
+		const tport: TaskPort = {...portnode, codatype: this.codatype}
+		return tport
+	}
 }
 
 export class TaskLinkFactory extends DefaultLinkFactory {

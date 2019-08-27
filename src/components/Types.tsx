@@ -54,7 +54,7 @@ export interface NodeInfo {
 
 export type TaskId = string
 export type TaskBody = Object
-export type TypeDict = Object
+export type TypeDict = Arguments
 
 export type ParseResult = {
       taskbody: TaskBody | TypeDict

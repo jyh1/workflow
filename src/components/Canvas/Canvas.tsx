@@ -29,7 +29,7 @@ type State = {
 
 const nullRes: State["compiled"] = {command: null, codalang: null, jlang: null, codalangstr: null}
 
-type UnfilledPort = T.JObject<"unfilled", {portname: string, nodename: string}>
+type ConflictPort = T.JObject<"conflictport", {portname: string}>
 type CircleErr = T.JObject<"circle", {nodeids: string[]}>
 type EmptyGraph = T.JObject<"empty", {}>
 
@@ -70,10 +70,11 @@ export class Canvas extends React.Component<Props, State>{
             graphModel.addEdge(l.source, l.target)
         }
         let portIdToName: {[portid: string]: string} = {}
-        type ArgDic = {[arg: string]: string} //argumentname to linkid
-        let processedNodes: {[nodeid: string]: ToolNodeInterface<string>} = {}
+        type PortState = T.JObject<"linkid", string> | T.JObject<"var", string>
+        type ArgDic = {[arg: string]: PortState} //argumentname to linkid
+        let processedNodes: {[nodeid: string]: ToolNodeInterface<PortState>} = {}
         let uniqName: Map<string, number> = new Map()
-        let argNodeDict: T.TypeDict = null
+        let argNodeDict: T.TypeDict = {}
         for(let n of nodes){
             let {id, ports} = n
             let extras = n.extras as T.ToolModelExtra
@@ -85,7 +86,17 @@ export class Canvas extends React.Component<Props, State>{
             
             // argument node
             if (extras.nodeType == "argument"){
-                argNodeDict = extras.task.taskbody
+                // TODO: throw error if key conflict
+                const args = extras.task.taskbody as T.Arguments
+                for (const argname in args){
+                    if (argname in argNodeDict){
+                        const e: ConflictPort = {type: "conflictport", content: {portname: argname}}
+                        throw e
+                    } else {
+                        argNodeDict[argname] = args[argname]
+                    }
+                }
+                argNodeDict = {...argNodeDict, ...(extras.task.taskbody as T.Arguments)}
             }
 
             // uniq name
@@ -101,18 +112,20 @@ export class Canvas extends React.Component<Props, State>{
                 let portname = (p as any).label
                 portIdToName[p.id] = portname
                 if((p as any).in){
-                    if (p.links.length !== 1){ 
-                        const error: UnfilledPort = {
-                            type: "unfilled",
-                            content: {nodename: (n as any).name, portname: portname}
+                    if (p.links.length == 0){ 
+                        if (portname in argNodeDict){
+                            const e: ConflictPort = {type: "conflictport", content: {portname}}
+                            throw e
+                        }else {
+                            argNodeDict[portname] = (p as any).codatype
+                            argDic[portname] = {type: "var", content: portname}    
                         }
-                        throw (error)
-                    } 
-                    let link = p.links[0]
-                    argDic[portname] = link
+                    } else {
+                        let link = p.links[0]
+                        argDic[portname] = {type: "linkid", content: link}    
+                    }
                 }
             }
-
             processedNodes[id]= {id, taskbody, arguments: argDic, name, nodeType: extras.nodeType}
         }
 
@@ -129,15 +142,21 @@ export class Canvas extends React.Component<Props, State>{
         }
         // console.log(processedNodes)
         let tools = _.mapValues(processedNodes, (n) => {
-                let toToolPort: (linkid: string) => ToolPort = (linkid) => {
-                    const {nodeid} = linkDic[linkid]
-                    const sourcenode = processedNodes[nodeid]
-                    const nodeobj = {nodeid, nodename: sourcenode.name, label: portIdToName[linkDic[linkid].portid]}
-                    return {type: sourcenode.nodeType, content: nodeobj}
+                let toToolPort: (portstate: PortState) => ToolPort = (portstate) => {
+                    if (portstate.type=="linkid"){
+                        const linkid = portstate.content
+                        const {nodeid} = linkDic[linkid]
+                        const sourcenode = processedNodes[nodeid]
+                        const nodeobj = {nodeid, nodename: sourcenode.name, label: portIdToName[linkDic[linkid].portid]}
+                        return {type: sourcenode.nodeType, content: nodeobj}
+                    }
+                    if (portstate.type=="var"){
+                        return {type: "argument", content: {nodeid: "lambdaNodeId", nodename: "lambdaNodeName", label: portstate.content}}
+                    }
                 }
                 return ({...n, arguments: _.mapValues(n.arguments, toToolPort)})
             })
-        return ({args: argNodeDict, body: _.map(sortedOrder, k => tools[k])})
+        return ({args: Object.keys(argNodeDict).length == 0? null : argNodeDict, body: _.map(sortedOrder, k => tools[k])})
     }
 
     lockModel = () => {
@@ -154,7 +173,7 @@ export class Canvas extends React.Component<Props, State>{
                 const e: EmptyGraph = {type: "empty", content: {}}
                 throw e
             }
-            this.setState(p => ({...p, loading: true, compiled: nullRes}))
+            this.setState(p => ({...p, loading: true, compiled: nullRes, tab: "Canvas"}))
             compileReq(nodes)
             .then((res) => {
                 buildCommand(res.jlang)
@@ -169,14 +188,14 @@ export class Canvas extends React.Component<Props, State>{
             }) 
         } catch (error) {
             this.setState(p => ({...p, compiled: nullRes}))
-            const einfo: UnfilledPort | CircleErr | EmptyGraph = error
+            const einfo: ConflictPort | CircleErr | EmptyGraph = error
             let info: T.Info
             switch (einfo.type){
-                case "unfilled":
+                case "conflictport":
                     info = {
                           type: "error"
-                        , header: "Unfilled Input Port"
-                        , body: <p>Port <b>{einfo.content.portname}</b> is empty in node <b>{einfo.content.nodename}</b></p>
+                        , header: "Conflict Port Name"
+                        , body: <p>Multiple unfilled input ports with name <b>{einfo.content.portname}</b>. Try renaming one using an argument node.</p>
                     }
                     break
                 case "circle":
@@ -194,6 +213,7 @@ export class Canvas extends React.Component<Props, State>{
                     }
                     break
                 default:
+                    console.log(einfo)
                     info = {type: "error",  header: "Error", body: <p>{JSON.stringify(einfo)}</p>}
             }
             this.props.report(info)
@@ -279,14 +299,6 @@ export class Canvas extends React.Component<Props, State>{
 
     render(){
         const model = this.engine.getDiagramModel()
-        const nodes = model.nodes as {[s: string]: TaskNodeModel}
-        let hasarg: boolean = false
-        for(const n in nodes){
-            if (nodes[n].nodeType == "argument"){
-                hasarg = true
-                break
-            }
-        }
 
         const dropDown = (
             <S.Dropdown item icon='plus' simple>
@@ -294,7 +306,7 @@ export class Canvas extends React.Component<Props, State>{
                     <S.Dropdown.Item style={{cursor: "grab"}} draggable onDragStart={this.dragStart}>
                         <S.Icon name="code"/>Empty Tool
                     </S.Dropdown.Item>
-                    <S.Dropdown.Item style={{cursor: "grab"}} disabled={hasarg} draggable onDragStart={this.dragArgumentStart}>
+                    <S.Dropdown.Item style={{cursor: "grab"}} draggable onDragStart={this.dragArgumentStart}>
                         <S.Icon name="ellipsis vertical"/>Argument Node
                     </S.Dropdown.Item>
                 </S.Dropdown.Menu>
