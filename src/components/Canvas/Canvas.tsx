@@ -1,7 +1,7 @@
 import {NodeInfo, taskTag, TaskDragType, ToolPort, Info, ToolNodeInterface, JLang} from "../Types"
 import * as React from "react"
 import * as SRD from "storm-react-diagrams"
-import {TaskNodeModel, TaskNodeFactory, TaskLinkFactory} from "./TaskNodeModel"
+import {TaskNodeModel, TaskNodeFactory, TaskLinkFactory, OldLinks, TaskLinkModel} from "./TaskNodeModel"
 import {Graph, debounce} from '../algorithms'
 import * as _ from "lodash"
 import * as S from 'semantic-ui-react'
@@ -288,8 +288,10 @@ export class Canvas extends React.Component<Props, State>{
         // console.log(node)
     }
 
-    newNode = (node: NodeInfo) => {
-        this.engine.getDiagramModel().addNode(new TaskNodeModel(node, this.refresh, this.lockModel, this.unlockModel, this.newNode, this.props.report))
+    newNode = (node: NodeInfo, oldLinks?: OldLinks) => {
+        const model = this.engine.getDiagramModel()
+        const newnode = new TaskNodeModel(node, this.refresh, this.newNode, this.props.report, model, oldLinks)
+        model.addNode(newnode)
         this.refresh()
     }
 

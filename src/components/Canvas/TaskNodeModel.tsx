@@ -9,7 +9,10 @@ import {
     , NodeModel
     , DefaultLinkFactory
     , DefaultLinkModel
-	, DefaultLinkWidget
+	, DefaultLinkWidget,
+	LinkModel,
+	PortModel,
+	DiagramModel
     } from "storm-react-diagrams";
 import * as React from "react";
 import * as _ from "lodash";
@@ -20,30 +23,35 @@ import {Button, Input, Divider, Dimmer, Loader, Popup} from 'semantic-ui-react'
 import {taskReq, parseReq} from "../Requests"
 import {CodaEditor} from './Editor'
 
+type AddLink = (old: TaskPortModel) => TaskLinkModel
+export type OldLinks = {[port: string]: AddLink[]}
+
 export class TaskNodeModel extends DefaultNodeModel {
     extras : T.ToolModelExtra
-    inports : TaskPortModel[]
-	outports: TaskPortModel[]
 	loading: boolean
 	toggleEditor: boolean
 	refresh: () => void
 	error: (e: T.Info) => void
-	lockModel: () => void
-	unlockModel: () => void
-	newNode: (node: NodeInfo) => void
+	newNode: (node: NodeInfo, oldlinks?: OldLinks) => void
 	nodeType: T.NodeType
-    constructor(node: NodeInfo, refresh: () => void, lock: () => void, unlock: () => void, newNode: (node: NodeInfo) => void, error: (e: T.Info) => void){
-        super(node.name);
+	oldlinks: OldLinks
+    constructor(
+		  node: NodeInfo
+		, refresh: () => void
+		, newNode: (node: NodeInfo) => void
+		, error: (e: T.Info) => void
+		, parent: DiagramModel
+		, oldlinks: OldLinks
+	){
+		super(node.name);
 		[this.x, this.y] = [node.pos.x, node.pos.y];
-		this.inports = []
-		this.outports = []
 		this.loading = true
 		let taskreq: Promise<Task>
+		this.oldlinks = oldlinks? oldlinks : {}
+		this.setParent(parent)
 
 		this.refresh = refresh;
 		this.error = error;
-		this.lockModel = lock;
-		this.unlockModel = unlock;
 		this.newNode = newNode;
 		this.toggleEditor = false
 		this.nodeType = node.nodeType ? node.nodeType : "tool"
@@ -72,16 +80,50 @@ export class TaskNodeModel extends DefaultNodeModel {
 
 	loadTask(taskreq: Promise<Task>){
 		taskreq.then((task) => {
-			this.inports = _.map(task.inports, (ty, pname) => this.addPort(new TaskPortModel(true, Toolkit.UID(), pname, ty)));
-			this.outports = _.map(task.outports, (ty, pname) => this.addPort(new TaskPortModel(false, Toolkit.UID(), pname, ty)));
+			_.map(task.inports, (ty, pname) => this.addPort(new TaskPortModel(true, Toolkit.UID(), pname, ty)));
+			_.map(task.outports, (ty, pname) => this.addPort(new TaskPortModel(false, Toolkit.UID(), pname, ty)));
 			this.loading = false;
 			this.extras = {task: task, nodeType: this.nodeType}
 			this.refresh()
+			// setTimeout(() => {this.addOldLinks();this.refresh()}, 1000)
+			this.addOldLinks();this.refresh()
 		})
 	}
+
+	addOldLinks(){
+		console.log(this.oldlinks)
+		const model = this.getParent()
+		_.map(this.getPorts(), 
+			(port: TaskPortModel) => {
+				const key = [port.in, port.label, port.codatype].toString()
+				if (key in this.oldlinks){
+					_.forEach(this.oldlinks[key], f => model.addLink(f(port)))
+				}
+			}
+		)
+	}
+
+	collectLinks(isin: boolean){
+		const ports: TaskPortModel[] = 
+			_.filter(this.getPorts(), (p: TaskPortModel) => (p.in == isin)) as TaskPortModel[]
+		_.forEach(ports, 
+			port => {
+				const targets = _.map(port.getLinks(), 
+										(l) => {
+											const ts = (isin? p => (l.sourcePort as TaskPortModel).link(p) : p => p.link(l.targetPort)) as AddLink
+											return ts
+										})
+				this.oldlinks[[port.in, port.label, port.codatype].toString()] = targets
+			}
+		)
+	}
+
 	updateTask(task: Task){
 		const node: NodeInfo = {name: this.name, pos: {x: this.x, y: this.y}, taskinfo: {type: "task", content: task}, nodeType: this.nodeType}
-		this.newNode(node)	
+		this.oldlinks = {}
+		this.collectLinks(true)
+		this.collectLinks(false)
+		this.newNode(node, this.oldlinks)
 		this.removeAndRefresh()
 	}
 	copyTask(){
@@ -153,7 +195,7 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 		this.props.node.lockNode()
 		this.forceUpdate()
 	}
-	closeEditor(){
+	closeEditor = () => {
 		this.props.node.toggleEditor = false		
 		this.props.node.lockNode(false)
 		this.forceUpdate()
@@ -200,8 +242,8 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 					{node.toggleEditor && node.extras.task? 
 						<CodaEditor 
 							name={node.name}
-							close={this.closeEditor.bind(this)}
-							save={(task) => node.updateTask(task)}
+							close={this.closeEditor}
+							save={(task) => {node.updateTask(task)}}
 							body={node.extras.task}
 							nodeType={node.extras.nodeType}
 							error={node.error}
