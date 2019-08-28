@@ -90,6 +90,10 @@ div.form-row {
     .outport-label{
         width: 100%;
         text-align: right;
+        i{
+            cursor: pointer;
+            padding-left: 10px;
+        }
     }
 }
 

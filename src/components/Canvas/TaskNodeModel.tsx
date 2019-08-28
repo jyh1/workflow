@@ -18,7 +18,7 @@ import * as React from "react";
 import * as _ from "lodash";
 import {NodeInfo, TaskBody, Task} from "../Types"
 import * as T from "../Types"
-import {Button, Input, Divider, Dimmer, Loader, Popup} from 'semantic-ui-react'
+import {Button, Input, Divider, Dimmer, Loader, Popup, Icon} from 'semantic-ui-react'
 // import {taskReq} from "../MockRequests"
 import {taskReq, parseReq} from "../Requests"
 import {CodaEditor} from './Editor'
@@ -91,7 +91,6 @@ export class TaskNodeModel extends DefaultNodeModel {
 	}
 
 	addOldLinks(){
-		console.log(this.oldlinks)
 		const model = this.getParent()
 		_.map(this.getPorts(), 
 			(port: TaskPortModel) => {
@@ -291,11 +290,23 @@ export class TaskPortWidget extends BaseWidget<TaskPortWidgetProps, {}> {
 				name={this.props.model.name} 
 				port={this.props.model}
 			/>;
-        let label = this.props.model.label;
+		const model = this.props.model
+        const label = model.label;
 		return (
 			<div {...this.getProps()}>
 				{terminal}
-				<div className={this.props.model.in? "" : "outport-label"}>{label}</div>
+				<div className={this.props.model.in? "" : "outport-label"}>
+					{label}
+					{this.props.model.in? 
+						<React.Fragment/> : 
+						<Icon 
+							onClick={() => {model.selected = !model.selected; this.forceUpdate()} } 
+							color={model.selected ? "blue": null} 
+							name="asterisk"
+							size="small"
+						/>
+					}
+				</div>
 			</div>
 		);
 	}
@@ -370,9 +381,11 @@ export class TaskLinkModel extends DefaultLinkModel {
 
 export class TaskPortModel extends DefaultPortModel {
 	codatype: T.CodaType
+	selected: boolean
 	constructor(isin: boolean, id: string, name: string, codatype: T.CodaType){
 		super(isin, id, name)
 		this.codatype = codatype
+		this.selected = false
 	}
 	createLinkModel(): TaskLinkModel | null {
 		return new TaskLinkModel();
@@ -386,8 +399,8 @@ export class TaskPortModel extends DefaultPortModel {
 	}
 	serialize(){
 		const portnode = super.serialize()
-		type TaskPort = typeof portnode & {codatype: T.CodaType}
-		const tport: TaskPort = {...portnode, codatype: this.codatype}
+		type TaskPort = typeof portnode & {codatype: T.CodaType, selected: boolean}
+		const tport: TaskPort = {...portnode, codatype: this.codatype, selected: this.selected}
 		return tport
 	}
 }
