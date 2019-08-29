@@ -1,7 +1,7 @@
 import {NodeInfo, taskTag, TaskDragType, ToolPort, Info, ToolNodeInterface, JLang} from "../Types"
 import * as React from "react"
 import * as SRD from "storm-react-diagrams"
-import {TaskNodeModel, TaskNodeFactory, TaskLinkFactory, OldLinks, TaskLinkModel} from "./TaskNodeModel"
+import {TaskNodeModel, TaskNodeFactory, TaskLinkFactory, OldLinks, TaskLinkModel, TaskPortModel} from "./TaskNodeModel"
 import {Graph, debounce} from '../algorithms'
 import * as _ from "lodash"
 import * as S from 'semantic-ui-react'
@@ -11,6 +11,7 @@ import {clReq} from '../Requests'
 import * as T from '../Types'
 import {buildCommand, Execution} from './ExePlan'
 import { fromException } from "../Errors/FromException";
+import { DefaultPortModel } from "storm-react-diagrams";
 
 type Props = {
       nodes: NodeInfo[]
@@ -27,7 +28,7 @@ type State = {
     tab: Tab
 }
 
-const nullRes: State["compiled"] = {command: null, codalang: null, jlang: null, codalangstr: null}
+const nullRes: State["compiled"] = {command: null, codalang: null, jlang: null, codalangstr: null, interface: null}
 
 type ConflictPort = T.JObject<"conflictport", {portname: string}>
 type CircleErr = T.JObject<"circle", {nodeids: string[]}>
@@ -75,6 +76,7 @@ export class Canvas extends React.Component<Props, State>{
         let processedNodes: {[nodeid: string]: ToolNodeInterface<PortState>} = {}
         let uniqName: Map<string, number> = new Map()
         let argNodeDict: T.TypeDict = {}
+        let resRecord: ToolPort[] = []
         for(let n of nodes){
             let {id, ports} = n
             let extras = n.extras as T.ToolModelExtra
@@ -86,7 +88,6 @@ export class Canvas extends React.Component<Props, State>{
             
             // argument node
             if (extras.nodeType == "argument"){
-                // TODO: throw error if key conflict
                 const args = extras.task.taskbody as T.Arguments
                 for (const argname in args){
                     if (argname in argNodeDict){
@@ -108,10 +109,11 @@ export class Canvas extends React.Component<Props, State>{
                 uniqName.set(name, 0)
             }
             let argDic: ArgDic = {} // portname to linkid
-            for (let p of ports){
-                let portname = (p as any).label
+            for (const p of ports){
+                const portname = (p as any).label
                 portIdToName[p.id] = portname
                 if((p as any).in){
+                    // input port
                     if (p.links.length == 0){ 
                         if (portname in argNodeDict){
                             const e: ConflictPort = {type: "conflictport", content: {portname}}
@@ -123,6 +125,11 @@ export class Canvas extends React.Component<Props, State>{
                     } else {
                         let link = p.links[0]
                         argDic[portname] = {type: "linkid", content: link}    
+                    }
+                } else {
+                    // output port
+                    if ((p as any).selected){
+                        resRecord.push({type: "tool", content: {nodeid: id, nodename: name, label: portname}})
                     }
                 }
             }
@@ -156,7 +163,11 @@ export class Canvas extends React.Component<Props, State>{
                 }
                 return ({...n, arguments: _.mapValues(n.arguments, toToolPort)})
             })
-        return ({args: Object.keys(argNodeDict).length == 0? null : argNodeDict, body: _.map(sortedOrder, k => tools[k])})
+        return ({
+              args: Object.keys(argNodeDict).length == 0? null : argNodeDict
+            , body: _.map(sortedOrder, k => tools[k])
+            , result: resRecord
+        })
     }
 
     lockModel = () => {
@@ -180,8 +191,9 @@ export class Canvas extends React.Component<Props, State>{
                 .then( command => 
                     {this.setState(p => ({...p, compiled: {...res, command}, loading: false}))}
                 )
+                return res.interface
             })
-            .then(() => this.props.report({type: "positive", header: "Build Sucess", body: <p/>, timeout: 3000}))
+            .then((inter) => this.props.report({type: "positive", header: "Build Sucess", body: <p>{inter}</p>, timeout: 3000}))
             .catch(e => {
                 this.setState(p => ({...p, loading: false}))
                 this.props.report(fromException(e))

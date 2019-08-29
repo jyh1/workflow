@@ -41,7 +41,7 @@ export type JBlock = {variable: string, options: ClOption[], command: JCmd}
 
 export type JLang = {result: JRes, blocks: JBlock[]}
 
-export type CompileResult = {codalang: CodaLang, jlang: JLang, codalangstr: string}
+export type CompileResult = {codalang: CodaLang, jlang: JLang, codalangstr: string, interface: string}
 
 export type TaskInfo = JObject<"taskid", TaskId> | JObject<"codaval", string> | JObject<"task", Task> | JObject<"empty", {}>
 
@@ -102,7 +102,7 @@ export interface ToolNodeInterface<PortType> {
 export type ToolNode = ToolNodeInterface<ToolPort>
 
 // optional type dict for arguments
-export type CodaGraph = {args?: TypeDict, body: ToolNode[]}
+export type CodaGraph = {args?: TypeDict, body: ToolNode[], result: ToolPort[]}
 
 export type ToolModelExtra = {task: Task, nodeType: NodeType}
 
