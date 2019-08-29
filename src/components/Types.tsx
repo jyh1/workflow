@@ -153,6 +153,12 @@ export type Info =
     , update?: {id: number}
     , timeout?: number
     }
+export type ConfirmInfo =
+    {
+      type: "confirm"
+    , header: string
+    , confirm: () => void
+    }
 
 export const endPointPath = {
       login: "/workflow/login"

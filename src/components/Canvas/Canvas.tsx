@@ -17,7 +17,7 @@ type Props = {
       nodes: NodeInfo[]
     , refreshBundle: () => void
     , doSave: (codalang: T.CodaLang) => void
-    , report: (e: T.Info) => number
+    , report: (e: T.Info | T.ConfirmInfo) => number
 };
 
 type State = {
@@ -265,6 +265,19 @@ export class Canvas extends React.Component<Props, State>{
         }
     }
 
+    clearCanvas = () => {
+        if (this.state.locked){
+            this.lockWarning()
+            return
+        }
+        const info: T.ConfirmInfo = 
+            {  header: "Clear Canvas?"
+            , confirm: () => {_.forEach(this.engine.getDiagramModel().getNodes(), n => n.remove()); this.setState(p => ({...p, compiled: nullRes}))}
+            , type: "confirm"
+            }
+        this.props.report(info)
+    }
+
     dragStart: React.DragEventHandler = (event) => {
         let dragData : TaskDragType = {taskinfo: {type: "empty", content: {}}, name: "New Tool"}
         event.dataTransfer.setData(taskTag, JSON.stringify(dragData)); 
@@ -281,11 +294,15 @@ export class Canvas extends React.Component<Props, State>{
         this.forceUpdate()
     }
 
+    lockWarning = () => {
+        this.props.report({type: "warning", header: "Locked Canvas", body: <p>Unlock canvas to make change.</p>})
+    }
+
 
     processDrop: React.DragEventHandler = (event) => {
         event.preventDefault()
         if (this.state.locked){
-            this.props.report({type: "warning", header: "Locked Canvas", body: <p>Unlock canvas to add new node.</p>})
+            this.lockWarning()
             return
         }
         let data = event.dataTransfer.getData(taskTag);
@@ -342,6 +359,25 @@ export class Canvas extends React.Component<Props, State>{
                     </S.Menu.Item>
 
                     <S.Menu.Menu position='right'>
+
+                        <S.ButtonGroup style={{marginRight: "10px"}}>
+                            <S.Popup content={locked? "Unlock Canvas": "Lock Canvas"} trigger = 
+                                {<S.Button 
+                                    basic
+                                    color={locked? 'red' : 'blue'}
+                                    icon={locked? "lock open" : "lock"}
+                                    onClick={() => this.setState(p => ({...p, locked: !p.locked}))}
+                                />}
+                            />
+                            <S.Popup content="Clear Canvas" trigger = 
+                                {<S.Button 
+                                    basic
+                                    color='red'
+                                    icon='trash alternate outline'
+                                    onClick={() => this.clearCanvas()}
+                                />}
+                            />
+                        </S.ButtonGroup>
                     
                         <S.ButtonGroup style={{marginRight: "10px"}}>
                             <S.Button icon="zoom in" basic color="blue" onClick={() => this.zoom(1.25)}/>
@@ -378,14 +414,6 @@ export class Canvas extends React.Component<Props, State>{
                                     loading={running} 
                                     disabled={codalang? false : true} 
                                     onClick={() => this.props.doSave(codalang)}
-                                />}
-                            />
-                            <S.Popup content={locked? "Unlock Canvas": "Lock Canvas"} trigger = 
-                                {<S.Button 
-                                    basic
-                                    color={locked? 'red' : 'blue'}
-                                    icon={locked? "lock open" : "lock"}
-                                    onClick={() => this.setState(p => ({...p, locked: !p.locked}))}
                                 />}
                             />
                         </S.ButtonGroup>
