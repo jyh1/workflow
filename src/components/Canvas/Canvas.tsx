@@ -17,7 +17,7 @@ type Props = {
       nodes: NodeInfo[]
     , refreshBundle: () => void
     , doSave: (codalang: T.CodaLang) => void
-    , report: (e: T.Info | T.ConfirmInfo) => number
+    , report: (e: T.MessageInfo) => number
 };
 
 type State = {

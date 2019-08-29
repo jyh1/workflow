@@ -5,7 +5,7 @@ import * as S from 'semantic-ui-react'
 import { instanceOf } from "prop-types";
 
 type Props = {
-      errors: [number, T.Info | T.ConfirmInfo][]
+      errors: [number, T.MessageInfo][]
     , removeException: (ind: number) => void
 }
 
@@ -26,7 +26,7 @@ export class ErrorList extends React.Component<Props, State>{
     }
 }
 
-const InfoMsg: React.SFC<{info: T.Info | T.ConfirmInfo, close: () => void}> = (props) => {
+const InfoMsg: React.SFC<{info: T.MessageInfo, close: () => void}> = (props) => {
     switch(props.info.type){
         case "confirm":
             const {confirm, header} = props.info

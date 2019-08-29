@@ -85,7 +85,7 @@ export class HomeApp extends React.Component<Props, State>{
             <React.Fragment>
                 <ErrorList errors={errors} removeException={this.removeException}/>
                 <SplitPane split="vertical" defaultSize="16%" pane1Style={{overflowY: "auto"}}>
-                    <ToolPanel codalang={this.state.codalang} doneSave={this.doneSave}/>
+                    <ToolPanel report={this.addException} codalang={this.state.codalang} doneSave={this.doneSave}/>
                     <SplitPane split="vertical" defaultSize={385} primary="second" minSize={385} pane2Style={{overflowY: "auto"}}>
                         <Canvas report={this.addException} nodes = {[]} refreshBundle={refreshBundle} doSave={this.doSave} />
                         <WorksheetPanel 

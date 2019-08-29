@@ -159,6 +159,7 @@ export type ConfirmInfo =
     , header: string
     , confirm: () => void
     }
+export type MessageInfo = Info | ConfirmInfo
 
 export const endPointPath = {
       login: "/workflow/login"

@@ -18,7 +18,7 @@ type ToolPanelState = {
     , editing: boolean
     , elementInfo: {[elementid: string]: ElementInfo}
 }
-type ToolPanelProps = {codalang?: T.CodaLang, doneSave: () => void}
+type ToolPanelProps = {codalang?: T.CodaLang, doneSave: () => void, report: (info: T.MessageInfo) => void}
 export class ToolPanel extends React.Component<ToolPanelProps, ToolPanelState>{
     contextRef: React.Ref<any>
     constructor(props: ToolPanelProps){
@@ -102,9 +102,14 @@ export class ToolPanel extends React.Component<ToolPanelProps, ToolPanelState>{
     }
 
     removeEle = () => {
-        const current = this.state.current
+        const {current, elementInfo} = this.state
         if (current){
-            removeEleReq(current).then(() => this.updateList(true))
+            const info: T.ConfirmInfo = {
+                  header: "Delete item " + elementInfo[current].name + "?"
+                , type: "confirm"
+                , confirm: () => {removeEleReq(current).then(() => this.updateList(true))}
+            }
+            this.props.report(info)
         }
     }
 
@@ -184,7 +189,10 @@ export class ToolPanel extends React.Component<ToolPanelProps, ToolPanelState>{
                                         />
                                     </Button.Group>
                                     <Popup content='Delete' trigger = {
-                                            <Button basic color='red'
+                                            <Button 
+                                                basic 
+                                                disabled={current? false: true} 
+                                                color='red'
                                                 icon="trash alternate outline"
                                                 onClick={this.removeEle}
                                             />}
