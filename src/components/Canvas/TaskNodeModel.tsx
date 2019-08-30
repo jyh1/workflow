@@ -20,7 +20,7 @@ import {NodeInfo, TaskBody, Task} from "../Types"
 import * as T from "../Types"
 import {Button, Input, Divider, Dimmer, Loader, Popup, Icon} from 'semantic-ui-react'
 // import {taskReq} from "../MockRequests"
-import {taskReq, parseReq} from "../Requests"
+import {taskReq, parseReq, toolGraphReq} from "../Requests"
 import {CodaEditor} from './Editor'
 
 type AddLink = (old: TaskPortModel) => TaskLinkModel
@@ -32,13 +32,14 @@ export class TaskNodeModel extends DefaultNodeModel {
 	toggleEditor: boolean
 	refresh: () => void
 	error: (e: T.Info) => void
-	newNode: (node: NodeInfo, oldlinks?: OldLinks) => void
+	newNode: (node: NodeInfo, oldlinks?: OldLinks) => TaskNodeModel
 	nodeType: T.NodeType
 	oldlinks: OldLinks
+	intialize: Promise<void>
     constructor(
 		  node: NodeInfo
 		, refresh: () => void
-		, newNode: (node: NodeInfo) => void
+		, newNode: (node: NodeInfo, oldlinks?: OldLinks) => TaskNodeModel
 		, error: (e: T.Info) => void
 		, parent: DiagramModel
 		, oldlinks: OldLinks
@@ -71,7 +72,8 @@ export class TaskNodeModel extends DefaultNodeModel {
 			taskreq = Promise.resolve({taskbody: {}, inports: {}, outports: {}, taskcode: ""})
 		}
 
-		this.loadTask(taskreq)
+		this.intialize = this.loadTask(taskreq)
+		this.intialize.then(this.refresh)
 	}
 	removeAndRefresh(){
 		this.remove()
@@ -79,14 +81,14 @@ export class TaskNodeModel extends DefaultNodeModel {
 	}
 
 	loadTask(taskreq: Promise<Task>){
-		taskreq.then((task) => {
+		return taskreq.then((task) => {
 			_.map(task.inports, (ty, pname) => this.addPort(new TaskPortModel(true, Toolkit.UID(), pname, ty)));
 			_.map(task.outports, (ty, pname) => this.addPort(new TaskPortModel(false, Toolkit.UID(), pname, ty)));
 			this.loading = false;
 			this.extras = {task: task, nodeType: this.nodeType}
 			this.refresh()
 			// setTimeout(() => {this.addOldLinks();this.refresh()}, 1000)
-			this.addOldLinks();this.refresh()
+			this.addOldLinks()
 		})
 	}
 
@@ -133,6 +135,7 @@ export class TaskNodeModel extends DefaultNodeModel {
 			, nodeType: this.nodeType
 		}
 		this.newNode(node)
+        this.refresh()
 	}
 	lockNode(lock: boolean = true){
 		this.setLocked(lock)
@@ -209,7 +212,37 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 	editName = (e: React.ChangeEvent<HTMLInputElement>) => {
         const name = e.target.value
         this.props.node.name = name
-    }
+	}
+	
+	async expandNode(){
+		const {node} = this.props
+		const taskid = node.extras.task.taskid
+		if (taskid === undefined || taskid === null){
+			return
+		}
+		const {tools, portidmap, links} = await toolGraphReq(taskid)
+		let oldIdToPort: {[oldid: string]: DefaultPortModel} = {}
+		for(const tool of tools){
+			const {name, pos, oldid, toolinfo} = tool
+			const newnode = node.newNode(
+				{
+					  taskinfo: {type: "task", content: toolinfo.task}
+					, name
+					, pos
+					, nodeType: toolinfo.nodeType
+				})
+			await newnode.intialize
+			_.forEach(newnode.getPorts(), (p: DefaultPortModel) => {
+				const key = [oldid, p.in, p.label].toString()
+				oldIdToPort[portidmap[key]] = p
+			})
+		}
+		const model = node.getParent()
+		for (const {from, to} of links){
+			model.addLink( oldIdToPort[from].link(oldIdToPort[to]) )
+		}
+		node.removeAndRefresh()
+	}
 
 	render() {
 		const inports = this.props.node.getInPorts()
@@ -232,6 +265,7 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 						<Button.Group size="medium" floated="right">
 							<Button icon='edit outline'  style={{padding: "3px"}} onClick={this.toggleEditor.bind(this)}/>
 							<Button icon='copy outline' style={{padding: "3px"}}  onClick={() => node.copyTask()}/>
+							<Button icon='window restore outline' style={{padding: "3px"}} onClick={this.expandNode.bind(this)} />
 							<Button icon='times' style={{padding: "3px"}}  onClick={()=>node.removeAndRefresh()}/>
 						</Button.Group>
 						<i className={isargument? "ellipsis vertical icon" : "code icon"}/>

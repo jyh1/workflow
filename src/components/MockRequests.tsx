@@ -57,6 +57,10 @@ export const taskReq: TaskInfoRequest = (taskid) => (
     })
 )
 
+export const toolGraphReq: T.ToolGraphRequest = (taskid) => mockRequest(
+    {"tools":[{name: "expanded", "toolinfo":{"task":{"outports":{"data":"bundle"},"inports":{},"taskbody":{"tag":"Dict","contents":{"data":{"tag":"Lit","contents":{"tag":"UUID","contents":"fdc0940220a84b6c8b7982e9473f63ee"}}}},"taskcode":"0xfdc0940220a84b6c8b7982e9473f63ee"},"nodeType":"tool"},"pos":{"x":713.6875,"y":315},"oldid":"479db502-7c80-4f0d-ae87-2e030f5db072"}],"portidmap":{"479db502-7c80-4f0d-ae87-2e030f5db072,false,data":"94a4c712-32ae-44a8-8d03-1768fc69014d"},"links":[]}
+)
+
 export const taskListReq: TaskListRequest = () => (
     new Promise((executor, resolve) => {
         setTimeout(

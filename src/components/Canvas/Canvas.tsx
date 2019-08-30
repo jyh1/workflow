@@ -89,11 +89,11 @@ export class Canvas extends React.Component<Props, State>{
             let name: string
             const taskbody = extras.task.taskbody
             graphModel.addNode(id)
-
+            name = (n as any).name
             // layout info
-            toolLayout.push({toolinfo: extras, pos: {x: n.x, y: n.y}, oldid: id})
+            toolLayout.push({toolinfo: extras, pos: {x: n.x, y: n.y}, oldid: id, name})
+            name = name.replace(/\W/g, '')
 
-            name = (n as any).name.replace(/\W/g, '')
             
             // argument node
             if (extras.nodeType == "argument"){
@@ -338,7 +338,7 @@ export class Canvas extends React.Component<Props, State>{
         const model = this.engine.getDiagramModel()
         const newnode = new TaskNodeModel(node, this.refresh, this.newNode, this.props.report, model, oldLinks)
         model.addNode(newnode)
-        this.refresh()
+        return newnode
     }
 
     setTab(tab: Tab){

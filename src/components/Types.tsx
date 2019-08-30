@@ -111,7 +111,7 @@ export type CodaGraph =
     }
 
 export type NodeLayout = {
-      tools: {toolinfo: ToolNodeExtra, pos: {x: number, y: number}, oldid: string}[]
+      tools: {toolinfo: ToolNodeExtra, pos: {x: number, y: number}, oldid: string, name: string}[]
     , portidmap: {[node_in_pname: string]: string}
     , links: {from: string, to: string}[]
 }
