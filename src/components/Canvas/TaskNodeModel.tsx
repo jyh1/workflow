@@ -213,14 +213,25 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
         const name = e.target.value
         this.props.node.name = name
 	}
+
+	expandable(){
+		try{
+			const taskid = this.props.node.extras.task.taskid
+			return !(taskid === undefined || taskid === null)
+		}
+		catch{
+			return false
+		}
+	}
 	
 	async expandNode(){
 		const {node} = this.props
 		const taskid = node.extras.task.taskid
-		if (taskid === undefined || taskid === null){
+		if (!this.expandable()){
 			return
 		}
 		const {tools, portidmap, links} = await toolGraphReq(taskid)
+		const [x0, y0] = [node.x, node.y]
 		let oldIdToPort: {[oldid: string]: DefaultPortModel} = {}
 		for(const tool of tools){
 			const {name, pos, oldid, toolinfo} = tool
@@ -228,7 +239,7 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 				{
 					  taskinfo: {type: "task", content: toolinfo.task}
 					, name
-					, pos
+					, pos: {x: x0 + pos.x, y: y0 + pos.y}
 					, nodeType: toolinfo.nodeType
 				})
 			await newnode.intialize
@@ -250,6 +261,7 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 		const node = this.props.node
 		const isargument = node.nodeType == "argument"
 		const nodename = node.name
+		const expandable = this.expandable()
 		const header = (this.state.editName? 
 			<input onChange={this.editName} onBlur={this.stopEditingName} defaultValue={nodename}/> 
 			: <div title="Double click to edit name" className="editorToolname" onDoubleClick={this.startEditingName}>{nodename}</div>)
@@ -265,7 +277,7 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 						<Button.Group size="medium" floated="right">
 							<Button icon='edit outline'  style={{padding: "3px"}} onClick={this.toggleEditor.bind(this)}/>
 							<Button icon='copy outline' style={{padding: "3px"}}  onClick={() => node.copyTask()}/>
-							<Button icon='window restore outline' style={{padding: "3px"}} onClick={this.expandNode.bind(this)} />
+							{expandable ? <Button icon='window restore outline' style={{padding: "3px"}} onClick={this.expandNode.bind(this)} /> : <React.Fragment/>}
 							<Button icon='times' style={{padding: "3px"}}  onClick={()=>node.removeAndRefresh()}/>
 						</Button.Group>
 						<i className={isargument? "ellipsis vertical icon" : "code icon"}/>

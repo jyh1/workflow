@@ -82,7 +82,7 @@ export class Canvas extends React.Component<Props, State>{
         const linkLayout: T.NodeLayout["links"] = _.map(links, l => ({from: l.sourcePort, to: l.targetPort}))
         let oldPortIdMap: T.NodeLayout["portidmap"] = {}
         let toolLayout: T.NodeLayout["tools"] = []
-
+        const [x0, y0] = [nodes[0].x, nodes[0].y]
         for(let n of nodes){
             let {id, ports} = n
             let extras = n.extras as T.ToolNodeExtra
@@ -91,7 +91,7 @@ export class Canvas extends React.Component<Props, State>{
             graphModel.addNode(id)
             name = (n as any).name
             // layout info
-            toolLayout.push({toolinfo: extras, pos: {x: n.x, y: n.y}, oldid: id, name})
+            toolLayout.push({toolinfo: extras, pos: {x: n.x - x0, y: n.y - y0}, oldid: id, name})
             name = name.replace(/\W/g, '')
 
             
