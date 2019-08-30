@@ -22,6 +22,7 @@ import {Button, Input, Divider, Dimmer, Loader, Popup, Icon} from 'semantic-ui-r
 // import {taskReq} from "../MockRequests"
 import {taskReq, parseReq, toolGraphReq} from "../Requests"
 import {CodaEditor} from './Editor'
+import { node } from "prop-types";
 
 type AddLink = (old: TaskPortModel) => TaskLinkModel
 export type OldLinks = {[port: string]: AddLink[]}
@@ -226,33 +227,41 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 	
 	async expandNode(){
 		const {node} = this.props
-		const taskid = node.extras.task.taskid
-		if (!this.expandable()){
-			return
-		}
-		const {tools, portidmap, links} = await toolGraphReq(taskid)
-		const [x0, y0] = [node.x, node.y]
-		let oldIdToPort: {[oldid: string]: DefaultPortModel} = {}
-		for(const tool of tools){
-			const {name, pos, oldid, toolinfo} = tool
-			const newnode = node.newNode(
-				{
-					  taskinfo: {type: "task", content: toolinfo.task}
-					, name
-					, pos: {x: x0 + pos.x, y: y0 + pos.y}
-					, nodeType: toolinfo.nodeType
+		try{
+			const taskid = node.extras.task.taskid
+			if (!this.expandable()){
+				return
+			}
+			const {tools, portidmap, links} = await toolGraphReq(taskid)
+			if(!tools){
+				throw "Not expandable"
+			}
+			const [x0, y0] = [node.x, node.y]
+			let oldIdToPort: {[oldid: string]: DefaultPortModel} = {}
+			for(const tool of tools){
+				const {name, pos, oldid, toolinfo} = tool
+				const newnode = node.newNode(
+					{
+						taskinfo: {type: "task", content: toolinfo.task}
+						, name
+						, pos: {x: x0 + pos.x, y: y0 + pos.y}
+						, nodeType: toolinfo.nodeType
+					})
+				await newnode.intialize
+				_.forEach(newnode.getPorts(), (p: DefaultPortModel) => {
+					const key = [oldid, p.in, p.label].toString()
+					oldIdToPort[portidmap[key]] = p
 				})
-			await newnode.intialize
-			_.forEach(newnode.getPorts(), (p: DefaultPortModel) => {
-				const key = [oldid, p.in, p.label].toString()
-				oldIdToPort[portidmap[key]] = p
-			})
+			}
+			const model = node.getParent()
+			for (const {from, to} of links){
+				model.addLink( oldIdToPort[from].link(oldIdToPort[to]) )
+			}
+			node.removeAndRefresh()
 		}
-		const model = node.getParent()
-		for (const {from, to} of links){
-			model.addLink( oldIdToPort[from].link(oldIdToPort[to]) )
+		catch{
+			node.error({type: "warning", header: "Unexpandable node", body: <p/>, timeout: 2000})
 		}
-		node.removeAndRefresh()
 	}
 
 	render() {
