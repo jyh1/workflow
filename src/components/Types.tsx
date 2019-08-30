@@ -77,6 +77,7 @@ export type TaskListElement = {name: string; taskid?: string; parent?: TaskListE
 export type LoginRequest = (username: string, password: string) => Promise<void>
 export type TaskListRequest = () => Promise<TaskListElement[]>
 export type TaskInfoRequest = (taskid: TaskId) => Promise<Task>
+export type ToolGraphRequest = (taskid: TaskId) => Promise<NodeLayout>
 export type CompileRequest = (nodes: CodaGraph) => Promise<CompileResult>
 export type ClRequest = (worsheet: string, command: string) => Promise<string>
 export type ClWaitRequest = (path: string) => Promise<string>
@@ -102,9 +103,20 @@ export interface ToolNodeInterface<PortType> {
 export type ToolNode = ToolNodeInterface<ToolPort>
 
 // optional type dict for arguments
-export type CodaGraph = {args?: TypeDict, body: ToolNode[], result: ToolPort[]}
+export type CodaGraph = 
+    {
+          args?: TypeDict
+        , body: ToolNode[]
+        , result: ToolPort[]
+    }
 
-export type ToolModelExtra = {task: Task, nodeType: NodeType}
+export type NodeLayout = {
+      tools: {toolinfo: ToolNodeExtra, pos: {x: number, y: number}, oldid: string}[]
+    , portidmap: {[node_in_pname: string]: string}
+    , links: {from: string, to: string}[]
+}
+
+export type ToolNodeExtra = {task: Task, nodeType: NodeType}
 
 // bundle list in worksheet
 export type BundleState = "created" | "ready" | "preparing" | "running" | "failed" | "uploading"
@@ -131,7 +143,7 @@ export type WorksheetContent = {items: WorksheetItem[]} & Worksheet
 
 export type Worksheet = {uuid: string, name: string, title?: string}
 
-export type NewTool = {parent?: string, name: string, description: string, codalang?: CodaLang}
+export type NewTool = {parent?: string, name: string, description: string, codalang?: CodaLang, graph?: NodeLayout}
 
 export type UpdateTool = {id: string, name: string, description: string}
 

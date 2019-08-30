@@ -11,24 +11,26 @@ import {clReq} from '../Requests'
 import * as T from '../Types'
 import {buildCommand, Execution} from './ExePlan'
 import { fromException } from "../Errors/FromException";
-import { DefaultPortModel } from "storm-react-diagrams";
+import { DefaultPortModel, DiagramModel } from "storm-react-diagrams";
+import { serialize } from "cookie";
 
 type Props = {
       nodes: NodeInfo[]
     , refreshBundle: () => void
-    , doSave: (codalang: T.CodaLang) => void
+    , doSave: (codalang: T.CodaLang, graph: T.NodeLayout) => void
     , report: (e: T.MessageInfo) => number
 };
 
 type State = {
-    compiled: T.CompileResult & {command: string}
+    compiled: T.CompileResult & {command: string, graph: T.NodeLayout }
     loading: boolean
     running: boolean
     locked: boolean
     tab: Tab
 }
 
-const nullRes: State["compiled"] = {command: null, codalang: null, jlang: null, codalangstr: null, interface: null}
+const nullRes: State["compiled"] = 
+    {command: null, codalang: null, jlang: null, codalangstr: null, interface: null, graph: null}
 
 type ConflictPort = T.JObject<"conflictport", {portname: string}>
 type CircleErr = T.JObject<"circle", {nodeids: string[]}>
@@ -38,7 +40,6 @@ type Tab = "Canvas" | "Execution Plan"
 
 export class Canvas extends React.Component<Props, State>{
     engine: SRD.DiagramEngine;
-    model: SRD.DiagramModel
     refreshBundle: () => void
     runningInfo: {commands: JSX.Element[], infoid: number, currentInfo: T.Info}
     // refresh: () => void;
@@ -50,7 +51,6 @@ export class Canvas extends React.Component<Props, State>{
         this.engine.registerNodeFactory(new TaskNodeFactory());
         this.engine.registerLinkFactory(new TaskLinkFactory());
         let model = new SRD.DiagramModel();
-        this.model = model
         this.engine.setDiagramModel(model);
 
         // refresh bundlelist after submitting request
@@ -61,8 +61,8 @@ export class Canvas extends React.Component<Props, State>{
         this.forceUpdate()
     }
 
-    serializeTaskGraph(): T.CodaGraph{
-        let g = this.model.serializeDiagram()
+    serializeTaskGraph(): {compileg: T.CodaGraph, layoutg: T.NodeLayout} {
+        let g = this.engine.getDiagramModel().serializeDiagram()
         let graphModel = new Graph()
         let {links, nodes} = g
         let linkDic : {[linkid: string]: {nodeid: string, portid: string}} = {} //linkid to source [nodeid, portid]
@@ -77,12 +77,21 @@ export class Canvas extends React.Component<Props, State>{
         let uniqName: Map<string, number> = new Map()
         let argNodeDict: T.TypeDict = {}
         let resRecord: ToolPort[] = []
+
+        // layout info
+        const linkLayout: T.NodeLayout["links"] = _.map(links, l => ({from: l.sourcePort, to: l.targetPort}))
+        let oldPortIdMap: T.NodeLayout["portidmap"] = {}
+        let toolLayout: T.NodeLayout["tools"] = []
+
         for(let n of nodes){
             let {id, ports} = n
-            let extras = n.extras as T.ToolModelExtra
+            let extras = n.extras as T.ToolNodeExtra
             let name: string
             const taskbody = extras.task.taskbody
             graphModel.addNode(id)
+
+            // layout info
+            toolLayout.push({toolinfo: extras, pos: {x: n.x, y: n.y}, oldid: id})
 
             name = (n as any).name.replace(/\W/g, '')
             
@@ -112,7 +121,9 @@ export class Canvas extends React.Component<Props, State>{
             for (const p of ports){
                 const portname = (p as any).label
                 portIdToName[p.id] = portname
-                if((p as any).in){
+                const isInport: boolean = (p as any).in
+                oldPortIdMap[[id, isInport, portname].toString()] = p.id
+                if(isInport){
                     // input port
                     if (p.links.length == 0){ 
                         if (portname in argNodeDict){
@@ -163,11 +174,17 @@ export class Canvas extends React.Component<Props, State>{
                 }
                 return ({...n, arguments: _.mapValues(n.arguments, toToolPort)})
             })
-        return ({
-              args: Object.keys(argNodeDict).length == 0? null : argNodeDict
-            , body: _.map(sortedOrder, k => tools[k])
-            , result: resRecord
-        })
+        const compileg = {
+            args: Object.keys(argNodeDict).length == 0? null : argNodeDict
+          , body: _.map(sortedOrder, k => tools[k])
+          , result: resRecord
+        }
+        const layoutg: T.NodeLayout = {
+              tools: toolLayout
+            , portidmap: oldPortIdMap
+            , links: linkLayout
+        }
+        return {compileg, layoutg}
     }
 
     lockModel = () => {
@@ -179,7 +196,7 @@ export class Canvas extends React.Component<Props, State>{
 
     compile(){
         try {
-            const nodes = this.serializeTaskGraph()
+            const {compileg: nodes, layoutg} = this.serializeTaskGraph()
             if (nodes.body.length == 0){
                 const e: EmptyGraph = {type: "empty", content: {}}
                 throw e
@@ -189,7 +206,7 @@ export class Canvas extends React.Component<Props, State>{
             .then((res) => {
                 buildCommand(res.jlang)
                 .then( command => 
-                    {this.setState(p => ({...p, compiled: {...res, command}, loading: false}))}
+                    {this.setState(p => ({...p, compiled: {...res, command, graph: layoutg}, loading: false}))}
                 )
                 return res.interface
             })
@@ -290,7 +307,7 @@ export class Canvas extends React.Component<Props, State>{
 
     zoom = (factor: number) => {
         const model = this.engine.getDiagramModel()
-        model.setZoomLevel(this.model.getZoomLevel() * factor)
+        model.setZoomLevel(model.getZoomLevel() * factor)
         this.forceUpdate()
     }
 
@@ -346,7 +363,7 @@ export class Canvas extends React.Component<Props, State>{
 
         const {running, compiled, locked, tab} = this.state
         model.setLocked(locked)
-        const {jlang, codalang, codalangstr, command} = compiled
+        const {jlang, codalang, codalangstr, command, graph} = compiled
 
         return(
             <div style={{height: "100%"}}>
@@ -413,7 +430,7 @@ export class Canvas extends React.Component<Props, State>{
                                     icon='save'
                                     loading={running} 
                                     disabled={codalang? false : true} 
-                                    onClick={() => this.props.doSave(codalang)}
+                                    onClick={() => this.props.doSave(codalang, graph)}
                                 />}
                             />
                         </S.ButtonGroup>

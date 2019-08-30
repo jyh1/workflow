@@ -21,7 +21,7 @@ type Props = {}
 type State = {
       currentWorksheet: T.WorksheetContent
     , loadingWorksheet: boolean
-    , codalang?: T.CodaLang
+    , codalang?: {ast: T.CodaLang, graph: T.NodeLayout}
     , infos: Map<number, T.Info>
     }
 
@@ -47,8 +47,8 @@ export class HomeApp extends React.Component<Props, State>{
         this.refreshBundle().then(() => this.setState(prev => Object.assign(prev, {loadingWorksheet: false})))
     }
 
-    doSave = (codalang: T.CodaLang) => {
-        this.setState(p => Object.assign(p, {codalang}))
+    doSave = (codalang: T.CodaLang, graph: T.NodeLayout) => {
+        this.setState(p => Object.assign(p, {codalang: {ast: codalang, graph}}))
     }
 
     doneSave = () => {

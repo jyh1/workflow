@@ -27,7 +27,7 @@ type AddLink = (old: TaskPortModel) => TaskLinkModel
 export type OldLinks = {[port: string]: AddLink[]}
 
 export class TaskNodeModel extends DefaultNodeModel {
-    extras : T.ToolModelExtra
+    extras : T.ToolNodeExtra
 	loading: boolean
 	toggleEditor: boolean
 	refresh: () => void

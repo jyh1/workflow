@@ -69,6 +69,19 @@ export const taskReq: TaskInfoRequest = (taskid) => (
     .then((e) => e.json())
 )
 
+export const toolGraphReq: T.ToolGraphRequest = (taskid) => (
+    fetch('./tool/graph/' + taskid, 
+        {
+          headers: {"Content-Type":'application/json'}
+        , credentials: 'same-origin'
+        })
+    .then(res => {
+        if (!res.ok){
+            return res.json().then(e => Promise.reject(e));
+        }
+        return res.json()
+    }))
+
 
 export const clReq: T.ClRequest = (worksheet, command) => (
     fetch(T.endPointPath.rest + 'cli/command',
