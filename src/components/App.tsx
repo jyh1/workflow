@@ -6,7 +6,7 @@ import * as _ from "lodash"
 import { Router, Route, Redirect, Switch, RouteProps } from 'react-router-dom';
 // import {getLoginStatus} from "./MockRequests"
 import {getLoginStatus} from "./Requests"
-import { createBrowserHistory } from 'history';
+import { createBrowserHistory, History } from 'history';
 import {Login} from "./Login";
 import {WorksheetPanel} from './Worksheet/WorksheetPanel'
 import * as T from './Types'
@@ -17,7 +17,7 @@ import * as localforage from 'localforage'
 import * as S from 'semantic-ui-react'
 import { ErrorList } from "./Errors/ErrorList";
 
-type Props = {}
+type Props = {history: History<any> }
 type State = {
       currentWorksheet: T.WorksheetContent
     , loadingWorksheet: boolean
@@ -84,6 +84,7 @@ export class HomeApp extends React.Component<Props, State>{
         return (
             <React.Fragment>
                 <ErrorList errors={errors} removeException={this.removeException}/>
+                <Navigation history={this.props.history}/>
                 <SplitPane split="vertical" defaultSize="16%" pane1Style={{overflowY: "auto"}}>
                     <ToolPanel report={this.addException} codalang={this.state.codalang} doneSave={this.doneSave}/>
                     <SplitPane split="vertical" defaultSize={385} primary="second" minSize={385} pane2Style={{overflowY: "auto"}}>
@@ -102,14 +103,31 @@ export class HomeApp extends React.Component<Props, State>{
 }
 
 
+const Navigation: React.SFC<{history: History<any>}> = ({history}) => {
+    const logout = () => {
+        T.logOut()
+        history.push(endPointPath.login)
+    }
+    return (
+        <S.Menu style={{margin: "0"}}>
+            <S.MenuItem>
+                <S.Header color="blue">Codalab Workflow</S.Header>
+            </S.MenuItem>
+            <S.Menu.Item position='right'>
+                  <S.Button onClick={logout} basic color="blue" as='a'>
+                    Log out
+                  </S.Button>
+            </S.Menu.Item>
+        </S.Menu>
+    )
+}
+
 export const mainapp = () => (
     <Router history={createBrowserHistory({})}>
-        <React.Fragment>
-            <Switch>
-                <Route path={endPointPath.login} component={Login} />
-                <PrivateRoute path={"/"} component={HomeApp}/>
-            </Switch>
-        </React.Fragment>
+        <Switch>
+            <Route path={endPointPath.login} component={Login} />
+            <PrivateRoute path={"/"} component={HomeApp}/>
+        </Switch>
     </Router>
 )
 

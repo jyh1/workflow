@@ -3,6 +3,7 @@ import * as React from "react";
 import {loginReq, getLoginStatus} from "./Requests"
 import {Redirect} from "react-router-dom";
 import {Location} from 'history'
+import * as T from './Types'
 import { Button, Form, Header, ButtonProps, Container, Message } from 'semantic-ui-react'
 
 type Props = {location: Location}
@@ -46,7 +47,7 @@ export class Login extends React.Component<Props, State> {
 
         let { loginStatus, from } = this.state;
 
-        if (loginStatus) return <Redirect to={from} />;
+        if (loginStatus) return <Redirect to={T.endPointPath.mainapp + "/"} />;
 
         return (
             <Container>
