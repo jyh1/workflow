@@ -1,5 +1,5 @@
 module.exports = {
-    mode: "development",
+    mode: "production",
     watch: true,
 
     // Enable sourcemaps for debugging webpack's output.
