@@ -17,6 +17,10 @@ function jsonRequest<T, R>(url: string, ctype : ContentType = 'application/json'
                 , method: 'POST'
                 ,  body: ((ctype == 'application/json')? JSON.stringify(info) : (info as any as string))
                 }).then((res) => {
+                    if (res.status==401){
+                        T.logOut()
+                        return Promise.reject(res.statusText)
+                    }
                     if (!res.ok){
                         return res.json().then(e => Promise.reject(e));
                     }

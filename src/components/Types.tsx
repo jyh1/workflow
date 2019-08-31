@@ -185,3 +185,7 @@ export function makeLitTask(uuid: string): Task{
         "outports":{data: "bundle"},"inports":{},
         "taskbody":{"tag":"Dict","contents":{"data":{"tag":"Lit","contents":{"tag":"UUID","contents":uuid}}}}, "taskcode": ("0x"+uuid)})
 }
+
+export function logOut(){
+    document.cookie.split(";").forEach(function(c) { document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); });
+}

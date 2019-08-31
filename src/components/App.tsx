@@ -107,7 +107,7 @@ export const mainapp = () => (
         <React.Fragment>
             <Switch>
                 <Route path={endPointPath.login} component={Login} />
-                <PrivateRoute path={endPointPath.mainapp} component={HomeApp}/>
+                <PrivateRoute path={"/"} component={HomeApp}/>
             </Switch>
         </React.Fragment>
     </Router>
