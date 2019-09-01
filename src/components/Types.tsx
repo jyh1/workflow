@@ -119,7 +119,7 @@ export type NodeLayout = {
 export type ToolNodeExtra = {task: Task, nodeType: NodeType}
 
 // bundle list in worksheet
-export type BundleState = "created" | "ready" | "preparing" | "running" | "failed" | "uploading"
+export type BundleState = "created" | "ready" | "preparing" | "running" | "failed" | "uploading" | "staged"
 export type BundleInfo = {
       uuid: string
     , args?: string

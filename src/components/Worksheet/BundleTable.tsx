@@ -37,7 +37,7 @@ export class BundleTable extends React.Component<BTProps, BTState>{
     }
 }
 
-let isRunning: ((s: T.BundleState) => boolean) = s => s == "preparing" || s == "running" || s == "created" || s == "uploading"
+let isRunning: ((s: T.BundleState) => boolean) = s => s == "preparing" || s == "running" || s == "created" || s == "uploading" || s == "staged"
 
 // bundle entry
 type BundleProps = {uuid: string, name: string, size: number, state: T.BundleState}
