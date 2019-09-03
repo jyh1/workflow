@@ -188,4 +188,5 @@ export function makeLitTask(uuid: string): Task{
 
 export function logOut(){
     document.cookie.split(";").forEach(function(c) { document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); });
+    document.location.replace(endPointPath.login)
 }

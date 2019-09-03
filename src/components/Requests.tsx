@@ -16,19 +16,23 @@ function jsonRequest<T, R>(url: string, ctype : ContentType = 'application/json'
                 , credentials: 'same-origin'
                 , method: 'POST'
                 ,  body: ((ctype == 'application/json')? JSON.stringify(info) : (info as any as string))
-                }).then((res) => {
-                    if (res.status==401){
-                        T.logOut()
-                        return Promise.reject(res.statusText)
-                    }
-                    if (!res.ok){
-                        return res.json().then(e => Promise.reject(e));
-                    }
-                    return res.json()
                 })
-            return req        
+            return processFetch(req)
         }
     )
+}
+
+function processFetch<T>(res: Promise<Response>): Promise<T>{
+    return res.then((res) => {
+        if (res.status==401){
+            T.logOut()
+            return Promise.reject(res.statusText)
+        }
+        if (!res.ok){
+            return res.json().then(e => Promise.reject(e));
+        }
+        return res.json()
+    })
 }
 
 export const loginReq: LoginRequest = (username, password) => {
@@ -56,21 +60,19 @@ export const getLoginStatus = () => {
 
 
 export const taskListReq: TaskListRequest = () => (
-    fetch('./tool/list', 
+    processFetch(fetch('./tool/list', 
         {
           headers: {"Content-Type":'application/json'}
         , credentials: 'same-origin'
-        })
-    .then((e) => e.json())
+        }))
 )
 
 export const taskReq: TaskInfoRequest = (taskid) => (
-    fetch('./tool/' + taskid, 
+    processFetch(fetch('./tool/' + taskid, 
         {
           headers: {"Content-Type":'application/json'}
         , credentials: 'same-origin'
-        })
-    .then((e) => e.json())
+        }))
 )
 
 export const toolGraphReq: T.ToolGraphRequest = (taskid) => (

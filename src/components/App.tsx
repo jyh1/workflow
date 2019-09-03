@@ -106,7 +106,7 @@ export class HomeApp extends React.Component<Props, State>{
 const Navigation: React.SFC<{history: History<any>}> = ({history}) => {
     const logout = () => {
         T.logOut()
-        history.push(endPointPath.login)
+        // history.push(endPointPath.login)
     }
     return (
         <S.Menu style={{margin: "0"}}>
