@@ -109,7 +109,7 @@ const Navigation: React.SFC<{history: History<any>}> = ({history}) => {
         // history.push(endPointPath.login)
     }
     return (
-        <S.Menu style={{margin: "0"}}>
+        <S.Menu secondary id="topmenu">
             <S.MenuItem>
                 <S.Header color="blue">Codalab Workflow</S.Header>
             </S.MenuItem>
