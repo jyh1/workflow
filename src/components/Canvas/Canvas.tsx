@@ -396,13 +396,13 @@ export class Canvas extends React.Component<Props, State>{
                             />
                         </S.ButtonGroup>
                     
-                        <S.ButtonGroup style={{marginRight: "10px"}}>
+                        {/* <S.ButtonGroup style={{marginRight: "10px"}}>
                             <S.Button icon="zoom in" basic color="blue" onClick={() => this.zoom(1.25)}/>
                             <S.Button icon="zoom out" basic color="blue" onClick={() => this.zoom(0.8)}/>
                             <S.Popup content='Zoom to Fit' trigger = {
                                 <S.Button icon="compress" basic color="blue" onClick={() => this.engine.zoomToFit()}/>
                             }/>
-                        </S.ButtonGroup>
+                        </S.ButtonGroup> */}
 
                         <S.ButtonGroup>
                             <S.Popup content='Build' trigger = 
