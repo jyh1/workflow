@@ -44,7 +44,12 @@ export class HomeApp extends React.Component<Props, State>{
     }
     changeWorksheet(){
         this.setState(prev => Object.assign(prev, {loadingWorksheet: true}))
-        this.refreshBundle().then(() => this.setState(prev => Object.assign(prev, {loadingWorksheet: false})))
+        this.refreshBundle()
+        .then(() => this.setState(prev => Object.assign(prev, {loadingWorksheet: false})))
+        .catch(() => {
+            this.setState(prev => Object.assign(prev, {loadingWorksheet: false}))
+            this.addException({type: "error", header: "Error loading worksheet", body: <p/>})
+        })
     }
 
     doSave = (codalang: T.CodaLang, graph: T.NodeLayout) => {
