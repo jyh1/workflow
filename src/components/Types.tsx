@@ -66,7 +66,9 @@ export type ParseResult = {
 export type Task = ParseResult & {taskcode: string}
 
 export const taskTag = "task"
+export const bundleTag = "bundle"
 export type TaskDragType = {name: string, taskinfo: TaskInfo, nodetype?: NodeType}
+export type BundleDragType = {name: string, uuid: string}
 
 export type TaskElement = {name: string, id: string, description: string} & ({children: TaskElement[]} | {taskid: TaskId})
 

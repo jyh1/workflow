@@ -322,12 +322,23 @@ export class Canvas extends React.Component<Props, State>{
             this.lockWarning()
             return
         }
-        let data = event.dataTransfer.getData(taskTag);
-        // console.log(data)
         let dragged: TaskDragType;
-        try {
-                dragged = JSON.parse(data);
-            } catch (e) {return}
+
+        // task tag
+        let data = event.dataTransfer.getData(taskTag);
+        if (data.length > 0){
+            dragged = JSON.parse(data);
+        } else {
+            data = event.dataTransfer.getData(T.bundleTag);
+            if (data.length > 0){
+                const {uuid, name}: T.BundleDragType = JSON.parse(data)
+                dragged = {taskinfo: {type: "task", content: T.makeLitTask(uuid)}, name};
+            }
+        }
+        if (!dragged){
+            return
+        }
+
         const pos = this.engine.getRelativeMousePoint(event)
         let node : NodeInfo = {pos, name: dragged.name, taskinfo: dragged.taskinfo, nodeType: dragged.nodetype}
         this.newNode(node)
