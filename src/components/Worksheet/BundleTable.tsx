@@ -69,7 +69,7 @@ class BundleEntry extends React.Component<BundleProps, BundleState>{
     }
     
     dragStart: React.DragEventHandler = (event) => {
-        const dragdata: T.BundleDragType = {uuid: this.props.uuid.slice(2), name: this.props.name}
+        const dragdata: T.BundleDragType = {uuid: this.props.uuid, name: this.props.name}
         event.dataTransfer.setData(T.bundleTag
             , JSON.stringify(dragdata)); 
     }

@@ -21,6 +21,7 @@ type State = {
     , codaval?: T.Task
     , line?: number
     , col?: number
+    , pos: {column: number, row: number}
 }
 
 export class CodaEditor extends React.Component<Props, State>{
@@ -30,6 +31,7 @@ export class CodaEditor extends React.Component<Props, State>{
         this.state = {
               value: props.body.taskcode
             , codaval: props.body
+            , pos: {column: 0, row: 0}
         }
         this.parseValue = (props.nodeType == "tool")? parseReq : parseArgReq
     }
@@ -59,6 +61,28 @@ export class CodaEditor extends React.Component<Props, State>{
         )
     }
 
+    processDrop: React.DragEventHandler = (event) => {
+        event.preventDefault()
+        event.stopPropagation()
+        let dragged: T.BundleDragType;
+        const data = event.dataTransfer.getData(T.bundleTag);
+        if (data.length > 0){
+            dragged = JSON.parse(data);
+            this.setState(p => {
+                const oldval = p.value
+                const {row, column} = p.pos
+                const lines = oldval.split("\n")
+                lines[row] = lines[row].slice(0, column) + dragged.uuid + lines[row].slice(column)
+                return ({...p, value: lines.join('\n')})
+            })
+        }
+    }
+
+    onCursorChange = (selection: any) => {
+        const pos = selection.getCursor();
+        this.setState(p => ({...p, pos}))
+      }
+
     render(){
         const {codaval, value,line, col} = this.state
         let markers: any[] = []
@@ -68,7 +92,9 @@ export class CodaEditor extends React.Component<Props, State>{
         }
         const compiled = codaval? true : false
         return(
-            <Segment style={{margin: "0", padding: "0"}}>
+            <Segment style={{margin: "0", padding: "0"}} 
+                onDrop={this.processDrop}
+            >
                 <AceEditor
                     mode="haskell"
                     theme="github"
@@ -82,6 +108,7 @@ export class CodaEditor extends React.Component<Props, State>{
                     highlightActiveLine={true}
                     value={value}
                     markers={markers}
+                    onCursorChange={this.onCursorChange}
                     placeholder={(this.props.nodeType == "tool")? "Input Codalang": "Input argument dictionary (e.g. [arg1: bundle, arg2: string ...])"}
                     setOptions={{
                         showLineNumbers: true,
