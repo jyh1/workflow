@@ -59,23 +59,6 @@ export class CodaEditor extends React.Component<Props, State>{
         )
     }
 
-    processDrop: React.DragEventHandler = (event) => {
-        event.preventDefault()
-        event.stopPropagation()
-        // if (this.props.nodeType!=="tool"){
-        //     return
-        // }
-        // let data = event.dataTransfer.getData(T.taskTag);
-        // let dragged: T.TaskDragType;
-        // try {
-        //         dragged = JSON.parse(data);
-        //     } catch (e) {return}
-        // const pos = this.engine.getRelativeMousePoint(event)
-        // let node : NodeInfo = {pos, name: dragged.name, taskinfo: dragged.taskinfo, nodeType: dragged.nodetype}
-        // this.newNode(node)
-        // console.log(node)
-    }
-
     render(){
         const {codaval, value,line, col} = this.state
         let markers: any[] = []
