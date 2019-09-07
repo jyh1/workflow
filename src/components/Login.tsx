@@ -4,7 +4,7 @@ import {loginReq, getLoginStatus} from "./Requests"
 import {Redirect} from "react-router-dom";
 import {Location} from 'history'
 import * as T from './Types'
-import { Button, Form, Header, ButtonProps, Container, Message } from 'semantic-ui-react'
+import { Button, Form, Header, ButtonProps, Grid, Message, Segment } from 'semantic-ui-react'
 
 type Props = {location: Location}
 type State = {username: string, password: string, from: string, loginStatus: boolean, loginError: boolean, loading: boolean}
@@ -50,61 +50,58 @@ export class Login extends React.Component<Props, State> {
         if (loginStatus) return <Redirect to={T.endPointPath.mainapp + "/"} />;
 
         return (
-            <Container>
-                <Header as='h3' >Login</Header>
-                <Form error={this.state.loginError} warning={from != '/'}>
-                    <Message
-                        warning
-                        header='Login required'
-                        list={['You must log in to view the page at ' + from]}
-                    />
-                    <Form.Field required>
-                        <Form.Input
-                            label='Username' 
-                            placeholder="Username or e-mail" 
+            <Grid textAlign='center' style={{ height: '100vh' }} verticalAlign='middle'>
+                <Grid.Column style={{ maxWidth: 450 }}>
+                <Header as='h2' color='teal' textAlign='center'>
+                    Log-in with your <a href={T.endPointPath.codalab}>Codalab</a> account
+                </Header>
+                <Form error={this.state.loginError} warning={from != 'workflow/'} size='large'>
+                    <Segment stacked>
+                        <Form.Input 
+                            fluid 
+                            icon='user' 
+                            iconPosition='left' 
                             name="username"
-                            type='text'
+                            placeholder='Codalab Username' 
                             autoFocus={true}
                             onChange={this.handleInputChange}
                             error={this.state.loginError}
                         />
-                    </Form.Field>
-                    <Form.Field required>
                         <Form.Input
-                            label="Password"
-                            placeholder="Password"
+                            fluid
+                            icon='lock'
                             name="password"
-                            type="password"
+                            iconPosition='left'
+                            placeholder='Password'
+                            type='password'
                             autoComplete='off'
                             onChange={this.handleInputChange}
                             error={this.state.loginError}
                         />
-                    </Form.Field>
-                    <Message
-                        error
-                        header='Action Forbidden'
-                        content='Wrong username or password'
-                    />
-                    <Button primary loading={this.state.loading} onClick={this.doLogin}>Login</Button>
-                    {/* <p>
-                        <a href='/account/signup'>Don't have an account? Sign up!</a>
-                    </p>
-                    <p>
-                        <a href='/account/reset'>Forgot your password?</a>
-                    </p>
-                    <a
-                        href=''
-                        onClick={(event) => {
-                            alert(
-                                'Please log in and navigate to your dashboard to resend confirmation email.',
-                            );
-                            event.preventDefault();
-                        }}
-                    >
-                        Resend confirmation email
-                    </a> */}
+
+                        <Message
+                            error
+                            header='Action Forbidden'
+                            content='Wrong username or password'
+                        />
+
+                        <Button color='teal' fluid size='large' loading={this.state.loading} onClick={this.doLogin}>
+                            Login
+                        </Button>
+                    </Segment>
                 </Form>
-            </Container>
+                <Message>
+                    <Message.List>
+                        <Message.Item>
+                            Don't have an account? <a href={T.endPointPath.codalab + "account/signup"}>Sign Up</a>
+                        </Message.Item>
+                        <Message.Item>
+                            <a href={T.endPointPath.codalab + "account/reset"}>Forget your password?</a>
+                        </Message.Item>
+                    </Message.List>
+                </Message>
+                </Grid.Column>
+            </Grid>
         );
     }
 }
