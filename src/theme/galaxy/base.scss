@@ -323,7 +323,7 @@ div.form-row-input label {
 
 .worksheetbuttons{
     margin-bottom: 0px; 
-    padding-bottom: 9px; 
+    padding-bottom: 5px; 
     border-radius: 0px; 
     padding-top: 5px;
     border-bottom: 1px solid #d4d4d5;
@@ -332,7 +332,7 @@ div.form-row-input label {
 
 .toolbuttons{
     margin-bottom: 0px; 
-    padding-bottom: 9px; 
+    padding-bottom: 5px; 
     border-radius: 0px; 
     padding-top: 5px;
     border-bottom: 1px solid #d4d4d5;
@@ -386,5 +386,6 @@ span {
 #topmenu{
     border-bottom: rgb(33, 133, 208) solid;
     border-width: 1px;
-    margin: 0;
+    margin-bottom: 5px;
+    margin-top:0;
 }

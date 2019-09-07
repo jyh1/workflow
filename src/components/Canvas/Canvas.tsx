@@ -378,7 +378,7 @@ export class Canvas extends React.Component<Props, State>{
 
         return(
             <div style={{height: "100%"}}>
-                <S.Menu color="blue" pointing secondary style={{paddingTop: "12px"}}>
+                <S.Menu color="blue" pointing secondary >
                     <S.Menu.Item active={tab == "Canvas"} onClick={() => this.setTab("Canvas")}>
                         Canvas
                     </S.Menu.Item>
@@ -386,7 +386,7 @@ export class Canvas extends React.Component<Props, State>{
                         Execution Plan
                     </S.Menu.Item>
 
-                    <S.Menu.Menu position='right'>
+                    <S.Menu.Menu position='right' style={{paddingTop: "3px", paddingBottom: "5px"}}>
 
                         <S.ButtonGroup style={{marginRight: "10px"}}>
                             <S.Popup content={locked? "Unlock Canvas": "Lock Canvas"} trigger = 
