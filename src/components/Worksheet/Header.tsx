@@ -13,10 +13,11 @@ export const WorksheetButtons: React.SFC<{uuid?: string, refreshPanel: (uuid: st
             >
                 <NewWorsheetForm refreshPanel={props.refreshPanel}/>
             </Popup>
-            <Popup
-                content="Input UUID"
+            <Popup flowing hoverable
                 trigger={<Button icon="barcode" basic color="blue"/>}
-            />
+            >
+                <InputWorksheetUUID refreshPanel={props.refreshPanel}/>
+            </Popup>
             <Popup
                 content="Refresh Panel"
                 trigger={
@@ -90,6 +91,36 @@ class NewWorsheetForm extends React.Component<MProps, MState>{
                     <Button basic color='blue' onClick={this.createWorksheet.bind(this)}>
                         <Icon name='plus'/> Create
                     </Button>
+                </Form>
+                    
+            </React.Fragment>
+        )
+    }
+
+}
+
+type IProps = {refreshPanel: (uuid: string) => void}
+class InputWorksheetUUID extends React.Component<IProps, {}>{
+    constructor(props: MProps){
+        super(props)
+        this.state = {name: ""}
+    }
+
+    handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const target = event.target
+        const value = target.value
+        if (value.length==34){
+            this.props.refreshPanel(value)
+        }
+    }
+    render(){
+        return(
+            <React.Fragment>
+                <Header as="h4" content='Select worksheet by UUID' />
+                <Form>
+                    <Form.Field>
+                        <Input placeholder='Worksheet uuid' onChange={this.handleInput}/>
+                    </Form.Field>
                 </Form>
                     
             </React.Fragment>
