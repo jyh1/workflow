@@ -28,7 +28,10 @@ export class WorksheetPanel extends React.Component<Props, State>{
 
     changeWorksheet(uuid: string){
         this.setState(p => {
-            const newstack = p.stack[p.stack.length - 1] == uuid ? p.stack : p.stack.concat([uuid])
+            const len = p.stack.length
+            let stack = p.stack
+            if (len > 10){ stack = stack.slice(-10)}
+            const newstack = stack[len - 1] == uuid ? stack : stack.concat([uuid])
             return({...p, stack: newstack})
         })
         this.selectWorksheet(uuid)
