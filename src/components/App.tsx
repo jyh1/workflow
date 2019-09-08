@@ -10,7 +10,7 @@ import { createBrowserHistory, History } from 'history';
 import {Login} from "./Login";
 import {WorksheetPanel} from './Worksheet/WorksheetPanel'
 import * as T from './Types'
-import {worksheetItemsReq} from './Requests'
+import {worksheetItemsReq, worksheetNameReq} from './Requests'
 import SplitPane from 'react-split-pane'
 import '../theme/layout.scss'
 import * as localforage from 'localforage'
@@ -39,6 +39,7 @@ export class HomeApp extends React.Component<Props, State>{
     }
     refreshBundle(){
         return (localforage.getItem("worksheet")
+        .then(uuid => uuid ? uuid : worksheetNameReq("dashboard"))
         .then(uuid => ( uuid? worksheetItemsReq(uuid as string) : Promise.resolve({items: [], uuid: ""}) ))
         .then(res => this.setState(prev => Object.assign(prev, {currentWorksheet: res}))))
     }
