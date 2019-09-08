@@ -13,6 +13,7 @@ import {ElementId, ElementInfo, CD} from './Types'
 
 type ToolPanelState = {
       tasks: TaskElement[]
+    , publicTasks: TaskElement[]
     , loading: boolean
     , current?: ElementId
     , editing: boolean
@@ -26,7 +27,7 @@ export class ToolPanel extends React.Component<ToolPanelProps, ToolPanelState>{
     contextRef: React.Ref<any>
     constructor(props: ToolPanelProps){
         super(props)
-        this.state = {tasks: [], loading: true, current: null, editing: false, elementInfo: {}}
+        this.state = {tasks: [], loading: true, current: null, editing: false, elementInfo: {}, publicTasks: []}
         this.contextRef = React.createRef()
     }
 
@@ -55,7 +56,16 @@ export class ToolPanel extends React.Component<ToolPanelProps, ToolPanelState>{
     updateList = (setroot: boolean) => {
         this.setState(p => ({...p, loading: true}))
         let tlis = taskListReq().then((e) => {
-            this.setState((prev)=> ({...prev, ...this.toTaskElement(e), loading: false, current: setroot? null : prev.current}))
+            const usereles = this.toTaskElement(e.user)
+            const publiceles = this.toTaskElement(e.public)
+            this.setState((prev)=> (
+                {...prev
+                , tasks: usereles.tasks
+                , publicTasks: publiceles.tasks
+                , elementInfo: {...usereles.elementInfo, ...publiceles.elementInfo}
+                , loading: false
+                , current: setroot? null : prev.current
+                }))
         })
         return tlis
     }
@@ -207,6 +217,9 @@ export class ToolPanel extends React.Component<ToolPanelProps, ToolPanelState>{
                             </div>
                         </Sticky>
                         <Segment style={{border: "none", paddingTop: "0", marginTop: "0"}} loading={this.state.loading} className="toolpanel">
+                            <Header as='h3' dividing>Public Tools</Header>
+                            <ToolList eleprops={eleprops} tasks={this.state.publicTasks}/>            
+                            <Header as='h3' dividing>User Tools</Header>
                             <ToolList eleprops={eleprops} tasks={this.state.tasks}/>                
                         </Segment> 
                     </div>

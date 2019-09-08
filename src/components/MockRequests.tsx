@@ -65,7 +65,7 @@ export const taskListReq: TaskListRequest = () => (
     new Promise((executor, resolve) => {
         setTimeout(
             () => {
-                executor(_.flatMap([1, 1, 1,1, 1, 1], (i) => toListEle(genEle(i))))
+                executor({user: _.flatMap([1, 1, 1,1, 1, 1], (i) => toListEle(genEle(i))), public: _.flatMap([1, 1], (i) => toListEle(genEle(i)))})
             }
             , reqtime())
     })

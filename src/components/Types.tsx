@@ -77,7 +77,7 @@ export type TaskListElement = {name: string; taskid?: string; parent?: TaskListE
 
 // requests
 export type LoginRequest = (username: string, password: string) => Promise<void>
-export type TaskListRequest = () => Promise<TaskListElement[]>
+export type TaskListRequest = () => Promise<{public: TaskListElement[], user: TaskListElement[]}>
 export type TaskInfoRequest = (taskid: TaskId) => Promise<Task>
 export type ToolGraphRequest = (taskid: TaskId) => Promise<NodeLayout>
 export type CompileRequest = (nodes: CodaGraph) => Promise<CompileResult>
