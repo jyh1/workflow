@@ -12,11 +12,14 @@ export class ToolList extends React.Component<TaskListProps, State>{
     }
 
     render(){
-        const {eleprops} = this.props
+        const {eleprops, tasks} = this.props
         return(
-            <List divided relaxed>
-                {...renderTaskElementList(this.props.tasks, eleprops)}
-            </List>
+            tasks.length > 0?
+                (<List divided relaxed>
+                    {...renderTaskElementList(tasks, eleprops)}
+                </List>)
+            :
+                <div style={{textAlign: "center"}}>{"<empty>"}</div>
         )
     }
 }
@@ -81,6 +84,10 @@ class ToolElementWidget extends React.Component<Props, {expand: boolean, name: s
     
     toggleF() {
         if (this.props.eleprops.editing) {return}
+        if (!this.props.eleprops.selectable){
+            this.setState((prevState) => ({...prevState, expand: !prevState.expand}))
+            return
+        }
         const {id, eleprops} = this.props
         const {cd, path} = eleprops
         const current = currentid(path)

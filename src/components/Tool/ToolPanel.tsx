@@ -54,7 +54,6 @@ export class ToolPanel extends React.Component<ToolPanelProps, ToolPanelState>{
     }
 
     updateList = (setroot: boolean) => {
-        this.setState(p => ({...p, loading: true}))
         let tlis = taskListReq().then((e) => {
             const usereles = this.toTaskElement(e.user)
             const publiceles = this.toTaskElement(e.public)
@@ -100,6 +99,7 @@ export class ToolPanel extends React.Component<ToolPanelProps, ToolPanelState>{
     }
 
     componentDidMount(){
+        this.setState(p => ({...p, loading: true}))
         this.updateList(false)
     }
 
@@ -177,7 +177,8 @@ export class ToolPanel extends React.Component<ToolPanelProps, ToolPanelState>{
             currentElement = ele.parent
         }
 
-        const eleprops = {editing: this.state.editing, path, cd: this.cd, save: this.save, cancelEdit: this.stopEdit}
+        const eleprops = {selectable: true, editing: this.state.editing, path, cd: this.cd, save: this.save, cancelEdit: this.stopEdit}
+        const publiceleprops = {selectable: false, editing: false, path, cd: () => {}, save: () => {}, cancelEdit: () => {}}
 
         return(
             <React.Fragment>
@@ -217,10 +218,10 @@ export class ToolPanel extends React.Component<ToolPanelProps, ToolPanelState>{
                             </div>
                         </Sticky>
                         <Segment style={{border: "none", paddingTop: "0", marginTop: "0"}} loading={this.state.loading} className="toolpanel">
-                            <Header as='h3' dividing>Public Tools</Header>
-                            <ToolList eleprops={eleprops} tasks={this.state.publicTasks}/>            
                             <Header as='h3' dividing>User Tools</Header>
                             <ToolList eleprops={eleprops} tasks={this.state.tasks}/>                
+                            <Header as='h3' dividing>Public Tools</Header>
+                            <ToolList eleprops={publiceleprops} tasks={this.state.publicTasks}/>
                         </Segment> 
                     </div>
                 </Ref>

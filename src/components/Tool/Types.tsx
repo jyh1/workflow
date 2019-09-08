@@ -6,5 +6,6 @@ export type EleProps = {
     , editing: boolean
     , save: (id: ElementId, name: string, desc: string) => void
     , cancelEdit: () => void
+    , selectable: boolean
     }
 export type ElementInfo = {id: ElementId, name: string, isfolder: boolean, parent: ElementId}
