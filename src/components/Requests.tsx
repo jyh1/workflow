@@ -171,14 +171,16 @@ export const worksheetItemsReq: T.WorksheetItemsRequest = (worksheet) => {
 }
 
 export const worksheetsReq: T.WorksheetsRequest = () => (
-    fetch(T.endPointPath.rest + 'worksheets?keywords=.mine', {credentials: 'same-origin'})
-    .then(res => {
-        if (!res.ok){
-            return Promise.reject(res);
-        }
-        let list = res.json().then(data => _.map(data.data, w => ({uuid: w.id, name: w.attributes.name, title: w.attributes.title})))
+    processFetch(fetch(T.endPointPath.rest + 'worksheets?keywords=.mine', {credentials: 'same-origin'}))
+    .then(data => {
+        let list = _.map((data as any).data, w => ({uuid: w.id, name: w.attributes.name, title: w.attributes.title}))
         return list
     })
+)
+
+export const worksheetNameReq: T.WorksheetNameRequest = (name) => (
+    processFetch(fetch(T.endPointPath.rest + 'worksheets?keywords=name=' + name, {credentials: 'same-origin'}))
+    .then (res => (res as any).data[0].id)
 )
 
 export const bundleInfoReq: T.BundleInfoRequest = (uuid: string) => (

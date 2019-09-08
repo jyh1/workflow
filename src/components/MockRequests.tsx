@@ -202,6 +202,18 @@ export const worksheetsReq: T.WorksheetsRequest = () => (
     })
 )
 
+export const worksheetNameReq: T.WorksheetNameRequest = (name: string) => (
+    new Promise((executor, resolve) => {
+        setTimeout(
+            () => {
+                executor("0xfb85fa298e8d48fba93febc8c1860e94")
+            }
+
+        , reqtime()
+        )
+    })
+)
+
 export const bundleInfoReq: T.BundleInfoRequest = (uuid: string) => (
     new Promise((executor, resolve) => {
         setTimeout(

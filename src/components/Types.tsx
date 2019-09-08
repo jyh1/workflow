@@ -85,6 +85,7 @@ export type ClRequest = (worsheet: string, command: string) => Promise<string>
 export type ClWaitRequest = (path: string) => Promise<string>
 export type WorksheetItemsRequest = (worksheet: string) => Promise<WorksheetContent>
 export type WorksheetsRequest = () => Promise<Worksheet[]>
+export type WorksheetNameRequest = (name: string) => Promise<string>
 export type BundleInfoRequest = (uuid: string) => Promise<BundleInfo>
 export type ParseRquest = (program: string) => Promise<ParseResult>
 export type ParseArgRequest = (arg: string) => Promise<ParseResult>

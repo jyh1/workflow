@@ -62,7 +62,7 @@ export class WorksheetPanel extends React.Component<Props, State>{
         return(
             <React.Fragment>
                 <div className="worksheetbuttons">
-                    <WorksheetButtons refreshPanel={this.refreshPanel.bind(this)} uuid={content.uuid}/>
+                    <WorksheetButtons refreshPanel={this.changeWorksheet.bind(this)} uuid={content.uuid}/>
                 </div>
                 <SegmentGroup className="newsegment">
                     <WorksheetDropdown selectWorksheet={this.changeWorksheet.bind(this)} uuid={content.uuid} worksheets={this.state.worksheets} />
