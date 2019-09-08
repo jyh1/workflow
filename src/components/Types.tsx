@@ -70,7 +70,7 @@ export const bundleTag = "bundle"
 export type TaskDragType = {name: string, taskinfo: TaskInfo, nodetype?: NodeType}
 export type BundleDragType = {name: string, uuid: string}
 
-export type TaskElement = {name: string, id: string, description: string} & ({children: TaskElement[]} | {taskid: TaskId})
+export type TaskElement = {name: string, id: string, description: string} & ({children: TaskElement[], open?: boolean} | {taskid: TaskId})
 
 export type TaskListElementId = string
 export type TaskListElement = {name: string; taskid?: string; parent?: TaskListElementId; id: TaskListElementId; description: TaskId}

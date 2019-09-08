@@ -59,6 +59,7 @@ type Props = {
   , id: string
   , eleprops: EleProps
   , taskid?: string
+  , open?: boolean
   }
 
 class ToolElementWidget extends React.Component<Props, {expand: boolean, name: string, description: string}>{
@@ -68,7 +69,7 @@ class ToolElementWidget extends React.Component<Props, {expand: boolean, name: s
     handleEditChange: (e: React.ChangeEvent<HTMLInputElement>) => void
     constructor(props: Props){
         super(props)
-        this.state = {expand: false, name: this.props.name, description: this.props.description}
+        this.state = {expand: props.open? true : false, name: this.props.name, description: this.props.description}
         this.dragStart = this.dragStartF.bind(this)
         this.toggle = this.toggleF.bind(this)
         this.isfolder = this.props.taskid? false : true
