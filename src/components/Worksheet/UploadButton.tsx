@@ -30,12 +30,10 @@ export class UploadButton extends React.Component<Props, State>{
                     <Button 
                         basic
                         color="blue" 
-                        floated="right"
                         icon="upload"
                         onClick={() => this.inputElement.current.click()}
                     />
                 }/>
-                <br style={{clear: "both"}}/>
             </React.Fragment>
         )
     }

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as _ from 'lodash'
-import {Header, Segment, Table, Dimmer, Loader} from 'semantic-ui-react'
+import {Header, Segment, Table, Dimmer, Loader, Button, Popup} from 'semantic-ui-react'
 import * as T from '../Types'
 import {BundleTable} from './BundleTable'
 import {UploadButton} from './UploadButton'
@@ -9,7 +9,7 @@ import {MarkupText} from './Markup'
 const worksheetLink = (uuid: string) => T.endPointPath.codalab + "worksheets/" + uuid
 
 type Props = T.WorksheetContent & 
-    {loading: boolean, refreshBundle: () => void, selectWorksheet: (uuid: string) => void}
+    {loading: boolean, refreshBundle: () => void, selectWorksheet: (uuid: string) => void, goBack: () => void}
 type State = {}
 
 export class Worksheet extends React.Component<Props, State>{
@@ -32,7 +32,14 @@ export class Worksheet extends React.Component<Props, State>{
                     </a>
                 </Header>
                 <Segment attached style={{paddingTop: "5px"}}>
-                    <UploadButton worksheet={uuid} refreshBundle={refreshBundle}/>
+                    <Button.Group floated="right">
+                        <Popup content='Go Back' position='bottom right' trigger = {
+                            <Button icon="arrow left" basic color="blue" onClick={this.props.goBack}/>
+                        }
+                        />
+                        <UploadButton worksheet={uuid} refreshBundle={refreshBundle}/>
+                    </Button.Group>
+                    <br style={{clear: "both"}}/>
                     {displayItems}
                 </Segment>
                 <Dimmer active={this.props.loading} inverted>

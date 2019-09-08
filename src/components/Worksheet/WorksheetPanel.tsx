@@ -14,16 +14,32 @@ type Props = {
     , loading: boolean
     , refreshBundle: () => void
 }
-type State = {worksheets: T.Worksheet[]}
+type State = {worksheets: T.Worksheet[], stack: string[]}
 
 export class WorksheetPanel extends React.Component<Props, State>{
     constructor(props: Props){
         super(props)
-        this.state = {worksheets: []}
+        this.state = {worksheets: [], stack: []}
     }
-    changeWorksheet(uuid: string){
+    selectWorksheet(uuid: string){
         localforage.setItem("worksheet", uuid)
         .then(this.props.changeWorksheet)
+    }
+
+    changeWorksheet(uuid: string){
+        this.setState(p => {
+            const newstack = p.stack[p.stack.length - 1] == uuid ? p.stack : p.stack.concat([uuid])
+            return({...p, stack: newstack})
+        })
+        this.selectWorksheet(uuid)
+    }
+
+    goBack = () => {
+        const {stack} = this.state
+        const len = stack.length
+        if (len <= 1){return}
+        this.selectWorksheet(stack[len - 2])
+        this.setState(p => ({...p, stack: stack.slice(0, len - 1)}))
     }
 
     refreshWorksheetList(){
@@ -51,7 +67,7 @@ export class WorksheetPanel extends React.Component<Props, State>{
                 <SegmentGroup className="newsegment">
                     <WorksheetDropdown selectWorksheet={this.changeWorksheet.bind(this)} uuid={content.uuid} worksheets={this.state.worksheets} />
                     <SegmentGroup>
-                        <Worksheet {...content} loading={loading} refreshBundle={refreshBundle} selectWorksheet={this.changeWorksheet.bind(this)}/>
+                        <Worksheet goBack={this.goBack} {...content} loading={loading} refreshBundle={refreshBundle} selectWorksheet={this.changeWorksheet.bind(this)}/>
                     </SegmentGroup>
                 </SegmentGroup>
             </React.Fragment>
