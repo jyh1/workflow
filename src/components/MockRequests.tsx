@@ -244,3 +244,11 @@ export const parseArgReq: T.ParseArgRequest = (str: string) => (
 export const updateToolReq: T.UpdateToolReq = (d) => mockRequest(d.id)
 export const newToolReq: T.NewToolReq = (t) => mockRequest("1")
 export const removeEleReq: T.RemoveElementReq = (t) => mockRequest({})
+
+export const userInfoReq: T.UserInfoReq = () => (
+    new Promise((executor, resolve) => {
+        setTimeout(
+            () => executor({"attributes": {"email": "yonghao_jin@student.uml.edu", "time_quota": 31536000, "last_login": "Sun Sep  8 06:53:28 2019", "affiliation": null, "date_joined": "Sat Sep  7 01:17:27 2019", "time_used": 0, "user_name": "yonghaojin", "parallel_run_quota": 3, "url": null, "notifications": 2, "last_name": "Jin", "disk_quota": 1099510000000, "disk_used": 19191, "first_name": "Yonghao"}, "id": "0x3227302d89d3482f9d2b7f772a824f77"} as T.UserInfo)
+        , reqtime())
+    })
+) 

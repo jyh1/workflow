@@ -58,6 +58,17 @@ export const getLoginStatus = () => {
     return (codalab_session != undefined);
 }
 
+export const userInfoReq: T.UserInfoReq = () => (
+    processFetch(fetch(T.endPointPath.rest + 'user', 
+        {
+          headers: {"Content-Type":'application/json'}
+        , credentials: 'same-origin'
+        }))
+    .then(res => {
+        const data = (res as any).data
+        return data? data : Promise.reject("Invalid user")
+    })
+)
 
 export const taskListReq: TaskListRequest = () => (
     processFetch(fetch('./tool/list', 

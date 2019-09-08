@@ -5,7 +5,7 @@ import {endPointPath} from "./Types"
 import * as _ from "lodash"
 import { Router, Route, Redirect, Switch, RouteProps } from 'react-router-dom';
 // import {getLoginStatus} from "./MockRequests"
-import {getLoginStatus} from "./Requests"
+import {getLoginStatus, userInfoReq} from "./Requests"
 import { createBrowserHistory, History } from 'history';
 import {Login} from "./Login";
 import {WorksheetPanel} from './Worksheet/WorksheetPanel'
@@ -23,6 +23,7 @@ type State = {
     , loadingWorksheet: boolean
     , codalang?: {ast: T.CodaLang, graph: T.NodeLayout}
     , infos: Map<number, T.Info>
+    , userinfo: T.UserInfo
     }
 
 export class HomeApp extends React.Component<Props, State>{
@@ -32,10 +33,12 @@ export class HomeApp extends React.Component<Props, State>{
               currentWorksheet: {items: [], uuid: "", name: ""}
             , loadingWorksheet: false
             , infos: new Map()
+            , userinfo: null
         }
     }
     componentDidMount(){
         this.changeWorksheet()
+        // userInfoReq().then(userinfo => this.setState(prev => ({...prev, userinfo})))
     }
     refreshBundle(){
         return (localforage.getItem("worksheet")

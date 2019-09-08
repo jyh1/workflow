@@ -2,7 +2,7 @@ import * as React from 'react'
 import {Dropdown, Segment, Button, Icon, Header, Input, Form, Popup } from 'semantic-ui-react'
 import * as _ from 'lodash'
 import * as T from '../Types'
-import {worksheetsReq, clReq, worksheetNameReq} from '../Requests'
+import {worksheetsReq, clReq, worksheetNameReq, userInfoReq} from '../Requests'
 
 type BProps = {uuid?: string, refreshPanel: (uuid: string) => void}
 type BState = {home: string, dashboard: string}
@@ -13,7 +13,8 @@ export class WorksheetButtons extends React.Component<BProps, BState>{
         this.state={home: null, dashboard: null}
     }
     componentDidMount(){
-        worksheetNameReq("home")
+        userInfoReq()
+        .then(userinfo => worksheetNameReq("home-" + userinfo.attributes.user_name))
         .then(home => this.setState(p => ({...p, home})))
         worksheetNameReq("dashboard")
         .then(dashboard => this.setState(p => ({...p, dashboard})))

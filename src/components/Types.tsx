@@ -93,6 +93,9 @@ export type NewToolReq = (task: NewTool) => Promise<string>
 export type UpdateToolReq = (task: UpdateTool) => Promise<string>
 export type RemoveElementReq = (eid: string) => Promise<{}>
 export type UploadFileReq = (worksheet: string, file: File) => Promise<{}>
+export type UserInfoReq = () => Promise<UserInfo>
+
+export type UserInfo = {attributes: {user_name: string}, id: string}
 
 // graph representation
 export type ToolPort = JObject <NodeType, {nodeid: string, label: string, nodename: string}>
