@@ -360,7 +360,7 @@ export class Canvas extends React.Component<Props, State>{
         const model = this.engine.getDiagramModel()
 
         const dropDown = (
-            <S.Dropdown item icon='plus' simple>
+            <S.Dropdown item button className="blue icon" icon='plus' floating simple basic>
                 <S.Dropdown.Menu>
                     <S.Dropdown.Item style={{cursor: "grab"}} draggable onDragStart={this.dragStart}>
                         <S.Icon name="code"/>Empty Tool
@@ -415,7 +415,7 @@ export class Canvas extends React.Component<Props, State>{
                             }/>
                         </S.ButtonGroup> */}
 
-                        <S.ButtonGroup>
+                        <S.ButtonGroup style={{marginRight: "10px"}}>
                             <S.Popup content='Build' trigger = 
                                 {<S.Button 
                                     basic
@@ -444,9 +444,9 @@ export class Canvas extends React.Component<Props, State>{
                                     onClick={() => this.props.doSave(codalang, graph)}
                                 />}
                             />
+                            {dropDown}
                         </S.ButtonGroup>
 
-                        {dropDown}
                     </S.Menu.Menu>
 
                 </S.Menu>
