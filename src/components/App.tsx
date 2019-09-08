@@ -14,8 +14,8 @@ import {worksheetItemsReq, worksheetNameReq} from './Requests'
 import SplitPane from 'react-split-pane'
 import '../theme/layout.scss'
 import * as localforage from 'localforage'
-import * as S from 'semantic-ui-react'
 import { ErrorList } from "./Errors/ErrorList";
+import {Navigation} from "./Navigation/Navigation"
 
 type Props = {history: History<any> }
 type State = {
@@ -93,7 +93,7 @@ export class HomeApp extends React.Component<Props, State>{
         return (
             <React.Fragment>
                 <ErrorList errors={errors} removeException={this.removeException}/>
-                <Navigation history={this.props.history}/>
+                <Navigation/>
                 <SplitPane split="vertical" defaultSize="16%" pane1Style={{overflowY: "auto"}}>
                     <ToolPanel report={this.addException} codalang={this.state.codalang} doneSave={this.doneSave}/>
                     <SplitPane split="vertical" defaultSize={385} primary="second" minSize={385} pane2Style={{overflowY: "auto"}}>
@@ -109,26 +109,6 @@ export class HomeApp extends React.Component<Props, State>{
             </React.Fragment>
         )
     }
-}
-
-
-const Navigation: React.SFC<{history: History<any>}> = ({history}) => {
-    const logout = () => {
-        T.logOut()
-        // history.push(endPointPath.login)
-    }
-    return (
-        <S.Menu secondary id="topmenu">
-            <S.MenuItem>
-                <S.Header color="blue">Codalab Workflow</S.Header>
-            </S.MenuItem>
-            <S.Menu.Item position='right'>
-                  <S.Button onClick={logout} basic color="blue" as='a'>
-                    Log out
-                  </S.Button>
-            </S.Menu.Item>
-        </S.Menu>
-    )
 }
 
 export const mainapp = () => (
