@@ -52,7 +52,7 @@ export class Login extends React.Component<Props, State> {
         return (
             <Grid textAlign='center' style={{ height: '100vh' }} verticalAlign='middle'>
                 <Grid.Column style={{ maxWidth: 450 }}>
-                <Header as='h2' color='teal' textAlign='center'>
+                <Header as='h2' color='blue' textAlign='center'>
                     Log-in with your <a href={T.endPointPath.codalab}>Codalab</a> account
                 </Header>
                 <Form error={this.state.loginError} warning={from != 'workflow/'} size='large'>
@@ -85,7 +85,7 @@ export class Login extends React.Component<Props, State> {
                             content='Wrong username or password'
                         />
 
-                        <Button color='teal' fluid size='large' loading={this.state.loading} onClick={this.doLogin}>
+                        <Button color='blue' fluid size='large' loading={this.state.loading} onClick={this.doLogin}>
                             Login
                         </Button>
                     </Segment>
