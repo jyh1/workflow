@@ -205,14 +205,18 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 	}
 
 	startEditingName = () => {
+		this.props.node.lockNode()
         this.setState(p => Object.assign(p, {editName: true}))
     }
     stopEditingName = () => {
+		this.props.node.lockNode(false)
         this.setState(p => Object.assign(p, {editName: false}))
 	}
 	editName = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const name = e.target.value
-        this.props.node.name = name
+		const name = e.target.value
+		if (name.length > 0){
+			this.props.node.name = name
+		}
 	}
 
 	expandable(){
