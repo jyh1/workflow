@@ -218,8 +218,8 @@ export class ToolPanel extends React.Component<ToolPanelProps, ToolPanelState>{
                             </div>
                         </Sticky>
                         <Segment style={{border: "none", paddingTop: "0", marginTop: "0"}} loading={this.state.loading} className="toolpanel">
-                            <ToolList eleprops={eleprops} tasks={[{name: "User Tools", description:" ", id: null, children: this.state.tasks, open: true}]}/>                
-                            <ToolList eleprops={publiceleprops} tasks={[{name: "Publc Tools", description:" ", id: "unselectable", children: this.state.publicTasks, open: true}]}/>
+                            <ToolList eleprops={eleprops} tasks={[{name: "User Tools", description:"User directory", id: null, children: this.state.tasks, open: true}]}/>                
+                            <ToolList eleprops={publiceleprops} tasks={[{name: "Publc Tools", description:"Public directory", id: "unselectable", children: this.state.publicTasks, open: true}]}/>
                         </Segment> 
                     </div>
                 </Ref>
