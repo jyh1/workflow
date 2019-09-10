@@ -1,6 +1,6 @@
 import * as T from './Types'
 import * as _ from 'lodash'
-import {quote} from './algorithms'
+import {quote, singleQuote, quoteStr} from './algorithms'
 import {clReq, clWait} from './Requests'
 import * as localforage from 'localforage'
 
@@ -80,7 +80,7 @@ function resolveClOpts(env: Env, opts: T.ClOption[]): Promise<string>{
 function resolveCMDEle(env: Env, alias: Map<string, string>, e: T.CMDEle): Promise<string>{
     if (e.type == "quote"){
         return (resolveJNormalRes(env, e.content)
-                .then(str => quote([str]))
+                .then(str => quoteStr(str))
             )
     } 
     if (e.type == "bundle"){
@@ -94,7 +94,7 @@ function resolveCMDEle(env: Env, alias: Map<string, string>, e: T.CMDEle): Promi
 function resolveCMDEles(env: Env, alias: Map<string, string>, es: T.CMDEle[]): Promise<string>{
     return(
         Promise.all(_.map(es, x => resolveCMDEle(env, alias, x)))
-        .then(ss => quote([ss.join('')]))
+        .then(ss => singleQuote(ss.join('')))
     )
 }
 

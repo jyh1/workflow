@@ -54,19 +54,31 @@ export class Graph {
 // https://github.com/substack/node-shell-quote
 export let quote = function (xs: string[]) {
     let strs = _.map(xs, function (s) {
-        if (/["\s]/.test(s) && !/'/.test(s)) {
+        if (/["\s]/.test(s)) {
             return "'" + s.replace(/(['\\])/g, '\\$1') + "'";
         }
         else if (/["'\s]/.test(s)) {
             return '"' + s.replace(/(["\\$`!])/g, '\\$1') + '"';
         }
         else {
-            return String(s).replace(/([#!"$&'()*,:;<=>?@\[\\\]^`{|}])/g, '\\$1'); 
+            // return String(s).replace(/([#!"$&'()*,:;<=>?@\[\\\]^`{|}])/g, '\\$1'); 
+            return s
         }
     })
     return strs.join(" ")
 };
 
+
+export const singleQuote = function (s: string){
+    return "'" + s.replace(/(['\\])/g, '\\$1') + "'"
+}
+
+export const quoteStr = function (s: string){
+    if (/['"\s[#!$&()*,:;<=>?@\[\\\]^`{|}]/.test(s)) {
+        return singleQuote(s);
+    }
+    return s
+}
 
 export const debounce = (func: () => void, delay: number) => {
     let inDebounce: NodeJS.Timeout
