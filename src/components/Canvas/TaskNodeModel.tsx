@@ -74,7 +74,9 @@ export class TaskNodeModel extends DefaultNodeModel {
 		}
 
 		this.intialize = this.loadTask(taskreq)
-		this.intialize.then(this.refresh)
+		this.intialize
+		.catch(() => { this.error({type: "error",  header: "Error Loading Tool", body: <p/>}); this.remove()})
+		.finally(this.refresh)
 	}
 	removeAndRefresh(){
 		this.remove()
