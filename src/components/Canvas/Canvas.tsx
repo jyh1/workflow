@@ -278,7 +278,11 @@ export class Canvas extends React.Component<Props, State>{
                 this.runningInfo.currentInfo = {type: "positive", header: "Execution Complete", body: <p/>}
                 this.reportRunning()
                 })
-            .then(()=>{this.setState(prev => Object.assign(prev, {running: false}))})
+            .catch(err => {
+                const {infoid} = this.runningInfo
+                this.props.report({type: "error", header: "Runtime Error", body: <p/>, update: {id: infoid}})
+            })
+            .finally(()=>{this.setState(prev => Object.assign(prev, {running: false}))})
         }
     }
 
@@ -472,6 +476,7 @@ export class Canvas extends React.Component<Props, State>{
                                 diagramEngine={this.engine} 
                                 allowCanvasZoom={false}
                                 allowCanvasTranslation={!this.state.locked}
+                                deleteKeys={[46]}
                                 // maxNumberPointsPerLink={0}
                             />
                         </div>
