@@ -2,7 +2,7 @@ import {NodeInfo, taskTag, TaskDragType, ToolPort, Info, ToolNodeInterface, JLan
 import * as React from "react"
 import * as SRD from "storm-react-diagrams"
 import {TaskNodeModel, TaskNodeFactory, TaskLinkFactory, OldLinks, TaskLinkModel, TaskPortModel} from "./TaskNodeModel"
-import {Graph, debounce} from '../algorithms'
+import {Graph, debounce, toolName} from '../algorithms'
 import * as _ from "lodash"
 import * as S from 'semantic-ui-react'
 import {compileReq} from "../Requests"
@@ -92,7 +92,7 @@ export class Canvas extends React.Component<Props, State>{
             name = (n as any).name
             // layout info
             toolLayout.push({toolinfo: extras, pos: {x: n.x - x0, y: n.y - y0}, oldid: id, name})
-            name = name.replace(/\W/g, '')
+            name = toolName(name)
 
             
             // argument node

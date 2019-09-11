@@ -102,3 +102,11 @@ export function humanFileSize(bytes: number) {
     } while(Math.abs(bytes) >= thresh && u < units.length - 1);
     return bytes.toFixed(1)+' '+units[u];
 }
+
+export function toolName(name: string): string{
+    let newName = name.replace(/[\W'"\s[#!$&()*,:;<=>?@\[\\\]^`{|}]/g, '')
+    if (!/^[a-zA-Z]/.test(newName) || newName.length == 0){
+        newName = 'a' + newName
+    }
+    return newName
+}
