@@ -153,9 +153,9 @@ function cmdBundle(uuid: string): T.CMDEle{
 
 const testBlocks: JBlock[] = [
       blk("x", tc("lit", "0x0cf40bf4b76246bc9d0545e13524a174"))
-    , blk("y", tc("run", {dependencies: [["x", jv("x")]], cmd: [plainE("bash"), cmdBundle("x"), cmdBundle("x")]}))
+    , blk("y", tc("run", {dependencies: [["x", jv("x")]] as T.Deps, cmd: [plainE("bash"), cmdBundle("x"), cmdBundle("x")]}))
     , blk("z", tc("cat", tc("dir", {root: jv("y"), path: ["stdout"]})))
-    , blk('dir', tc('make', [["res", tc("dir", {root:jv("y"), path: ["stdout"]})], ["code", jv("x")]]))
+    , blk('dir', tc('make', [["res", tc("dir", {root:jv("y"), path: ["stdout"]})], ["code", jv("x")]] as T.Deps))
 ]
 
 export const clReq: T.ClRequest = (worksheet, command) => (
