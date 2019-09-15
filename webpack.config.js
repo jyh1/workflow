@@ -41,17 +41,11 @@ module.exports = (env) => {
                         "sass-loader" // compiles Sass to CSS, using Node Sass by default
                     ]
                 },
-                {
-                    test: /\.css$/,
-                    use: ['style-loader', 'css-loader'],
-                },
 
-                { 
-                    test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/
-                , loader: "url-loader?limit=10000&mimetype=application/font-woff"
-                , options: {publicPaht: './dist/'}
-                },
-                { test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "file-loader" }
+                { test: /\.(png|ttf|eot|svg|woff(2)?)(\?v=[0-9]\.[0-9]\.[0-9])?$/
+                    , loader: "url-loader" 
+                    , options: {publicPath: '/dist/'}
+                }
 
             ]
         },
@@ -64,5 +58,6 @@ module.exports = (env) => {
             "react": "React",
             "react-dom": "ReactDOM"
         }
+
     })
 };
