@@ -70,7 +70,7 @@ In this setting, users can just use their CodaLab accounts for authentication. T
 If the above process succeed, the frontend will get two cookies and can use them to directly communicate with both servers.
 
 ## Start your own instance
-
+You can easily set up everything with a simple `docker-compose` command. Check out the [Docker repository](https://github.com/jyh1/codalabworkflow-docker) for Workflow.
 
 ## Build from source
 
@@ -84,4 +84,4 @@ cp index.production.html build/index.html
 ```
 
 ### Backend
-Please refer to the [backend repository]()
+Please refer to the [backend repository](https://github.com/jyh1/codalang-server).
