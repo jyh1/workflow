@@ -36,7 +36,8 @@ export class TaskNodeModel extends DefaultNodeModel {
 	newNode: (node: NodeInfo, oldlinks?: OldLinks) => TaskNodeModel
 	nodeType: T.NodeType
 	oldlinks: OldLinks
-	intialize: Promise<void>
+	initialize: Promise<void>
+	unselectable: boolean
     constructor(
 		  node: NodeInfo
 		, refresh: () => void
@@ -73,11 +74,15 @@ export class TaskNodeModel extends DefaultNodeModel {
 			taskreq = Promise.resolve({taskbody: {}, inports: {}, outports: {}, taskcode: ""})
 		}
 
-		this.intialize = this.loadTask(taskreq)
-		this.intialize
+		this.initialize = this.loadTask(taskreq)
+		this.initialize
 		.catch(() => { this.error({type: "error",  header: "Error Loading Tool", body: <p/>}); this.remove()})
 		.finally(this.refresh)
+
+		this.unselectable = this.toggleEditor
+		this.addListener({selectionChanged: ({isSelected}) => {this.selected = (!this.unselectable) && isSelected} })
 	}
+
 	removeAndRefresh(){
 		this.remove()
 		this.refresh()
@@ -141,13 +146,8 @@ export class TaskNodeModel extends DefaultNodeModel {
         this.refresh()
 	}
 	lockNode(lock: boolean = true){
-		this.setLocked(lock)
-		_.mapValues(this.getPorts(), 
-			p => {
-				_.mapValues(p.getLinks(), v => {v.setLocked(lock)})
-				p.setLocked(lock)
-			}
-		)
+		// lock node so we can select text in the editor
+		this.unselectable = lock
 	}
 }
 
@@ -253,7 +253,7 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 						, pos: {x: x0 + pos.x, y: y0 + pos.y}
 						, nodeType: toolinfo.nodeType
 					})
-				await newnode.intialize
+				await newnode.initialize
 				_.forEach(newnode.getPorts(), (p: DefaultPortModel) => {
 					const key = [oldid, p.in, p.label].toString()
 					oldIdToPort[portidmap[key]] = p
