@@ -16,7 +16,7 @@ import * as T from "./Types"
 import * as _ from "lodash"
 import * as Data from './TestData'
 
-let latency = 3000
+let latency = 300
 let reqtime = () => latency * Math.random()
 
 function mockRequest<R>(info: R): Promise<R>{
@@ -162,11 +162,7 @@ export const clReq: T.ClRequest = (worksheet, command) => (
     new Promise((executor, resolve) => {
         setTimeout(
             () => {
-                if (worksheet == "0x4329e2c6d58c4312aad5a0df042eea95"){
-                    executor("0xfb85fa298e8d48fba93febc8c1860e94")
-                } else {
-                    resolve()
-                }
+                executor("0xfb85fa298e8d48fba93febc8c1860e94")
             }
         , reqtime())
     })
@@ -192,8 +188,7 @@ export const worksheetsReq: T.WorksheetsRequest = () => (
     new Promise((executor, resolve) => {
         setTimeout(
             () => {
-                let data = _.map(Data.myworksheets.data, w => ({uuid: w.id, name: w.attributes.name, title: w.attributes.title}))
-                console.log(data)
+                let data = [{uuid: "0xc06bcc842af34cd5a30f7feeea52ab1d", name: "workflow-demo", title: "Workflow Demo"}]
                 executor(data)
             }
 
@@ -248,7 +243,7 @@ export const removeEleReq: T.RemoveElementReq = (t) => mockRequest({})
 export const userInfoReq: T.UserInfoReq = () => (
     new Promise((executor, resolve) => {
         setTimeout(
-            () => executor({"attributes": {"email": "yonghao_jin@student.uml.edu", "time_quota": 31536000, "last_login": "Sun Sep  8 06:53:28 2019", "affiliation": null, "date_joined": "Sat Sep  7 01:17:27 2019", "time_used": 0, "user_name": "yonghaojin", "parallel_run_quota": 3, "url": null, "notifications": 2, "last_name": "Jin", "disk_quota": 1099510000000, "disk_used": 19191, "first_name": "Yonghao"}, "id": "0x3227302d89d3482f9d2b7f772a824f77"} as T.UserInfo)
+            () => executor({"attributes": {"email": "", "time_quota": 31536000, "last_login": "Sun Sep  8 06:53:28 2019", "affiliation": null, "date_joined": "Sat Sep  7 01:17:27 2019", "time_used": 0, "user_name": "demo", "parallel_run_quota": 3, "url": null, "notifications": 2, "last_name": "Demo", "disk_quota": 1099510000000, "disk_used": 19191, "first_name": "Demo"}, "id": "0x3227302d89d3482f9d2b7f772a824f77"} as T.UserInfo)
         , reqtime())
     })
 ) 

@@ -7,7 +7,8 @@ import * as _ from "lodash"
 import * as S from 'semantic-ui-react'
 import {compileReq} from "../Requests"
 import {evalJLang} from "../Interpreter"
-import {clReq} from '../Requests'
+// import {clReq} from '../Requests'
+import {clReq} from '../MockRequests'
 import * as T from '../Types'
 import {buildCommand, Execution} from './ExePlan'
 import { fromException } from "../Errors/FromException";
@@ -253,7 +254,7 @@ export class Canvas extends React.Component<Props, State>{
         let req = clReq(worksheet, command)
         req.then(this.refreshBundle)
         .then( () => {
-            this.runningInfo.commands.push(<S.MessageItem key={this.runningInfo.commands.length}><code>{command}</code></S.MessageItem>)
+            this.runningInfo.commands.push(<S.MessageItem key={this.runningInfo.commands.length}><b>DEMO: </b><code>{command}</code></S.MessageItem>)
             this.reportRunning()
         })
         return req

@@ -28,6 +28,10 @@ export class Login extends React.Component<Props, State> {
         };
     }
 
+    componentDidMount(){
+        this.doLogin(null, null)
+    }
+
     handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const target = event.target
         const name = target.name

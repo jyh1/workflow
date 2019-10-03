@@ -54,7 +54,7 @@ export const loginReq: LoginRequest = (username, password) => {
 export const getLoginStatus = () => {
     // console.log('check login')
     let cookie = new Cookies()
-    let codalab_session = cookie.get('codalab_session');
+    let codalab_session = cookie.get('NO-XSRF-TOKEN');
     return (codalab_session != undefined);
 }
 

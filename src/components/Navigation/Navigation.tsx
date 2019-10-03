@@ -2,6 +2,7 @@ import * as React from "react";
 import * as S from 'semantic-ui-react'
 import * as T from '../Types'
 import * as R from '../Requests'
+import {userInfoReq} from '../MockRequests'
 
 export class Navigation extends React.Component<{}, {username: string}>{
     constructor(props: {}){
@@ -9,7 +10,7 @@ export class Navigation extends React.Component<{}, {username: string}>{
         this.state = {username: ""}
     }
     componentDidMount(){
-        R.userInfoReq()
+        userInfoReq()
         .then(user => this.setState(p => ({...p, uesrname: user.attributes.user_name})))
     }
     logout = () => {
