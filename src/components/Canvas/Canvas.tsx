@@ -13,6 +13,7 @@ import {buildCommand, Execution} from './ExePlan'
 import { fromException } from "../Errors/FromException";
 import { DefaultPortModel, DiagramModel } from "storm-react-diagrams";
 import { serialize } from "cookie";
+import { node } from "prop-types"
 
 type Props = {
       nodes: NodeInfo[]
@@ -201,12 +202,24 @@ export class Canvas extends React.Component<Props, State>{
                 const e: EmptyGraph = {type: "empty", content: {}}
                 throw e
             }
+            let codalangstr : string = null
+            let codalang: T.CodaLang = null
+            if (layoutg.tools.length == 1){
+                // only has a single node
+                const onlynode = layoutg.tools[0]
+                codalangstr = onlynode.toolinfo.task.taskcode
+                codalang = onlynode.toolinfo.task.taskbody
+            }
             this.setState(p => ({...p, loading: true, compiled: nullRes, tab: "Canvas"}))
             compileReq(nodes)
             .then((res) => {
                 buildCommand(res.jlang)
                 .then( command => 
-                    {this.setState(p => ({...p, compiled: {...res, command, graph: layoutg}, loading: false}))}
+                    {
+                        codalangstr = codalangstr || res.codalangstr
+                        codalang = codalang || res.codalang
+                        this.setState(p => ({...p, compiled: {...res, codalangstr, codalang, command, graph: layoutg}, loading: false}))
+                    }
                 )
                 return res.interface
             })
