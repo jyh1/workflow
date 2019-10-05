@@ -18,7 +18,7 @@ import { node } from "prop-types"
 type Props = {
       nodes: NodeInfo[]
     , refreshBundle: () => void
-    , doSave: (codalang: T.CodaLang, graph: T.NodeLayout) => void
+    , doSave: (codalang: T.CodaLang, graph: T.NodeLayout, codalangstr?: string) => void
     , report: (e: T.MessageInfo) => number
 };
 
@@ -458,7 +458,7 @@ export class Canvas extends React.Component<Props, State>{
                                     icon='save'
                                     loading={running} 
                                     disabled={codalang? false : true} 
-                                    onClick={() => this.props.doSave(codalang, graph)}
+                                    onClick={() => this.props.doSave(codalang, graph, codalangstr)}
                                 />}
                             />
                             {dropDown}

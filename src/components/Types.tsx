@@ -149,7 +149,7 @@ export type WorksheetContent = {items: WorksheetItem[]} & Worksheet
 
 export type Worksheet = {uuid: string, name: string, title?: string}
 
-export type NewTool = {parent?: string, name: string, description: string, codalang?: CodaLang, graph?: NodeLayout}
+export type NewTool = {parent?: string, name: string, description: string, codalang?: CodaLang, graph?: NodeLayout, codalangstr?: string}
 
 export type UpdateTool = {id: string, name: string, description: string}
 
