@@ -323,7 +323,7 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 					const model = node.getParent()
 					const deplen = bundleinfo.dependencies.length
 					const ydis = 100
-					const offset = deplen * ydis / 2
+					const offset = deplen * ydis / 4
 					let nodecount = 0
 					for(const name in newnodeports){
 						const p = newnodeports[name] as DefaultPortModel
