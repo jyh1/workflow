@@ -314,6 +314,8 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 						}
 					)
 					const newtask = await compileCodaValReq(T.lambda(args, runcmd))
+					// change output port label so old links will be correctly collected
+					node.getOutPorts()[0].label = Object.keys(newtask.inports)[0]
 					const newnode = node.execTask(newtask)
 					await newnode.initialize
 					const newnodeports = newnode.getInPorts()
