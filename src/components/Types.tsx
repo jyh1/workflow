@@ -130,7 +130,15 @@ export type BundleInfo = {
     , command?: string
     , metadata: BundleMeta
     , state: BundleState
+    , dependencies: ParentBundle[]
 }
+export type ParentBundle = {
+      child_path: string
+    , parent_uuid: string
+    , parent_path: string
+    , parent_name: string
+}
+
 export type BundleMeta = {
       run_status?: "Finished"
     , data_size?: number
