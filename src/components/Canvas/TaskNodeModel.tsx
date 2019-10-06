@@ -293,10 +293,19 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 									parentBundle[dep.child_path] = {name: dep.parent_name, uuid: dep.parent_uuid}
 									const bexpr = T.cvar(dep.child_path)
 									const expr = dep.parent_path.length > 0 ? T.dir(bexpr, dep.parent_path) : bexpr
-									return [T.cmdPlain(" mv "), T.cmdExpr(expr), T.cmdPlain(" " + dep.child_path + " && ")]
+									return [T.cmdPlain(" mv "), T.cmdExpr(expr), T.cmdPlain(" " + dep.child_path + " &&\n")]
 								}
 							)
-					const cmdeles = [].concat(...mvcmds, T.cmdPlain(bundleinfo.command))
+					const unlinkcmds = 
+						_.map(bundleinfo.dependencies, 
+								dep => {
+									parentBundle[dep.child_path] = {name: dep.parent_name, uuid: dep.parent_uuid}
+									const bexpr = T.cvar(dep.child_path)
+									const expr = dep.parent_path.length > 0 ? T.dir(bexpr, dep.parent_path) : bexpr
+									return [T.cmdPlain("\n && unlink " + dep.child_path)]
+								}
+							)
+					const cmdeles = [].concat(...mvcmds, T.cmdPlain(bundleinfo.command), ...unlinkcmds)
 					const runcmd: T.CodaVal = T.cl([], T.run(cmdeles))
 					let args: {[k: string]: T.CodaType} = {}
 					_.forEach(bundleinfo.dependencies
