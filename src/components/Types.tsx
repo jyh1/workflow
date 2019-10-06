@@ -41,7 +41,7 @@ export type JLang = {result: JRes, blocks: JBlock[]}
 
 export type CompileResult = {codalang: CodaVal, jlang: JLang, codalangstr: string, interface: string}
 
-export type TaskInfo = JObject<"taskid", TaskId> | JObject<"codaval", string> | JObject<"task", Task> | JObject<"empty", {}>
+export type TaskInfo = JObject<"taskid", TaskId> | JObject<"codaval", string> | JObject<"task", Task> | JObject<"empty", {}> | JObject<"uuid", string>
 
 export interface NodeInfo {
     name: string
@@ -60,7 +60,7 @@ export type ParseResult = {
     , taskid?: string
 }
 
-export type Task = ParseResult & {taskcode: string}
+export type Task = ParseResult & {taskcode: string, bundleinfo?: BundleInfo}
 
 export const taskTag = "task"
 export const bundleTag = "bundle"

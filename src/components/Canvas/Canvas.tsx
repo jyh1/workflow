@@ -349,7 +349,7 @@ export class Canvas extends React.Component<Props, State>{
             data = event.dataTransfer.getData(T.bundleTag);
             if (data.length > 0){
                 const {uuid, name}: T.BundleDragType = JSON.parse(data)
-                dragged = {taskinfo: {type: "task", content: T.makeLitTask(uuid.slice(2))}, name};
+                dragged = {taskinfo: {type: "uuid", content: uuid}, name};
             }
         }
         if (!dragged){

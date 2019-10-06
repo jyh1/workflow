@@ -68,6 +68,9 @@ export class TaskNodeModel extends DefaultNodeModel {
 		if(node.taskinfo.type == "task"){
 			taskreq = Promise.resolve(node.taskinfo.content)
 		}
+		if(node.taskinfo.type == "uuid"){
+			taskreq = Promise.resolve(T.makeLitTask(node.taskinfo.content.slice(2)))
+		}
 		if(node.taskinfo.type == "empty"){
 			this.lockNode()
 			this.toggleEditor = true
