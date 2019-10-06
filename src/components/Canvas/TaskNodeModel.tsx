@@ -141,6 +141,7 @@ export class TaskNodeModel extends DefaultNodeModel {
 		this.oldlinks = {}
 		this.collectLinks(true)
 		this.collectLinks(false)
+		// console.log(this.oldlinks)
 		return this.newNode(node, this.oldlinks)
 	}
 
@@ -315,7 +316,7 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 					)
 					const newtask = await compileCodaValReq(T.lambda(args, runcmd))
 					// change output port label so old links will be correctly collected
-					node.getOutPorts()[0].label = Object.keys(newtask.inports)[0]
+					node.getOutPorts()[0].label = Object.keys(newtask.outports)[0]
 					const newnode = node.execTask(newtask)
 					await newnode.initialize
 					const newnodeports = newnode.getInPorts()
@@ -327,7 +328,6 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 					for(const name in newnodeports){
 						const p = newnodeports[name] as DefaultPortModel
 						const pname = p.label
-						console.log(p)
 						const pnode = 
 							node.newNode(
 								{
