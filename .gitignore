@@ -18,3 +18,5 @@ dist/
 
 dev.sh
 buid/
+.vscode
+yarn-error.log

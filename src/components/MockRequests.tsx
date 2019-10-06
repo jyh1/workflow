@@ -73,7 +73,7 @@ export const taskListReq: TaskListRequest = () => (
 
 let defTask = (i:TaskId):Task => (
     {
-        taskbody: i
+        taskbody: T.lit(i)
       , inports: {dataset1: "bundle", dataset2: "bundle"}
       , outports: {result: "bundle"}
       , taskcode: "test  code"
@@ -112,7 +112,7 @@ function toListEle(e: TaskElement, parent?: string): TaskListElement[] {
 export const compileReq: CompileRequest = (ts) => new Promise((executor, resolve) => {
         setTimeout(
             () => {
-                executor({codalang: tc("lit", "0x0cf40bf4b76246bc9d0545e13524a174"), codalangstr: "0x0cf24434ffs", jlang: {result: testRes, blocks: testBlocks}, interface: "bundle"})
+                executor({codalang: T.lit("0cf40bf4b76246bc9d0545e13524a174"), codalangstr: "0x0cf24434ffs", jlang: {result: testRes, blocks: testBlocks}, interface: "bundle"})
             }
         , reqtime())
     }
@@ -231,7 +231,7 @@ export const parseReq: T.ParseRquest = (program: string) => (
 export const parseArgReq: T.ParseArgRequest = (str: string) => (
     new Promise((executor, resolve) => {
         setTimeout(
-            () => executor({"outports":{arg1: "bundle",arg2: "bundle"},"inports":{},"taskbody":{"arg1":{"tag":"TypeBundle"},"arg2":{"tag":"TypeBundle"}}})
+            () => executor({"outports":{arg1: "bundle",arg2: "bundle"},"inports":{},"taskbody":{"arg1":"bundle","arg2":"bundle"}})
         , reqtime())
     })
 ) 

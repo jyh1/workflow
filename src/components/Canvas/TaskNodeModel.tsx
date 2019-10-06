@@ -16,7 +16,7 @@ import {
     } from "storm-react-diagrams";
 import * as React from "react";
 import * as _ from "lodash";
-import {NodeInfo, TaskBody, Task} from "../Types"
+import {NodeInfo, Task} from "../Types"
 import * as T from "../Types"
 import {Button, Input, Divider, Dimmer, Loader, Popup, Icon} from 'semantic-ui-react'
 // import {taskReq} from "../MockRequests"

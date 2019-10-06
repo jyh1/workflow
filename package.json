@@ -26,6 +26,7 @@
     "webpack-cli": "^3.3.5"
   },
   "dependencies": {
+    "@types/dompurify": "^0.0.33",
     "@types/localforage": "^0.0.34",
     "@types/lodash": "^4.14.135",
     "@types/marked": "^0.6.5",
@@ -34,6 +35,7 @@
     "anser": "^1.4.8",
     "bootstrap-scss": "^4.3.1",
     "css-loader": "^3.0.0",
+    "dompurify": "^2.0.3",
     "file-loader": "^4.0.0",
     "font-awesome-scss": "^1.0.0",
     "localforage": "^1.7.3",

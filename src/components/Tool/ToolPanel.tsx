@@ -20,7 +20,7 @@ type ToolPanelState = {
     , elementInfo: {[elementid: string]: ElementInfo}
 }
 type ToolPanelProps = {
-      codalang?: {ast: T.CodaLang, graph: T.NodeLayout}
+      codalang?: {ast: T.CodaVal, graph: T.NodeLayout, codalangstr?: string}
     , doneSave: () => void
     , report: (info: T.MessageInfo) => void}
 export class ToolPanel extends React.Component<ToolPanelProps, ToolPanelState>{
@@ -34,7 +34,7 @@ export class ToolPanel extends React.Component<ToolPanelProps, ToolPanelState>{
     shouldComponentUpdate(nextProps: ToolPanelProps, nextState: ToolPanelState){
         const {codalang} = nextProps
         if (codalang){
-            this.newTool(codalang.ast, codalang.graph)
+            this.newTool(codalang.ast, codalang.graph, codalang.codalangstr)
             this.props.doneSave()
             return false
         }
@@ -69,10 +69,10 @@ export class ToolPanel extends React.Component<ToolPanelProps, ToolPanelState>{
         return tlis
     }
 
-    newTool = (codalang: T.CodaLang, graph: T.NodeLayout) => {
+    newTool = (codalang: T.CodaVal, graph: T.NodeLayout, codalangstr?: string) => {
         const parent = this.currentFolderPid()
         const name = "New Tool"
-        this.newElement(newToolReq({name, description: "", parent, codalang, graph}))
+        this.newElement(newToolReq({name, description: "", parent, codalang, graph, codalangstr}))
     }
 
     newFolder = () => {
