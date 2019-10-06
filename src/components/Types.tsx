@@ -1,11 +1,9 @@
 import { string } from "prop-types";
 
 export interface Tool {
-    codaExpr: CodaLang;
+    codaExpr: CodaVal;
     node: Node;
 }
-
-export type CodaLang = Object;
 
 export type Arguments = {[arg: string]: CodaType}
 
@@ -41,7 +39,7 @@ export type JBlock = {variable: string, options: ClOption[], command: JCmd}
 
 export type JLang = {result: JRes, blocks: JBlock[]}
 
-export type CompileResult = {codalang: CodaLang, jlang: JLang, codalangstr: string, interface: string}
+export type CompileResult = {codalang: CodaVal, jlang: JLang, codalangstr: string, interface: string}
 
 export type TaskInfo = JObject<"taskid", TaskId> | JObject<"codaval", string> | JObject<"task", Task> | JObject<"empty", {}>
 
@@ -53,11 +51,10 @@ export interface NodeInfo {
 }
 
 export type TaskId = string
-export type TaskBody = Object
 export type TypeDict = Arguments
 
 export type ParseResult = {
-      taskbody: TaskBody | TypeDict
+      taskbody: CodaVal | TypeDict
     , inports: Arguments
     , outports: Arguments
     , taskid?: string
@@ -102,7 +99,7 @@ export type ToolPort = JObject <NodeType, {nodeid: string, label: string, nodena
 export interface ToolNodeInterface<PortType> {
     name: string; 
     id: string; 
-    taskbody: TaskBody; 
+    taskbody: CodaVal | Arguments; 
     arguments: {[arg: string]: PortType}
     nodeType: NodeType
 }
@@ -149,7 +146,7 @@ export type WorksheetContent = {items: WorksheetItem[]} & Worksheet
 
 export type Worksheet = {uuid: string, name: string, title?: string}
 
-export type NewTool = {parent?: string, name: string, description: string, codalang?: CodaLang, graph?: NodeLayout, codalangstr?: string}
+export type NewTool = {parent?: string, name: string, description: string, codalang?: CodaVal, graph?: NodeLayout, codalangstr?: string}
 
 export type UpdateTool = {id: string, name: string, description: string}
 
@@ -189,10 +186,122 @@ export const endPointPath = {
 export function makeLitTask(uuid: string): Task{
     return ({
         "outports":{data: "bundle"},"inports":{},
-        "taskbody":{"tag":"Dict","contents":{"data":{"tag":"Lit","contents":{"tag":"UUID","contents":uuid}}}}, "taskcode": ("0x"+uuid)})
+        "taskbody": dict({data: lit(uuid)}), "taskcode": ("0x"+uuid)})
 }
 
 export function logOut(){
     document.cookie.split(";").forEach(function(c) { document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); });
     document.location.replace(endPointPath.login)
 }
+
+
+
+// CodaVal
+
+
+type CodaCMDEle<T1, T2> = ICMDExpr<T1, T2> | IPlain<T1, T2>;
+
+interface ICMDExpr<T1, T2> {
+  type: "expr";
+  content: T1;
+}
+
+interface IPlain<T1, T2> {
+  type: "plain";
+  content: T2;
+}
+
+type UUID = IUUID | IBundleName;
+
+interface IUUID {
+  tag: "UUID";
+  contents: string;
+}
+
+interface IBundleName {
+  tag: "BundleName";
+  contents: string;
+}
+
+type Cmd<T> = IRun<T> | IClCat<T> | IClMake<T>;
+
+interface IRun<T> {
+  tag: "Run";
+  contents: CodaCMDEle<T, string>[];
+}
+
+interface IClCat<T> {
+  tag: "ClCat";
+  contents: T;
+}
+
+interface IClMake<T> {
+  tag: "ClMake";
+  contents: [string, T][];
+}
+
+export type CodaVal = ILit | IVar | ICl | IStr | IDir | ILet | IConvert | IDict | ILambda | IApply;
+
+interface ILit {
+  tag: "Lit";
+  contents: UUID;
+}
+
+interface IVar {
+  tag: "Var";
+  contents: string;
+}
+
+interface ICl {
+  tag: "Cl";
+  contents: [CodaCMDEle<CodaVal, string>[], Cmd<CodaVal>];
+}
+
+interface IStr {
+  tag: "Str";
+  contents: string;
+}
+
+interface IDir {
+  tag: "Dir";
+  contents: [CodaVal, string];
+}
+
+interface ILet {
+  tag: "Let";
+  contents: [string, CodaVal, CodaVal];
+}
+
+interface IConvert {
+  tag: "Convert";
+  contents: [CodaType, CodaVal, CodaType];
+}
+
+interface IDict {
+  tag: "Dict";
+  contents: {[k: string]: CodaVal};
+}
+
+interface ILambda {
+  tag: "Lambda";
+  contents: [{[k: string]: CodaType}, CodaVal];
+}
+
+interface IApply {
+  tag: "Apply";
+  contents: [CodaVal, {[k: string]: CodaVal}];
+}
+
+
+export const lit = (uuid: string): ILit => ({tag:"Lit", contents: {tag: "UUID" , contents: uuid}})
+export const cvar = (name: string): IVar => ({tag: "Var", contents: name})
+export const cl = (eles: CodaCMDEle<CodaVal, string>[], cmd: Cmd<CodaVal>): ICl => ({tag: "Cl", contents: [eles, cmd]})
+export const cmdPlain = (txt: string): IPlain<CodaVal, string> => ({type: "plain", content: txt})
+export const cmdExpr = (val: CodaVal): ICMDExpr<CodaVal, string> => ({type: "expr", content: val})
+export const run = (eles: CodaCMDEle<CodaVal, string>[]): IRun<CodaVal> => ({tag: "Run", contents: eles})
+export const str = (s: string): IStr => ({tag: "Str", contents: s})
+export const dir = (val: CodaVal, path: string): IDir => ({tag: "Dir", contents: [val, path]})
+export const clet = (v: string, val: CodaVal, body: CodaVal): ILet => ({tag: "Let", contents: [v, val, body]})
+export const dict = (d: {[k: string]: CodaVal}): IDict => ({tag: "Dict", contents: d})
+export const lambda = (arg: {[k: string]: CodaType}, body: CodaVal): ILambda => ({tag: "Lambda", contents: [arg, body]})
+export const apply = (fun: CodaVal, ad: {[k: string]: CodaVal}): IApply => ({tag: "Apply", contents: [fun, ad]})

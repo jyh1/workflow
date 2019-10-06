@@ -18,7 +18,7 @@ import { node } from "prop-types"
 type Props = {
       nodes: NodeInfo[]
     , refreshBundle: () => void
-    , doSave: (codalang: T.CodaLang, graph: T.NodeLayout, codalangstr?: string) => void
+    , doSave: (codalang: T.CodaVal, graph: T.NodeLayout, codalangstr?: string) => void
     , report: (e: T.MessageInfo) => number
 };
 
@@ -203,12 +203,12 @@ export class Canvas extends React.Component<Props, State>{
                 throw e
             }
             let codalangstr : string = null
-            let codalang: T.CodaLang = null
+            let codalang: T.CodaVal = null
             if (layoutg.tools.length == 1){
                 // only has a single node
                 const onlynode = layoutg.tools[0]
                 codalangstr = onlynode.toolinfo.task.taskcode
-                codalang = onlynode.toolinfo.task.taskbody
+                codalang = onlynode.toolinfo.task.taskbody as T.CodaVal
             }
             this.setState(p => ({...p, loading: true, compiled: nullRes, tab: "Canvas"}))
             compileReq(nodes)
