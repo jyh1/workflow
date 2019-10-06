@@ -20,7 +20,7 @@ import {NodeInfo, Task} from "../Types"
 import * as T from "../Types"
 import {Button, Input, Divider, Dimmer, Loader, Popup, Icon} from 'semantic-ui-react'
 // import {taskReq} from "../MockRequests"
-import {taskReq, parseReq, toolGraphReq} from "../Requests"
+import {taskReq, parseReq, toolGraphReq, bundleInfoReq, compileCodaValReq} from "../Requests"
 import {CodaEditor} from './Editor'
 import { node } from "prop-types";
 
@@ -69,14 +69,15 @@ export class TaskNodeModel extends DefaultNodeModel {
 			taskreq = Promise.resolve(node.taskinfo.content)
 		}
 		if(node.taskinfo.type == "uuid"){
-			taskreq = Promise.resolve(T.makeLitTask(node.taskinfo.content.slice(2)))
+			const uuid = node.taskinfo.content
+			taskreq = Promise.resolve({...T.makeLitTask(uuid.slice(2)), bundleuuid: uuid})
 		}
 		if(node.taskinfo.type == "empty"){
 			this.lockNode()
 			this.toggleEditor = true
 			taskreq = Promise.resolve({taskbody: {}, inports: {}, outports: {}, taskcode: ""})
 		}
-
+		this.refresh()
 		this.initialize = this.loadTask(taskreq)
 		this.initialize
 		.catch(() => { this.error({type: "error",  header: "Error Loading Tool", body: <p/>}); this.remove()})
@@ -131,13 +132,18 @@ export class TaskNodeModel extends DefaultNodeModel {
 	}
 
 	updateTask(task: Task){
+		this.execTask(task)
+		this.removeAndRefresh()
+	}
+
+	execTask(task: Task): TaskNodeModel{
 		const node: NodeInfo = {name: this.name, pos: {x: this.x, y: this.y}, taskinfo: {type: "task", content: task}, nodeType: this.nodeType}
 		this.oldlinks = {}
 		this.collectLinks(true)
 		this.collectLinks(false)
-		this.newNode(node, this.oldlinks)
-		this.removeAndRefresh()
+		return this.newNode(node, this.oldlinks)
 	}
+
 	copyTask(){
 		const node: NodeInfo = {
 			  name: this.name
@@ -227,7 +233,11 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 	expandable(){
 		try{
 			const taskid = this.props.node.extras.task.taskid
-			return !(taskid === undefined || taskid === null)
+			if (!(taskid === undefined || taskid === null)){
+				return true
+			}
+			const isrun = this.props.node.extras.task.bundleuuid
+			return isrun.length > 0
 		}
 		catch{
 			return false
@@ -237,39 +247,101 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 	async expandNode(){
 		const {node} = this.props
 		try{
-			const taskid = node.extras.task.taskid
 			if (!this.expandable()){
-				return
+				throw ""
 			}
-			const {tools, portidmap, links} = await toolGraphReq(taskid)
-			if(!tools){
-				throw "Not expandable"
-			}
-			const [x0, y0] = [node.x, node.y]
-			let oldIdToPort: {[oldid: string]: DefaultPortModel} = {}
-			for(const tool of tools){
-				const {name, pos, oldid, toolinfo} = tool
-				const newnode = node.newNode(
-					{
-						taskinfo: {type: "task", content: toolinfo.task}
-						, name
-						, pos: {x: x0 + pos.x, y: y0 + pos.y}
-						, nodeType: toolinfo.nodeType
+			const taskid = node.extras.task.taskid
+			if (taskid){
+				// expand saved tool
+				const {tools, portidmap, links} = await toolGraphReq(taskid)
+				if(!tools){
+					throw "Empty graph"
+				}
+				const [x0, y0] = [node.x, node.y]
+				let oldIdToPort: {[oldid: string]: DefaultPortModel} = {}
+				for(const tool of tools){
+					const {name, pos, oldid, toolinfo} = tool
+					const newnode = node.newNode(
+						{
+							taskinfo: {type: "task", content: toolinfo.task}
+							, name
+							, pos: {x: x0 + pos.x, y: y0 + pos.y}
+							, nodeType: toolinfo.nodeType
+						})
+					await newnode.initialize
+					_.forEach(newnode.getPorts(), (p: DefaultPortModel) => {
+						const key = [oldid, p.in, p.label].toString()
+						oldIdToPort[portidmap[key]] = p
 					})
-				await newnode.initialize
-				_.forEach(newnode.getPorts(), (p: DefaultPortModel) => {
-					const key = [oldid, p.in, p.label].toString()
-					oldIdToPort[portidmap[key]] = p
-				})
-			}
-			const model = node.getParent()
-			for (const {from, to} of links){
-				model.addLink( oldIdToPort[from].link(oldIdToPort[to]) )
+				}
+				const model = node.getParent()
+				for (const {from, to} of links){
+					model.addLink( oldIdToPort[from].link(oldIdToPort[to]) )
+				}
+			} else {
+				// expand a run bundle
+				const uuid = node.extras.task.bundleuuid
+				if (uuid){
+					const bundleinfo = await bundleInfoReq(uuid)
+					if (bundleinfo.bundle_type != "run"){
+						throw "Not a run bundle"
+					}
+					let parentBundle: {[chidname: string]: {name: string, uuid: string}} = {}
+					const mvcmds = 
+						_.map(bundleinfo.dependencies, 
+								dep => {
+									parentBundle[dep.child_path] = {name: dep.parent_name, uuid: dep.parent_uuid}
+									const bexpr = T.cvar(dep.child_path)
+									const expr = dep.parent_path.length > 0 ? T.dir(bexpr, dep.parent_path) : bexpr
+									return [T.cmdPlain(" mv "), T.cmdExpr(expr), T.cmdPlain(" " + dep.child_path + " && ")]
+								}
+							)
+					const cmdeles = [].concat(...mvcmds, T.cmdPlain(bundleinfo.command))
+					const runcmd: T.CodaVal = T.cl([], T.run(cmdeles))
+					let args: {[k: string]: T.CodaType} = {}
+					_.forEach(bundleinfo.dependencies
+						, dep => {
+							args[dep.child_path] = "bundle"
+						}
+					)
+					const newtask = await compileCodaValReq(T.lambda(args, runcmd))
+					const newnode = node.execTask(newtask)
+					await newnode.initialize
+					const newnodeports = newnode.getInPorts()
+					const model = node.getParent()
+					const deplen = bundleinfo.dependencies.length
+					const ydis = 100
+					const offset = deplen * ydis / 2
+					let nodecount = 0
+					for(const name in newnodeports){
+						const p = newnodeports[name] as DefaultPortModel
+						const pname = p.label
+						console.log(p)
+						const pnode = 
+							node.newNode(
+								{
+								  name: parentBundle[pname].name
+								, pos: {x: node.x - 300, y: node.y + ydis * nodecount - offset}
+								, taskinfo: {type: "uuid", content: parentBundle[pname].uuid}
+								, nodeType: "tool"
+								})
+							await pnode.initialize
+							model.addLink(pnode.getOutPorts()[0].link(p))
+						nodecount = nodecount + 1
+					}
+					
+				} else {
+					throw "Not a bundle"
+				}
 			}
 			node.removeAndRefresh()
 		}
-		catch{
-			node.error({type: "warning", header: "Unexpandable node", body: <p/>, timeout: 2000})
+		catch (err){
+			if (typeof(err) == "string") {
+				node.error({type: "warning", header: "Unexpandable node", body: <p>{err}</p>, timeout: 2000})
+			} else {
+				throw err
+			}
 		}
 	}
 

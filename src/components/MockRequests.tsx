@@ -118,6 +118,8 @@ export const compileReq: CompileRequest = (ts) => new Promise((executor, resolve
     }
 )
 
+export const compileCodaValReq: T.CompileCodaValReq = (ts) => parseReq(null).then(r => ({...r, taskcode: "0x2343434"}))
+
 const makeVar: (x: string) => JVar = (x) => ({type: "variable", content: x})
 
 const testRes: JVar = {

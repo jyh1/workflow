@@ -60,7 +60,7 @@ export type ParseResult = {
     , taskid?: string
 }
 
-export type Task = ParseResult & {taskcode: string, bundleinfo?: BundleInfo}
+export type Task = ParseResult & {taskcode: string, bundleuuid?: string}
 
 export const taskTag = "task"
 export const bundleTag = "bundle"
@@ -91,6 +91,7 @@ export type UpdateToolReq = (task: UpdateTool) => Promise<string>
 export type RemoveElementReq = (eid: string) => Promise<{}>
 export type UploadFileReq = (worksheet: string, file: File) => Promise<{}>
 export type UserInfoReq = () => Promise<UserInfo>
+export type CompileCodaValReq = (cv: CodaVal) => Promise<Task>
 
 export type UserInfo = {attributes: {user_name: string}, id: string}
 
@@ -123,10 +124,11 @@ export type ToolNodeExtra = {task: Task, nodeType: NodeType}
 
 // bundle list in worksheet
 export type BundleState = "created" | "ready" | "preparing" | "running" | "failed" | "uploading" | "staged"
+export type BundleType = "run" | "dataset"
 export type BundleInfo = {
       uuid: string
     , args?: string
-    , bundle_type: "run" | "dataset"
+    , bundle_type: BundleType
     , command?: string
     , metadata: BundleMeta
     , state: BundleState
@@ -207,7 +209,7 @@ export function logOut(){
 // CodaVal
 
 
-type CodaCMDEle<T1, T2> = ICMDExpr<T1, T2> | IPlain<T1, T2>;
+export type CodaCMDEle<T1, T2> = ICMDExpr<T1, T2> | IPlain<T1, T2>;
 
 interface ICMDExpr<T1, T2> {
   type: "expr";
