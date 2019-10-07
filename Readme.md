@@ -1,6 +1,35 @@
-# Workflow - A graphical programming interface of [CodaLab](https://worksheets.codalab.org/)
+# Workflow - A graphical programming interface of CodaLab <!-- omit in toc -->
 
 Workflow is essentially [Galaxy](https://usegalaxy.org/)+[CodaLab](https://worksheets.codalab.org/), where you can create complex computation pipelines by editing a flowchart and submit the generated commands to a CodaLab instance. Checkout the [demo page](demo_link) for a complete overview.
+
+## Screenshots
+
+### Create a simple pipeline 
+![create_pipeline](https://media.giphy.com/media/Vd8WQ7pCoepGWpZDFO/giphy.gif)
+
+### Visualize and edit pipeline from bundle dependencies
+![bundle_dep](https://media.giphy.com/media/JpwdJDKGTQTQclpROd/giphy.gif)
+
+- [Screenshots](#screenshots)
+  - [Create a simple pipeline](#create-a-simple-pipeline)
+  - [Visualize and edit pipeline from bundle dependencies](#visualize-and-edit-pipeline-from-bundle-dependencies)
+- [Tutorial](#tutorial)
+- [Why using Workflow](#why-using-workflow)
+  - [Compared to Galaxy](#compared-to-galaxy)
+  - [Compared to CodaLab](#compared-to-codalab)
+- [How it works](#how-it-works)
+  - [Function Nodes](#function-nodes)
+  - [Build Graph](#build-graph)
+    - [Eliminate Functions](#eliminate-functions)
+    - [Generate Expression](#generate-expression)
+    - [Unfilled Input Ports](#unfilled-input-ports)
+- [Backend Setup](#backend-setup)
+  - [Authentication](#authentication)
+- [Start your own instance](#start-your-own-instance)
+- [Build from source](#build-from-source)
+  - [Frontend](#frontend)
+  - [Backend](#backend)
+
 
 ## Tutorial
 Visit the [demo page](demo_link) for a work through of the application.
