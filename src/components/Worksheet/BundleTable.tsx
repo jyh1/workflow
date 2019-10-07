@@ -37,7 +37,8 @@ export class BundleTable extends React.Component<BTProps, BTState>{
     }
 }
 
-let isRunning: ((s: T.BundleState) => boolean) = s => s == "preparing" || s == "running" || s == "created" || s == "uploading" || s == "staged"
+const finishState: Set<T.BundleState> = new Set(["failed", "ready"])
+const notRunning: ((s: T.BundleState) => boolean) = s => finishState.has(s)
 
 // bundle entry
 type BundleProps = {uuid: string, name: string, size: number, state: T.BundleState}
@@ -51,7 +52,7 @@ class BundleEntry extends React.Component<BundleProps, BundleState>{
     }
     updateState(){
         const {state} = this.state
-        const running = isRunning(state)
+        const running = !notRunning(state)
         if (running){
             delay(5000)
             .then(() => bundleInfoReq(this.props.uuid))
@@ -78,7 +79,7 @@ class BundleEntry extends React.Component<BundleProps, BundleState>{
     render(){
         const {uuid, name} = this.props
         const {state} = this.state
-        const running = isRunning(state)
+        const running = !notRunning(state)
         const data_size = running? state : (this.state.size? humanFileSize(this.state.size) : "null")
         return(
             <Table.Row warning={running} error={state == "failed"} draggable={true} onClick={() => console.log('click')} onDragStart={this.dragStart}>

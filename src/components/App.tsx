@@ -99,6 +99,7 @@ export class HomeApp extends React.Component<Props, State>{
                     <SplitPane split="vertical" defaultSize={385} primary="second" minSize={385} pane2Style={{overflowY: "auto"}}>
                         <Canvas report={this.addException} nodes = {[]} refreshBundle={refreshBundle} doSave={this.doSave} />
                         <WorksheetPanel 
+                            report={this.addException}
                             refreshBundle={refreshBundle} 
                             content={this.state.currentWorksheet} 
                             changeWorksheet={changeWorksheet} 

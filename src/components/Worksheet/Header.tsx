@@ -4,7 +4,7 @@ import * as _ from 'lodash'
 import * as T from '../Types'
 import {worksheetsReq, clReq, worksheetNameReq, userInfoReq} from '../Requests'
 
-type BProps = {uuid?: string, refreshPanel: (uuid: string) => void}
+type BProps = {uuid?: string, refreshPanel: (uuid: string) => void, report: (err: T.Info) => void}
 type BState = {home: string, dashboard: string}
 
 export class WorksheetButtons extends React.Component<BProps, BState>{
@@ -26,7 +26,7 @@ export class WorksheetButtons extends React.Component<BProps, BState>{
                 <Popup flowing hoverable
                     trigger={<Button icon="plus" basic color="blue"/>}
                 >
-                    <NewWorsheetForm refreshPanel={props.refreshPanel}/>
+                    <NewWorsheetForm report={props.report} refreshPanel={props.refreshPanel}/>
                 </Popup>
                 <Popup flowing hoverable
                     trigger={<Button icon="barcode" basic color="blue"/>}
@@ -99,7 +99,7 @@ export class WorksheetDropdown extends React.Component <Props, State>{
 }
 
 
-type MProps = {refreshPanel: (uuid: string) => void}
+type MProps = {refreshPanel: (uuid: string) => void, report: (err: T.Info) => void}
 type MState = {name: string}
 class NewWorsheetForm extends React.Component<MProps, MState>{
     constructor(props: MProps){
@@ -113,8 +113,10 @@ class NewWorsheetForm extends React.Component<MProps, MState>{
         this.setState((prev) => ({...prev, name: value}));
     }
     createWorksheet(){
-        clReq("", 'cl new ' + this.state.name)
+        const wname = this.state.name
+        clReq("", 'cl new ' + wname)
         .then(newuuid => this.props.refreshPanel(newuuid))
+        .catch(() => this.props.report({type: "error", header: 'Error creating worksheet', body: <p>The name <b>{wname}</b> might have already been used.</p>, timeout: 3000}))
     }
 
     render(){

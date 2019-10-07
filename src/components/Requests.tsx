@@ -145,7 +145,7 @@ export const clWait: T.ClWaitRequest = (path) => {
 
 
 export const compileReq: T.CompileRequest = jsonRequest('./tool/compile')
-
+export const compileCodaValReq: T.CompileCodaValReq = jsonRequest('./tool/compile/codaval')
 
 function parseWorksheetItem(item: any): T.WorksheetItem{
     if (item.mode == "markup_block"){

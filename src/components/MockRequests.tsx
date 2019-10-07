@@ -118,6 +118,8 @@ export const compileReq: CompileRequest = (ts) => new Promise((executor, resolve
     }
 )
 
+export const compileCodaValReq: T.CompileCodaValReq = (ts) => parseReq(null).then(r => ({...r, taskcode: "0x2343434"}))
+
 const makeVar: (x: string) => JVar = (x) => ({type: "variable", content: x})
 
 const testRes: JVar = {
@@ -215,7 +217,20 @@ export const bundleInfoReq: T.BundleInfoRequest = (uuid: string) => (
             () => executor({uuid: uuid, args: "python test.py test.in", bundle_type: "run"
                             , command: "run python "
                             , metadata: {name: "testbundle"}
-                            , state: coin()? "ready" : "failed"})
+                            , state: coin()? "ready" : "failed"
+                            , dependencies: [{
+                                child_path: "s",
+                                parent_uuid: "0x7fd572133c544c2baa1567781be0aba6",
+                                parent_path: "annotations/1.bioc.xml",
+                                parent_name: "sample"
+                                },
+                                {
+                                child_path: "conf.txt",
+                                parent_uuid: "0x44cb608a79864ab4983fd9a52ca872bb",
+                                parent_path: "",
+                                parent_name: "conf.txt"
+                                }]
+                        })
         , reqtime())
     })
 ) 
