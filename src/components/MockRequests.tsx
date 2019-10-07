@@ -190,7 +190,10 @@ export const worksheetsReq: T.WorksheetsRequest = () => (
     new Promise((executor, resolve) => {
         setTimeout(
             () => {
-                let data = [{uuid: "0xc06bcc842af34cd5a30f7feeea52ab1d", name: "workflow-demo", title: "Workflow Demo"}]
+                let data = [
+                    {uuid: "0xc06bcc842af34cd5a30f7feeea52ab1d", name: "workflow-demo", title: "Workflow Demo"}
+                    , {uuid: "0x818930127c4d47de84c1ceaadf04d014", name: "home", title: "Public Home"}
+                ]
                 executor(data)
             }
 
