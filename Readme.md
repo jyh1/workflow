@@ -7,12 +7,12 @@ Workflow is essentially [Galaxy](https://usegalaxy.org/)+[CodaLab](https://works
 ### Create a simple pipeline 
 ![create_pipeline](https://media.giphy.com/media/Vd8WQ7pCoepGWpZDFO/giphy.gif)
 
-### Visualize and edit pipeline from bundle dependencies
+### Visualize and edit your pipeline from bundle dependencies
 ![bundle_dep](https://media.giphy.com/media/JpwdJDKGTQTQclpROd/giphy.gif)
 
 - [Screenshots](#screenshots)
   - [Create a simple pipeline](#create-a-simple-pipeline)
-  - [Visualize and edit pipeline from bundle dependencies](#visualize-and-edit-pipeline-from-bundle-dependencies)
+  - [Visualize and edit your pipeline from bundle dependencies](#visualize-and-edit-your-pipeline-from-bundle-dependencies)
 - [Tutorial](#tutorial)
 - [Why using Workflow](#why-using-workflow)
   - [Compared to Galaxy](#compared-to-galaxy)
