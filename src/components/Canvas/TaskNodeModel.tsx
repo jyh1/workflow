@@ -307,7 +307,11 @@ export class TaskNodeWidget extends BaseWidget<TaskNodeProps, TaskNodeState> {
 								}
 							)
 					const cmdeles = [].concat(...mvcmds, T.cmdPlain(bundleinfo.command), ...unlinkcmds)
-					const runcmd: T.CodaVal = T.cl([], T.run(cmdeles))
+
+					const resInfo = bundleinfo.args.match('(--[a-zA-Z\-]* [^\"\' ]*[ ]?)+$')
+					const resCmd = (resInfo && (resInfo.length > 0)) ? [T.cmdPlain(resInfo[0] + "\n")] : []
+					
+					const runcmd: T.CodaVal = T.cl(resCmd, T.run(cmdeles))
 					let args: {[k: string]: T.CodaType} = {}
 					_.forEach(bundleinfo.dependencies
 						, dep => {
