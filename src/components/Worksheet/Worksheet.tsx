@@ -72,7 +72,7 @@ const Subworksheets: React.SFC<{worksheets: T.Worksheet[], selectWorksheet: (uui
                             <Table.Cell 
                                 collapsing
                                 onClick={() => props.selectWorksheet(b.uuid)}
-                                style={{paddingRight: "100px"}}
+                                style={{paddingLeft: "50px"}}
                             >
                                     <a onClick={e => e.stopPropagation()} href={worksheetLink(b.uuid)} target="_blank">
                                         {b.title? (b.title + " " + "[" + b.name + "]") : b.name}
