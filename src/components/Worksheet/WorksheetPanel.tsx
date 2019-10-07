@@ -13,6 +13,7 @@ type Props = {
     , content: T.WorksheetContent
     , loading: boolean
     , refreshBundle: () => void
+    , report: (err: T.Info) => void
 }
 type State = {worksheets: T.Worksheet[], stack: string[]}
 
@@ -61,11 +62,11 @@ export class WorksheetPanel extends React.Component<Props, State>{
 
     render(){
         // console.log(this.props.items)
-        const {content, loading, refreshBundle} = this.props
+        const {content, loading, refreshBundle, report} = this.props
         return(
             <React.Fragment>
                 <div className="worksheetbuttons">
-                    <WorksheetButtons refreshPanel={this.refreshPanel.bind(this)} uuid={content.uuid}/>
+                    <WorksheetButtons report={report} refreshPanel={this.refreshPanel.bind(this)} uuid={content.uuid}/>
                 </div>
                 <SegmentGroup className="newsegment">
                     <WorksheetDropdown selectWorksheet={this.changeWorksheet.bind(this)} uuid={content.uuid} worksheets={this.state.worksheets} />
