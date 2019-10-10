@@ -71,7 +71,7 @@ export const userInfoReq: T.UserInfoReq = () => (
 )
 
 export const taskListReq: TaskListRequest = () => (
-    processFetch(fetch('./tool/list', 
+    processFetch(fetch(T.endPointPath.tool + 'list', 
         {
           headers: {"Content-Type":'application/json'}
         , credentials: 'same-origin'
@@ -79,7 +79,7 @@ export const taskListReq: TaskListRequest = () => (
 )
 
 export const taskReq: TaskInfoRequest = (taskid) => (
-    processFetch(fetch('./tool/' + taskid, 
+    processFetch(fetch(T.endPointPath.tool + taskid, 
         {
           headers: {"Content-Type":'application/json'}
         , credentials: 'same-origin'
@@ -87,7 +87,7 @@ export const taskReq: TaskInfoRequest = (taskid) => (
 )
 
 export const toolGraphReq: T.ToolGraphRequest = (taskid) => (
-    fetch('./tool/graph/' + taskid, 
+    fetch(T.endPointPath.tool + 'graph/' + taskid, 
         {
           headers: {"Content-Type":'application/json'}
         , credentials: 'same-origin'
@@ -144,8 +144,8 @@ export const clWait: T.ClWaitRequest = (path) => {
 }
 
 
-export const compileReq: T.CompileRequest = jsonRequest('./tool/compile')
-export const compileCodaValReq: T.CompileCodaValReq = jsonRequest('./tool/compile/codaval')
+export const compileReq: T.CompileRequest = jsonRequest(T.endPointPath.tool + 'compile')
+export const compileCodaValReq: T.CompileCodaValReq = jsonRequest(T.endPointPath.tool + 'compile/codaval')
 
 function parseWorksheetItem(item: any): T.WorksheetItem{
     if (item.mode == "markup_block"){
@@ -215,7 +215,7 @@ export const newToolReq: T.NewToolReq = jsonRequest('tool/create')
 export const updateToolReq: T.UpdateToolReq = jsonRequest('tool/update')
 
 export const removeEleReq: T.RemoveElementReq = (eid) => (
-    fetch('./tool/' + eid, 
+    fetch(T.endPointPath.tool + '' + eid, 
     {
       headers: {"Content-Type":'application/json'}
     , credentials: 'same-origin'
