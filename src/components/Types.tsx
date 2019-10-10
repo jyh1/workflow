@@ -211,7 +211,7 @@ export type MessageInfo = Info | ConfirmInfo
 
 export const endPointPath = {
       login: "/workflow/demologin"
-    , mainapp: "/workflow"
+    , mainapp: "/workflowdemo"
     , rest: "/rest/"
     , codalab: "/"
     , tool: "/workflow/tool/"
