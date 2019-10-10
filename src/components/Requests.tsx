@@ -206,13 +206,13 @@ export const bundleInfoReq: T.BundleInfoRequest = (uuid: string) => (
     .then(res => res.data.attributes)
 ) 
 
-export const parseReq: T.ParseRquest = jsonRequest('tool/parse', 'text/plain;charset=utf-8')
+export const parseReq: T.ParseRquest = jsonRequest(T.endPointPath.tool + 'parse', 'text/plain;charset=utf-8')
 
-export const parseArgReq: T.ParseArgRequest = jsonRequest('tool/parse/argument', 'text/plain;charset=utf-8')
+export const parseArgReq: T.ParseArgRequest = jsonRequest(T.endPointPath.tool + 'parse/argument', 'text/plain;charset=utf-8')
 
-export const newToolReq: T.NewToolReq = jsonRequest('tool/create')
+export const newToolReq: T.NewToolReq = jsonRequest(T.endPointPath.tool + 'create')
 
-export const updateToolReq: T.UpdateToolReq = jsonRequest('tool/update')
+export const updateToolReq: T.UpdateToolReq = jsonRequest(T.endPointPath.tool + 'update')
 
 export const removeEleReq: T.RemoveElementReq = (eid) => (
     fetch(T.endPointPath.tool + '' + eid, 
