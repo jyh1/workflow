@@ -214,6 +214,7 @@ export const endPointPath = {
     , mainapp: "/workflow"
     , rest: "/rest/"
     , codalab: "/"
+    , tool: "/workflow/tool/"
 }
 
 export function makeLitTask(uuid: string): Task{
