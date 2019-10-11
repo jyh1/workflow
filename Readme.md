@@ -1,6 +1,6 @@
-# Workflow - A graphical programming interface of CodaLab <!-- omit in toc -->
+# Workflow - A visual workflow manager built on top of CodaLab <!-- omit in toc -->
 
-Workflow is essentially [Galaxy](https://usegalaxy.org/)+[CodaLab](https://worksheets.codalab.org/), where you can create complex computation pipelines by editing a flowchart and submit the generated commands to a CodaLab instance. Checkout the [demo page](demo_link) for a complete overview.
+Workflow is essentially [Galaxy](https://usegalaxy.org/)+[CodaLab](https://worksheets.codalab.org/), where you can create complex computation pipelines by editing a flowchart and submit the generated commands to a CodaLab instance. Check out the [demo page](http://13.82.168.247/workflowdemo/) for a complete overview.
 
 ## Screenshots
 
@@ -9,6 +9,8 @@ Workflow is essentially [Galaxy](https://usegalaxy.org/)+[CodaLab](https://works
 
 ### Visualize and edit your pipeline from bundle dependencies
 ![bundle_dep](https://media.giphy.com/media/JpwdJDKGTQTQclpROd/giphy.gif)
+
+### Interested? Try it in the [demo page](http://13.82.168.247/workflowdemo/) <!-- omit in toc -->
 
 - [Screenshots](#screenshots)
   - [Create a simple pipeline](#create-a-simple-pipeline)
@@ -32,20 +34,22 @@ Workflow is essentially [Galaxy](https://usegalaxy.org/)+[CodaLab](https://works
 
 
 ## Tutorial
-Visit the [demo page](demo_link) for a work through of the application.
+Visit the [demo page](http://13.82.168.247/workflowdemo/) for a work through of the application.
 
 ## Why using Workflow
 
 
 ### Compared to Galaxy
-[Galaxy](https://usegalaxy.org/) is a well-known data analysis platform in the bioinformatics community. The flowchart interface of Workflow is actually inspired by the Galaxy. The advantages of Workflow over Galaxy can be largely summarized in one word: CodaLab. Because of using CodaLab, computation results in Workflow can be easily shared and reproduced. In Workflow, users can define their own tools using arbitrary shell commands. While in galaxy, users can only use predefined tools managed by administrators. 
+[Galaxy](https://usegalaxy.org/) is a well-known workflow manager platform in the bioinformatics community. The flowchart interface of Workflow is inspired by the Galaxy one. The main advantages of Workflow over Galaxy is that Workflow is built on top of CodaLab. Because of using CodaLab, computation results in Workflow can be easily shared and reproduced. In Workflow, users can define their own tools with arbitrary shell commands. While in galaxy, users normally can only access predefined tools managed by administrators. 
 
 As will be mentioned [later](#how-it-works), Workflow is based on a typed programming language [CodaLang](https://github.com/jyh1/codalang). The flowchart in Workflow is actually a CodaLang expression. This means tools in Workflow can be composed and reused in a principled way. For example, in Workflow you can turn a complex flowchart in a function and use it as a single node when creating new pipelines. This is not possible in Galaxy.
  
 
 ### Compared to CodaLab
 Workflow is built on top of [CodaLab](https://worksheets.codalab.org/). 
-It provides two extensions to the regular CodaLab CLI interface: the ability to define functions and a visual programming interface to compose those functions in a flowchart to build a computation pipeline or a new function. Workflow is able to compile a built pipeline to a series of `cl run` commands and automatically submit them.
+In a way it can be viewed as providing an alternative graphical programming interface for CodaLab.
+In Workflow, you can view, edit your pipeline and submit jobs in a more intuitive way.
+You can even visualize the dependencies of an existing run bundle and make changes in the Workflow (interface)[#visualize-and-edit-your-pipeline-from-bundle-dependencies].
 
 
 ## How it works
