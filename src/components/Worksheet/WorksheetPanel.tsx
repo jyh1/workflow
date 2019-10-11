@@ -58,6 +58,7 @@ export class WorksheetPanel extends React.Component<Props, State>{
     }
 
     componentDidMount(){
+        this.selectWorksheet("0xc06bcc842af34cd5a30f7feeea52ab1d")
         this.refreshWorksheetList()
     }
 

@@ -37,12 +37,11 @@ export class HomeApp extends React.Component<Props, State>{
         }
     }
     componentDidMount(){
-        this.changeWorksheet()
+        // this.changeWorksheet()
         // userInfoReq().then(userinfo => this.setState(prev => ({...prev, userinfo})))
     }
     refreshBundle(){
         return (localforage.getItem("worksheet")
-        .then(uuid => uuid ? uuid : "0xb843335f02a9443995db2013fbe2e7f4")
         .then(uuid => ( uuid? worksheetItemsReq(uuid as string) : Promise.resolve({items: [], uuid: ""}) ))
         .then(res => this.setState(prev => Object.assign(prev, {currentWorksheet: res}))))
     }
