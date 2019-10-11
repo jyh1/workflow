@@ -4,7 +4,7 @@ import {loginReq, getLoginStatus} from "./Requests"
 import {Redirect} from "react-router-dom";
 import {Location} from 'history'
 import * as T from './Types'
-import { Button, Form, Header, ButtonProps, Grid, Message, Segment } from 'semantic-ui-react'
+import { Button, Form, Header, ButtonProps, Grid, Message, Segment, MessageContent } from 'semantic-ui-react'
 
 type Props = {location: Location}
 type State = {username: string, password: string, from: string, loginStatus: boolean, loginError: boolean, loading: boolean}
@@ -53,8 +53,17 @@ export class Login extends React.Component<Props, State> {
             <Grid textAlign='center' style={{ height: '100vh' }} verticalAlign='middle'>
                 <Grid.Column style={{ maxWidth: 450 }}>
                 <Header as='h2' color='blue' textAlign='center'>
-                    Log-in with your <a href={T.endPointPath.codalab}>Codalab</a> account
+                    Log-in with your <a href={T.endPointPath.codalab}>Codalab</a> account at <a target="_blank" href="https://worksheets.codalab.org/">worksheets.codalab.org</a>
                 </Header>
+                <Message warning>
+                    <MessageContent>
+                        Due to CORS restriction, the CodaLab at worksheets.codalab.org is brought to the current domain with reverse proxy. This means 
+                        your CodaLab credentials will pass through our server. If that is an issue for you, consider making a test account or 
+                        <a target="_blank" href="https://github.com/jyh1/workflow#start-your-own-instance"> running your own Workflow instance</a>
+                        <br/>
+                        More information about the backend setup and authentication can be found <a target="_blank" href="https://github.com/jyh1/workflow#backend-setup">here</a>.                        
+                    </MessageContent>
+                </Message>
                 <Form error={this.state.loginError} warning={from != 'workflow/'} size='large'>
                     <Segment stacked>
                         <Form.Input 
