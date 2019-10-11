@@ -54,7 +54,7 @@ class BundleEntry extends React.Component<BundleProps, BundleState>{
         const {state} = this.state
         const running = !notRunning(state)
         if (running){
-            delay(5000)
+            delay(3000 + 3000 * Math.random()) // alleviate the slow down when a large number of bundles in current worksheet are running at the same time
             .then(() => bundleInfoReq(this.props.uuid))
             .then(res => this._isMounted && this.setState(prev => Object.assign(prev, {state: res.state, size: res.metadata.data_size})))
             .then(() => this._isMounted && this.updateState())
