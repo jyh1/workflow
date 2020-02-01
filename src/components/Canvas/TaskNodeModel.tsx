@@ -79,9 +79,8 @@ export class TaskNodeModel extends DefaultNodeModel {
 		}
 		this.refresh()
 		this.initialize = this.loadTask(taskreq)
-		this.initialize
-		.catch(() => { this.error({type: "error",  header: "Error Loading Tool", body: <p/>}); this.remove()})
-		.finally(this.refresh)
+		this.initialize.then(this.refresh)
+		.catch(() => { this.error({type: "error",  header: "Error Loading Tool", body: <p/>}); this.remove(); this.refresh()})
 
 		this.unselectable = this.toggleEditor
 		this.addListener({selectionChanged: ({isSelected}) => {this.selected = (!this.unselectable) && isSelected} })
