@@ -21,12 +21,12 @@ export class BundleTable extends React.Component<BTProps, BTState>{
                         </Table.Row>
                     </Table.Header>
                     <Table.Body>
-                        {... _.map(this.props.bundles, 
-                            b => 
-                                (<BundleEntry 
-                                    uuid={b.uuid} 
-                                    name={b.metadata.name} 
-                                    size={b.metadata.data_size} 
+                        {... _.map(this.props.bundles,
+                            b =>
+                                (<BundleEntry
+                                    uuid={b.uuid}
+                                    name={b.metadata.name}
+                                    size={b.metadata.data_size}
                                     state={b.state}
                                     key = {b.uuid}
                                 />))
@@ -54,7 +54,7 @@ class BundleEntry extends React.Component<BundleProps, BundleState>{
         const {state} = this.state
         const running = !notRunning(state)
         if (running){
-            delay(3000 + 3000 * Math.random()) // alleviate the slow down when a large number of bundles in current worksheet are running at the same time
+            delay(10000 + 10000 * Math.random()) // alleviate the slow down when a large number of bundles in current worksheet are running at the same time
             .then(() => bundleInfoReq(this.props.uuid))
             .then(res => this._isMounted && this.setState(prev => Object.assign(prev, {state: res.state, size: res.metadata.data_size})))
             .then(() => this._isMounted && this.updateState())
@@ -68,11 +68,11 @@ class BundleEntry extends React.Component<BundleProps, BundleState>{
         this._isMounted = true;
         this.updateState()
     }
-    
+
     dragStart: React.DragEventHandler = (event) => {
         const dragdata: T.BundleDragType = {uuid: this.props.uuid, name: this.props.name}
         event.dataTransfer.setData(T.bundleTag
-            , JSON.stringify(dragdata)); 
+            , JSON.stringify(dragdata));
     }
 
 
