@@ -39,6 +39,9 @@ export class HomeApp extends React.Component<Props, State>{
     componentDidMount(){
         this.changeWorksheet()
         // userInfoReq().then(userinfo => this.setState(prev => ({...prev, userinfo})))
+        window.onbeforeunload = (ev: BeforeUnloadEvent) => {
+            return "Contents on canvas might not be saved."
+        }
     }
     refreshBundle(){
         return (localforage.getItem("worksheet")
@@ -98,12 +101,12 @@ export class HomeApp extends React.Component<Props, State>{
                     <ToolPanel report={this.addException} codalang={this.state.codalang} doneSave={this.doneSave}/>
                     <SplitPane split="vertical" defaultSize={385} primary="second" minSize={385} pane2Style={{overflowY: "auto"}}>
                         <Canvas report={this.addException} nodes = {[]} refreshBundle={refreshBundle} doSave={this.doSave} />
-                        <WorksheetPanel 
+                        <WorksheetPanel
                             report={this.addException}
-                            refreshBundle={refreshBundle} 
-                            content={this.state.currentWorksheet} 
-                            changeWorksheet={changeWorksheet} 
-                            loading={this.state.loadingWorksheet} 
+                            refreshBundle={refreshBundle}
+                            content={this.state.currentWorksheet}
+                            changeWorksheet={changeWorksheet}
+                            loading={this.state.loadingWorksheet}
                         />
                     </SplitPane>
                 </SplitPane>
@@ -129,8 +132,8 @@ class PrivateRoute<T extends RouteProps = RouteProps> extends Route<T>{
             <Route
                 {... rest}
                 component={(props : object) =>(
-                    getLoginStatus() ? 
-                        (React.createElement(component, props)) : 
+                    getLoginStatus() ?
+                        (React.createElement(component, props)) :
                         (<Redirect
                             to={{
                                 pathname: endPointPath.login,
