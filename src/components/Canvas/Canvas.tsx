@@ -30,7 +30,7 @@ type State = {
     tab: Tab
 }
 
-const nullRes: State["compiled"] = 
+const nullRes: State["compiled"] =
     {command: null, codalang: null, jlang: null, codalangstr: null, interface: null, graph: null}
 
 type ConflictPort = T.JObject<"conflictport", {portname: string}>
@@ -95,7 +95,7 @@ export class Canvas extends React.Component<Props, State>{
             toolLayout.push({toolinfo: extras, pos: {x: n.x - x0, y: n.y - y0}, oldid: id, name})
             name = toolName(name)
 
-            
+
             // argument node
             if (extras.nodeType == "argument"){
                 const args = extras.task.taskbody as T.Arguments
@@ -126,17 +126,17 @@ export class Canvas extends React.Component<Props, State>{
                 oldPortIdMap[[id, isInport, portname].toString()] = p.id
                 if(isInport){
                     // input port
-                    if (p.links.length == 0){ 
+                    if (p.links.length == 0){
                         if (portname in argNodeDict){
                             const e: ConflictPort = {type: "conflictport", content: {portname}}
                             throw e
                         }else {
                             argNodeDict[portname] = (p as any).codatype
-                            argDic[portname] = {type: "var", content: portname}    
+                            argDic[portname] = {type: "var", content: portname}
                         }
                     } else {
                         let link = p.links[0]
-                        argDic[portname] = {type: "linkid", content: link}    
+                        argDic[portname] = {type: "linkid", content: link}
                     }
                 } else {
                     // output port
@@ -214,7 +214,7 @@ export class Canvas extends React.Component<Props, State>{
             compileReq(nodes)
             .then((res) => {
                 buildCommand(res.jlang)
-                .then( command => 
+                .then( command =>
                     {
                         codalangstr = codalangstr || res.codalangstr
                         codalang = codalang || res.codalang
@@ -227,7 +227,7 @@ export class Canvas extends React.Component<Props, State>{
             .catch(e => {
                 this.setState(p => ({...p, loading: false}))
                 this.props.report(fromException(e))
-            }) 
+            })
         } catch (error) {
             this.setState(p => ({...p, compiled: nullRes}))
             const einfo: ConflictPort | CircleErr | EmptyGraph = error
@@ -290,12 +290,14 @@ export class Canvas extends React.Component<Props, State>{
             .then(res => {
                 this.runningInfo.currentInfo = {type: "positive", header: "Execution Complete", body: <p/>}
                 this.reportRunning()
+                this.setState(prev => Object.assign(prev, {running: false}))
                 })
             .catch(err => {
                 const {infoid} = this.runningInfo
                 this.props.report({type: "error", header: "Runtime Error", body: <p/>, update: {id: infoid}})
+                this.setState(prev => Object.assign(prev, {running: false}))
             })
-            .finally(()=>{this.setState(prev => Object.assign(prev, {running: false}))})
+            // .finally(()=>{this.setState(prev => Object.assign(prev, {running: false}))})
         }
     }
 
@@ -304,7 +306,7 @@ export class Canvas extends React.Component<Props, State>{
             this.lockWarning()
             return
         }
-        const info: T.ConfirmInfo = 
+        const info: T.ConfirmInfo =
             {  header: "Clear Canvas?"
             , confirm: () => {_.forEach(this.engine.getDiagramModel().getNodes(), n => n.remove()); this.setState(p => ({...p, compiled: nullRes}))}
             , type: "confirm"
@@ -314,12 +316,12 @@ export class Canvas extends React.Component<Props, State>{
 
     dragStart: React.DragEventHandler = (event) => {
         let dragData : TaskDragType = {taskinfo: {type: "empty", content: {}}, name: "New Tool"}
-        event.dataTransfer.setData(taskTag, JSON.stringify(dragData)); 
+        event.dataTransfer.setData(taskTag, JSON.stringify(dragData));
     }
 
     dragArgumentStart: React.DragEventHandler = (event) => {
         let dragData : TaskDragType = {taskinfo: {type: "empty", content: {}}, name: "Arguments", nodetype: "argument"}
-        event.dataTransfer.setData(taskTag, JSON.stringify(dragData)); 
+        event.dataTransfer.setData(taskTag, JSON.stringify(dragData));
     }
 
     zoom = (factor: number) => {
@@ -406,16 +408,16 @@ export class Canvas extends React.Component<Props, State>{
                     <S.Menu.Menu position='right' style={{paddingTop: "3px", paddingBottom: "5px"}}>
 
                         <S.ButtonGroup style={{marginRight: "10px"}}>
-                            <S.Popup content={locked? "Unlock Canvas": "Lock Canvas"} trigger = 
-                                {<S.Button 
+                            <S.Popup content={locked? "Unlock Canvas": "Lock Canvas"} trigger =
+                                {<S.Button
                                     basic
                                     color={locked? 'red' : 'blue'}
                                     icon={locked? "lock open" : "lock"}
                                     onClick={() => this.setState(p => ({...p, locked: !p.locked}))}
                                 />}
                             />
-                            <S.Popup content="Clear Canvas" trigger = 
-                                {<S.Button 
+                            <S.Popup content="Clear Canvas" trigger =
+                                {<S.Button
                                     basic
                                     color='red'
                                     icon='trash alternate outline'
@@ -423,7 +425,7 @@ export class Canvas extends React.Component<Props, State>{
                                 />}
                             />
                         </S.ButtonGroup>
-                    
+
                         {/* <S.ButtonGroup style={{marginRight: "10px"}}>
                             <S.Button icon="zoom in" basic color="blue" onClick={() => this.zoom(1.25)}/>
                             <S.Button icon="zoom out" basic color="blue" onClick={() => this.zoom(0.8)}/>
@@ -433,31 +435,31 @@ export class Canvas extends React.Component<Props, State>{
                         </S.ButtonGroup> */}
 
                         <S.ButtonGroup style={{marginRight: "10px"}}>
-                            <S.Popup content='Build' trigger = 
-                                {<S.Button 
+                            <S.Popup content='Build' trigger =
+                                {<S.Button
                                     basic
                                     color='blue'
-                                    icon='cogs' 
-                                    loading={this.state.loading} 
+                                    icon='cogs'
+                                    loading={this.state.loading}
                                     onClick={this.compile.bind(this)}/>}
                             />
-                            <S.Popup content='Run' trigger = 
-                                {<S.Button 
+                            <S.Popup content='Run' trigger =
+                                {<S.Button
                                     basic
                                     color='blue'
-                                    icon='play' 
-                                    loading={running} 
-                                    disabled={jlang? false : true} 
+                                    icon='play'
+                                    loading={running}
+                                    disabled={jlang? false : true}
                                     onClick={this.run.bind(this)}
                                 />}
                             />
-                            <S.Popup content='Save' trigger = 
-                                {<S.Button 
+                            <S.Popup content='Save' trigger =
+                                {<S.Button
                                     basic
                                     color='blue'
                                     icon='save'
-                                    loading={running} 
-                                    disabled={codalang? false : true} 
+                                    loading={running}
+                                    disabled={codalang? false : true}
                                     onClick={() => this.props.doSave(codalang, graph, codalangstr)}
                                 />}
                             />
@@ -469,7 +471,7 @@ export class Canvas extends React.Component<Props, State>{
                 </S.Menu>
 
                 <S.Segment attached='bottom' className="canvas-segment">
-                    {tab == "Execution Plan"? 
+                    {tab == "Execution Plan"?
                         (<div style={{height: "100%"}}>
                             <Execution codalang={codalangstr} command={command} />
                         </div>
@@ -484,9 +486,9 @@ export class Canvas extends React.Component<Props, State>{
                     >
                         <div className = "srd-demo-workspace__content">
                             <SRD.DiagramWidget
-                                className="srd-demo-canvas" 
-                                allowLooseLinks={false} 
-                                diagramEngine={this.engine} 
+                                className="srd-demo-canvas"
+                                allowLooseLinks={false}
+                                diagramEngine={this.engine}
                                 allowCanvasZoom={false}
                                 allowCanvasTranslation={!this.state.locked}
                                 deleteKeys={[46]}
