@@ -3,7 +3,7 @@ import * as _ from "lodash"
 import * as S from 'semantic-ui-react'
 import {evalJLang} from "../Interpreter"
 import * as T from '../Types'
-import "brace/mode/haskell";
+// import "brace/mode/haskell";
 import "brace/mode/sh";
 import "brace/theme/github";
 import AceEditor from "react-ace";
@@ -22,7 +22,7 @@ export class Execution extends React.Component<Props, State>{
             <S.Grid.Column width={leftwidth}>
                 <S.Header>Out.cl</S.Header>
                 <AceEditor
-                mode="haskell"
+                // mode="haskell"
                 theme="github"
                 value={codalang}
                 readOnly
