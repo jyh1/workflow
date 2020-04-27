@@ -221,9 +221,15 @@ export class Canvas extends React.Component<Props, State>{
                         this.setState(p => ({...p, compiled: {...res, codalangstr, codalang, command, graph: layoutg}, loading: false}))
                     }
                 )
-                return res.interface
+                let msg: T.MessageInfo
+                if (res.jlang){
+                    msg = {type:"positive", header: "Build Success", body: <p>{res.interface}</p>, timeout: 3000}
+                } else {
+                    msg = {type:"warning", header: "Unfilled Input Ports", body: <p>{"A function is built with type: ".concat(res.interface)}</p>}
+                }
+                return msg
             })
-            .then((inter) => this.props.report({type: "positive", header: "Build Sucess", body: <p>{inter}</p>, timeout: 3000}))
+            .then(msg => this.props.report(msg))
             .catch(e => {
                 this.setState(p => ({...p, loading: false}))
                 this.props.report(fromException(e))
