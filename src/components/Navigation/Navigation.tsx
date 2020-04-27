@@ -20,7 +20,7 @@ export class Navigation extends React.Component<{}, {username: string}>{
         return (
             <S.Menu secondary id="topmenu">
                 <S.MenuItem>
-                    <S.Header color="blue">Codalab Workflow</S.Header>
+                    <S.Header color="blue">BENTO</S.Header>
                 </S.MenuItem>
                 <S.Menu.Item position='right' style={{padding: "0"}}>
                     <S.ButtonGroup style={{marginRight: "20px"}}>
