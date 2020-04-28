@@ -75,15 +75,13 @@ export class HomeApp extends React.Component<Props, State>{
         } else {
             timestamp = new Date().getTime()
         }
-        let newinfos = new Map(this.state.infos)
-        newinfos.set(timestamp, e)
-        this.setState(p => ({...p, infos: newinfos}))
+        this.state.infos.set(timestamp, e)
+        this.forceUpdate()
         return timestamp
     }
     removeException = (id: number) => {
-        let newinfos = new Map(this.state.infos)
-        newinfos.delete(id)
-        this.setState(p => ({...p, infos: newinfos}))
+        this.state.infos.delete(id)
+        this.forceUpdate()
     }
 
 

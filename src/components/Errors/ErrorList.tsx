@@ -30,7 +30,7 @@ const InfoMsg: React.SFC<{info: T.MessageInfo, close: () => void}> = (props) => 
     switch(props.info.type){
         case "confirm":
             const {confirm, header} = props.info
-            const info: T.Info = 
+            const info: T.Info =
                 {header: header
                     , type: "warning"
                     , body: (
