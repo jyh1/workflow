@@ -89,7 +89,6 @@ class BundleEntry extends React.Component<BundleProps, BundleState>{
                 , body: <p>{this.props.uuid}</p>
             }
             const msgid = report(actioninfo)
-            console.log(msgid)
             clReq("", "rm " + this.props.uuid)
             .then(() => {this._isMounted && this.setState(p => ({...p, removed: true}))})
             .then(() => {
