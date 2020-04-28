@@ -3,7 +3,8 @@ import {Table, Loader, Popup} from 'semantic-ui-react'
 import * as _ from 'lodash'
 import * as T from '../Types'
 import {humanFileSize} from '../algorithms'
-import {bundleInfoReq, clReq} from '../MockRequests'
+import {bundleInfoReq} from '../Requests'
+import {clReq} from '../MockRequests'
 import { delay } from "q";
 
 // bundle table
