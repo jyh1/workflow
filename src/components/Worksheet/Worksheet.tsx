@@ -8,8 +8,14 @@ import {MarkupText} from './Markup'
 
 const worksheetLink = (uuid: string) => T.endPointPath.codalab + "worksheets/" + uuid
 
-type Props = T.WorksheetContent & 
-    {loading: boolean, refreshBundle: () => void, selectWorksheet: (uuid: string) => void, goBack: () => void}
+type Props = T.WorksheetContent &
+    {
+        loading: boolean
+        , refreshBundle: () => void
+        , selectWorksheet: (uuid: string) => void
+        , goBack: () => void
+        , report: (info: T.MessageInfo) => number
+    }
 type State = {}
 
 export class Worksheet extends React.Component<Props, State>{
@@ -17,12 +23,12 @@ export class Worksheet extends React.Component<Props, State>{
         super(props)
     }
     render(){
-        const {items, uuid, name, title, refreshBundle, selectWorksheet} = this.props
+        const {items, uuid, name, title, refreshBundle, selectWorksheet, report} = this.props
         const headername = title? title: name
-        const displayItems = items.length == 0 ? 
+        const displayItems = items.length == 0 ?
             <div className="emptyWorksheet">(Empty)</div>
             :(<React.Fragment>
-                {... _.map(items, (item, ind) => <WorksheetItem selectWorksheet={selectWorksheet} key={uuid + ind} item={item} />)}
+                {... _.map(items, (item, ind) => <WorksheetItem report={report} selectWorksheet={selectWorksheet} key={uuid + ind} item={item} />)}
             </React.Fragment>)
         return(
             <React.Fragment>
@@ -50,10 +56,10 @@ export class Worksheet extends React.Component<Props, State>{
     }
 }
 
-const WorksheetItem: React.SFC<{item: T.WorksheetItem, selectWorksheet: (uuid: string) => void}> = (props) => {
+const WorksheetItem: React.SFC<{item: T.WorksheetItem, selectWorksheet: (uuid: string) => void, report: (info: T.MessageInfo) => number}> = (props) => {
     // console.log(props.item)
     if (props.item.type == "bundles"){
-        return( <BundleTable bundles={props.item.content} />)
+        return( <BundleTable report={props.report} bundles={props.item.content} />)
     }
     if (props.item.type == "markup"){
         return( <MarkupText text={props.item.content}/> )
@@ -67,9 +73,9 @@ const Subworksheets: React.SFC<{worksheets: T.Worksheet[], selectWorksheet: (uui
     return(
         <Table selectable fixed singleLine compact='very'>
             <Table.Body>
-                {... _.map(props.worksheets, 
+                {... _.map(props.worksheets,
                     b => (<Table.Row key={b.uuid}>
-                            <Table.Cell 
+                            <Table.Cell
                                 collapsing
                                 onClick={() => props.selectWorksheet(b.uuid)}
                                 style={{paddingLeft: "50px"}}

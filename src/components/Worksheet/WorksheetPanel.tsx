@@ -14,7 +14,7 @@ type Props = {
     , content: T.WorksheetContent
     , loading: boolean
     , refreshBundle: () => void
-    , report: (err: T.Info) => void
+    , report: (err: T.Info) => number
 }
 type State = {worksheets: T.Worksheet[], stack: string[]}
 
@@ -73,7 +73,7 @@ export class WorksheetPanel extends React.Component<Props, State>{
                 <SegmentGroup className="newsegment">
                     <WorksheetDropdown selectWorksheet={this.changeWorksheet.bind(this)} uuid={content.uuid} worksheets={this.state.worksheets} />
                     <SegmentGroup>
-                        <Worksheet goBack={this.goBack} {...content} loading={loading} refreshBundle={refreshBundle} selectWorksheet={this.changeWorksheet.bind(this)}/>
+                        <Worksheet report={report} goBack={this.goBack} {...content} loading={loading} refreshBundle={refreshBundle} selectWorksheet={this.changeWorksheet.bind(this)}/>
                     </SegmentGroup>
                 </SegmentGroup>
             </React.Fragment>

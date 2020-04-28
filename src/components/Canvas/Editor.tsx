@@ -5,7 +5,7 @@ import {Segment, Button, Icon, Popup, Header } from 'semantic-ui-react'
 import * as T from '../Types'
 import {parseReq, parseArgReq} from "../Requests"
 import {fromException} from "../Errors/FromException"
-import "brace/mode/haskell";
+// import "brace/mode/haskell";
 import "brace/theme/github";
 
 type Props = {
@@ -87,16 +87,16 @@ export class CodaEditor extends React.Component<Props, State>{
         const {codaval, value,line, col} = this.state
         let markers: any[] = []
         if (typeof line == "number"){
-            markers = 
+            markers =
                 [{startRow: line, startCol: 0, endRow: line, endCol: col, className: 'error-marker', type: 'background'}]
         }
         const compiled = codaval? true : false
         return(
-            <Segment style={{margin: "0", padding: "0"}} 
+            <Segment style={{margin: "0", padding: "0"}}
                 onDrop={this.processDrop}
             >
                 <AceEditor
-                    mode="haskell"
+                    // mode="haskell"
                     theme="github"
                     onChange={this.handleInput}
                     editorProps={{ $blockScrolling: true }}

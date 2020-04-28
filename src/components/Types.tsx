@@ -7,18 +7,18 @@ export interface Tool {
 
 export type Arguments = {[arg: string]: CodaType}
 
-export type CodaType = 
-      "bundle" 
-    | "string" 
-    | {type: "record", content: Arguments} 
-    | {type: "lambda", arg: Arguments, body: CodaType} 
+export type CodaType =
+      "bundle"
+    | "string"
+    | {type: "record", content: Arguments}
+    | {type: "lambda", arg: Arguments, body: CodaType}
 
 export interface JObject<T, C> {
     "type": T
     "content": C
 }
-export type JVar = JObject<"variable", string> 
-export type JVerbatim = JObject <"value", string> 
+export type JVar = JObject<"variable", string>
+export type JVerbatim = JObject <"value", string>
 export type JDir = JObject<"dir", {root: JVar | JVerbatim, path: string[]}>
 export type JNormalRes = JVar | JVerbatim | JDir
 export type JRec = JObject<"record", {[key: string]: JRes}>
@@ -98,16 +98,16 @@ export type UserInfo = {attributes: {user_name: string}, id: string}
 // graph representation
 export type ToolPort = JObject <NodeType, {nodeid: string, label: string, nodename: string}>
 export interface ToolNodeInterface<PortType> {
-    name: string; 
-    id: string; 
-    taskbody: CodaVal | Arguments; 
+    name: string;
+    id: string;
+    taskbody: CodaVal | Arguments;
     arguments: {[arg: string]: PortType}
     nodeType: NodeType
 }
 export type ToolNode = ToolNodeInterface<ToolPort>
 
 // optional type dict for arguments
-export type CodaGraph = 
+export type CodaGraph =
     {
           args?: TypeDict
         , body: ToolNode[]
@@ -163,16 +163,16 @@ export const Resources: [keyof BundleMeta, string | boolean | number][] = [
   , ["request_gpus", 0]
   , ["request_cpus", 1]
   , ["request_memory", "2g"]
-  , ["request_network", false], 
+  , ["request_network", false],
   , ["request_time", ""]
   , ["request_queue", ""]
   , ["request_disk", ""]
   , ["allow_failed_dependencies", false]
 ]
 
-export type WorksheetItem = 
-    JObject<"bundles", BundleInfo[]> 
-    | JObject<"markup", string> 
+export type WorksheetItem =
+    JObject<"bundles", BundleInfo[]>
+    | JObject<"markup", string>
     | JObject <"subworksheets", Worksheet[]>
 
 export type WorksheetContent = {items: WorksheetItem[]} & Worksheet
@@ -187,13 +187,13 @@ export type UpdateTool = {id: string, name: string, description: string}
 export type NodeType = "tool" | "argument"
 
 
-export type Exception = 
-    (({type: "parser", line: number, column: number} 
+export type Exception =
+    (({type: "parser", line: number, column: number}
         | {type: "type"}
-    ) 
+    )
     & {info: string})
 
-export type Info = 
+export type Info =
     {
       type: "positive" | "warning" | "error"  | "loading"
     , header: string
@@ -210,11 +210,11 @@ export type ConfirmInfo =
 export type MessageInfo = Info | ConfirmInfo
 
 export const endPointPath = {
-      login: "/workflow/demologin"
-    , mainapp: "/workflowdemo"
+      login: "/bento/demologin"
+    , mainapp: "/bentodemo"
     , rest: "/rest/"
     , codalab: "/"
-    , tool: "/workflow/tool/"
+    , tool: "/bento/tool/"
 }
 
 export function makeLitTask(uuid: string): Task{
