@@ -339,3 +339,7 @@ export const clet = (v: string, val: CodaVal, body: CodaVal): ILet => ({tag: "Le
 export const dict = (d: {[k: string]: CodaVal}): IDict => ({tag: "Dict", contents: d})
 export const lambda = (arg: {[k: string]: CodaType}, body: CodaVal): ILambda => ({tag: "Lambda", contents: [arg, body]})
 export const apply = (fun: CodaVal, ad: {[k: string]: CodaVal}): IApply => ({tag: "Apply", contents: [fun, ad]})
+
+
+// worksheet UUID at worksheets.codalab.org
+export const demoHome = "0xf8c11c7fd6184353949fad742c6133a7"
