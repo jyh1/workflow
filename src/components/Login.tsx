@@ -59,14 +59,15 @@ export class Login extends React.Component<Props, State> {
                 <Header as='h2' color='blue' textAlign='center'>
                     Log-in with your <a href={T.endPointPath.codalab}>Codalab</a> account
                 </Header>
+
                 <Form error={this.state.loginError} warning={from != 'workflow/'} size='large'>
                     <Segment stacked>
-                        <Form.Input 
-                            fluid 
-                            icon='user' 
-                            iconPosition='left' 
+                        <Form.Input
+                            fluid
+                            icon='user'
+                            iconPosition='left'
                             name="username"
-                            placeholder='Codalab Username' 
+                            placeholder='Codalab Username'
                             autoFocus={true}
                             onChange={this.handleInputChange}
                             error={this.state.loginError}
@@ -94,6 +95,15 @@ export class Login extends React.Component<Props, State> {
                         </Button>
                     </Segment>
                 </Form>
+                <Message
+                    content={
+                        <React.Fragment>
+                            Login with your account at <a href="https://worksheets.codalab.org/">worksheets.codalab.org</a>.
+                            Visit <a href="https://github.com/jyh1/workflow#authentication">here</a> for more information on the
+                            backend setup.
+                        </React.Fragment>
+                    }
+                />
                 <Message>
                     <Message.List>
                         <Message.Item>
