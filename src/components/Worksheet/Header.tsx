@@ -58,13 +58,23 @@ export class WorksheetButtons extends React.Component<BProps, BState>{
                 <Popup
                     content="Refresh Panel"
                     trigger={
-                        <Button 
-                            icon="refresh" 
+                        <Button
+                            icon="refresh"
                             onClick={() => props.refreshPanel(props.uuid)}
                             basic color="blue"
                         />}
                 />
-            </Button.Group>)
+                <Popup
+                    content="Demo Worksheet"
+                    trigger={
+                        <Button
+                            icon="question"
+                            onClick={() => props.refreshPanel(T.demoHome)}
+                            basic color="blue"
+                        />}
+                />
+            </Button.Group>
+            )
         }
 }
 
@@ -77,7 +87,7 @@ export class WorksheetDropdown extends React.Component <Props, State>{
     }
 
     render(){
-        let options = 
+        let options =
                 _.map(
                     this.props.worksheets
                     , res => ({key: res.uuid, value: res.uuid, text: res.name})
@@ -91,9 +101,9 @@ export class WorksheetDropdown extends React.Component <Props, State>{
                         options={options}
                         onChange={(event, data) => {this.props.selectWorksheet(data.value as string)}}
                         value={this.props.uuid}
-                    />  
+                    />
                 </span>
-            </Segment>       
+            </Segment>
         )
     }
 }
@@ -131,7 +141,7 @@ class NewWorsheetForm extends React.Component<MProps, MState>{
                         <Icon name='plus'/> Create
                     </Button>
                 </Form>
-                    
+
             </React.Fragment>
         )
     }
@@ -170,7 +180,7 @@ class InputWorksheetUUID extends React.Component<IProps, IState>{
                         <Icon name='search'/> Search
                     </Button>
                 </Form>
-                    
+
             </React.Fragment>
         )
     }
