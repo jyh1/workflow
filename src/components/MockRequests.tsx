@@ -90,8 +90,8 @@ function genEle(dep: number):TaskElement {
     let id = numEle.toString()
     if (dep > 5) {return ({name: "task" + id, taskid: id, id: id, description: "max depth"})}
     return (
-        coin() ? 
-              {name: "task" + id, taskid: id, id: id, description: "mock file description"} 
+        coin() ?
+              {name: "task" + id, taskid: id, id: id, description: "mock file description"}
             : {name: "folder" + id, children: _.map([newdep, newdep, newdep], genEle), id: id, description: "mock folder description"}
     )
 }
@@ -124,7 +124,7 @@ const makeVar: (x: string) => JVar = (x) => ({type: "variable", content: x})
 
 const testRes: JVar = {
     //   type: "record"
-    // , content: 
+    // , content:
     //     {"key1": makeVar("x"), "key2": makeVar("y")}
       type: "variable"
     , content: "dir"
@@ -191,7 +191,7 @@ export const worksheetsReq: T.WorksheetsRequest = () => (
         setTimeout(
             () => {
                 let data = [
-                    {uuid: "0xc06bcc842af34cd5a30f7feeea52ab1d", name: "workflow-demo", title: "Workflow Demo"}
+                    {uuid: T.demoHome, name: "bento-tutorial", title: "Workflow Demo"}
                     , {uuid: "0x818930127c4d47de84c1ceaadf04d014", name: "home", title: "Public Home"}
                 ]
                 executor(data)
@@ -236,7 +236,7 @@ export const bundleInfoReq: T.BundleInfoRequest = (uuid: string) => (
                         })
         , reqtime())
     })
-) 
+)
 
 export const parseReq: T.ParseRquest = (program: string) => (
     new Promise((executor, resolve) => {
@@ -244,7 +244,7 @@ export const parseReq: T.ParseRquest = (program: string) => (
             () => executor({"outports":{data: "bundle"},"inports":{},"taskbody":{"tag":"Dict","contents":{"data":{"tag":"Lit","contents":{"tag":"UUID","contents":"234"}}}}})
         , reqtime())
     })
-) 
+)
 
 export const parseArgReq: T.ParseArgRequest = (str: string) => (
     new Promise((executor, resolve) => {
@@ -252,7 +252,7 @@ export const parseArgReq: T.ParseArgRequest = (str: string) => (
             () => executor({"outports":{arg1: "bundle",arg2: "bundle"},"inports":{},"taskbody":{"arg1":"bundle","arg2":"bundle"}})
         , reqtime())
     })
-) 
+)
 
 export const updateToolReq: T.UpdateToolReq = (d) => mockRequest(d.id)
 export const newToolReq: T.NewToolReq = (t) => mockRequest("1")
@@ -264,4 +264,4 @@ export const userInfoReq: T.UserInfoReq = () => (
             () => executor({"attributes": {"email": "", "time_quota": 31536000, "last_login": "Sun Sep  8 06:53:28 2019", "affiliation": null, "date_joined": "Sat Sep  7 01:17:27 2019", "time_used": 0, "user_name": "demo", "parallel_run_quota": 3, "url": null, "notifications": 2, "last_name": "Demo", "disk_quota": 1099510000000, "disk_used": 19191, "first_name": "Demo"}, "id": "0x3227302d89d3482f9d2b7f772a824f77"} as T.UserInfo)
         , reqtime())
     })
-) 
+)
