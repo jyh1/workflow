@@ -65,7 +65,7 @@ export class WorksheetButtons extends React.Component<BProps, BState>{
                         />}
                 />
                 <Popup
-                    content="Demo Worksheet"
+                    content="Tutorial"
                     trigger={
                         <Button
                             icon="question"
