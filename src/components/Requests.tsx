@@ -10,7 +10,7 @@ type ContentType = 'application/json' | 'text/plain;charset=utf-8'
 function jsonRequest<T, R>(url: string, ctype : ContentType = 'application/json'): ((info: T) => Promise<R>){
     return(
         info => {
-            let req = fetch(url, 
+            let req = fetch(url,
                 {
                   headers: {"Content-Type":ctype}
                 , credentials: 'same-origin'
@@ -36,7 +36,7 @@ function processFetch<T>(res: Promise<Response>): Promise<T>{
 }
 
 export const loginReq: LoginRequest = (username, password) => {
-    let req = fetch(T.endPointPath.login, 
+    let req = fetch(T.endPointPath.login,
         {
           headers: {"Content-Type":'application/json'}
         , credentials: 'same-origin'
@@ -59,7 +59,7 @@ export const getLoginStatus = () => {
 }
 
 export const userInfoReq: T.UserInfoReq = () => (
-    processFetch(fetch(T.endPointPath.rest + 'user', 
+    processFetch(fetch(T.endPointPath.rest + 'user',
         {
           headers: {"Content-Type":'application/json'}
         , credentials: 'same-origin'
@@ -71,7 +71,7 @@ export const userInfoReq: T.UserInfoReq = () => (
 )
 
 export const taskListReq: TaskListRequest = () => (
-    processFetch(fetch(T.endPointPath.tool + 'list', 
+    processFetch(fetch(T.endPointPath.tool + 'list',
         {
           headers: {"Content-Type":'application/json'}
         , credentials: 'same-origin'
@@ -79,7 +79,7 @@ export const taskListReq: TaskListRequest = () => (
 )
 
 export const taskReq: TaskInfoRequest = (taskid) => (
-    processFetch(fetch(T.endPointPath.tool + taskid, 
+    processFetch(fetch(T.endPointPath.tool + taskid,
         {
           headers: {"Content-Type":'application/json'}
         , credentials: 'same-origin'
@@ -87,7 +87,7 @@ export const taskReq: TaskInfoRequest = (taskid) => (
 )
 
 export const toolGraphReq: T.ToolGraphRequest = (taskid) => (
-    fetch(T.endPointPath.tool + 'graph/' + taskid, 
+    fetch(T.endPointPath.tool + 'graph/' + taskid,
         {
           headers: {"Content-Type":'application/json'}
         , credentials: 'same-origin'
@@ -160,7 +160,7 @@ function parseWorksheetItem(item: any): T.WorksheetItem{
     return null
 }
 export const worksheetItemsReq: T.WorksheetItemsRequest = (worksheet) => {
-    let req = fetch(T.endPointPath.rest + 'interpret/worksheet/' + worksheet + '?include=items.bundles', 
+    let req = fetch(T.endPointPath.rest + 'interpret/worksheet/' + worksheet + '?include=items.bundles',
         {credentials: 'same-origin'})
         .then((res) => {
             if (!res.ok){
@@ -170,7 +170,7 @@ export const worksheetItemsReq: T.WorksheetItemsRequest = (worksheet) => {
         })
         .then(res => {
             let worksheetItems: T.WorksheetItem[] = []
-            for (let item of res.items){
+            for (let item of res.blocks){
                 let parsedItem = parseWorksheetItem(item)
                 if(parsedItem){
                     worksheetItems.push(parsedItem)
@@ -204,7 +204,7 @@ export const bundleInfoReq: T.BundleInfoRequest = (uuid: string) => (
         return (res.json())
     })
     .then(res => res.data.attributes)
-) 
+)
 
 export const parseReq: T.ParseRquest = jsonRequest(T.endPointPath.tool + 'parse', 'text/plain;charset=utf-8')
 
@@ -215,7 +215,7 @@ export const newToolReq: T.NewToolReq = jsonRequest(T.endPointPath.tool + 'creat
 export const updateToolReq: T.UpdateToolReq = jsonRequest(T.endPointPath.tool + 'update')
 
 export const removeEleReq: T.RemoveElementReq = (eid) => (
-    fetch(T.endPointPath.tool + '' + eid, 
+    fetch(T.endPointPath.tool + '' + eid,
     {
       headers: {"Content-Type":'application/json'}
     , credentials: 'same-origin'
