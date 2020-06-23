@@ -95,29 +95,38 @@ export class Canvas extends React.Component<Props, State>{
             toolLayout.push({toolinfo: extras, pos: {x: n.x - x0, y: n.y - y0}, oldid: id, name})
             name = toolName(name)
 
+            const uniquify = (name: string) => {
+                if (uniqName.has(name)){
+                    const count = uniqName.get(name)
+                    uniqName.set(name, count + 1)
+                    return (name + '-' + count)
+                } else {
+                    uniqName.set(name, 0)
+                    return name
+                }
+            }
+
+            const addArgument = (argname: string, ty: T.CodaType) => {
+                if (argname in argNodeDict){
+                    const e: ConflictPort = {type: "conflictport", content: {portname: argname}}
+                    throw e
+                } else {
+                    const unqName = uniquify(argname)
+                    argNodeDict[unqName] = ty
+                    return unqName
+                }
+            }
 
             // argument node
             if (extras.nodeType == "argument"){
                 const args = extras.task.taskbody as T.Arguments
                 for (const argname in args){
-                    if (argname in argNodeDict){
-                        const e: ConflictPort = {type: "conflictport", content: {portname: argname}}
-                        throw e
-                    } else {
-                        argNodeDict[argname] = args[argname]
-                    }
+                    addArgument(argname, args[argname])
                 }
-                argNodeDict = {...argNodeDict, ...(extras.task.taskbody as T.Arguments)}
             }
 
             // uniq name
-            if (uniqName.has(name)){
-                const count = uniqName.get(name)
-                uniqName.set(name, count + 1)
-                name = name + '-' + count
-            } else {
-                uniqName.set(name, 0)
-            }
+            name = uniquify(name)
             let argDic: ArgDic = {} // portname to linkid
             for (const p of ports){
                 const portname = (p as any).label
@@ -127,13 +136,7 @@ export class Canvas extends React.Component<Props, State>{
                 if(isInport){
                     // input port
                     if (p.links.length == 0){
-                        if (portname in argNodeDict){
-                            const e: ConflictPort = {type: "conflictport", content: {portname}}
-                            throw e
-                        }else {
-                            argNodeDict[portname] = (p as any).codatype
-                            argDic[portname] = {type: "var", content: portname}
-                        }
+                        argDic[portname] = {type: "var", content: addArgument(portname, (p as any).codatype)}
                     } else {
                         let link = p.links[0]
                         argDic[portname] = {type: "linkid", content: link}
